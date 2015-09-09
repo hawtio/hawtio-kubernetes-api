@@ -9,6 +9,7 @@ var gulp = require('gulp'),
     uri = require('URIjs'),
     urljoin = require('url-join'),
     s = require('underscore.string'),
+    stringifyObject = require('stringify-object'),
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
