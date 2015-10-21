@@ -1,12 +1,13 @@
 /// <reference path="kubernetesApiGlobals.d.ts" />
 declare module KubernetesAPI {
+    function currentKubernetesNamespace(): any;
     function kubernetesNamespacePath(): string;
     function apiPrefix(): string;
     function osApiPrefix(): string;
     function masterApiUrl(): string;
     function kubernetesApiPrefix(): string;
     function openshiftApiPrefix(): string;
-    function prefixForType(type: string): string;
+    function prefixForKind(kind: string): string;
     function kubernetesApiUrl(): string;
     function openshiftApiUrl(): string;
     function updateOrCreateObject(object: any, KubernetesModel: any, success?: (data) => void, error?: (error) => void): void;
@@ -19,6 +20,10 @@ declare module KubernetesAPI {
     function buildConfigsRestURL(): string;
     function routesRestURL(): string;
     function templatesRestURL(): string;
+    function wsScheme(url: string): string;
+    function wsUrl(url: string): URI;
+    function equals(left: any, right: any): boolean;
+    function getUID(entity: any): any;
     function getNamespace(entity: any): any;
     function getLabels(entity: any): any;
     function getName(entity: any): any;
@@ -58,24 +63,8 @@ declare module KubernetesAPI {
     function isRunning(podCurrentState: any): any;
     function selectorMatches(selector: any, labels: any): boolean;
     function getServiceRegistry(): any;
-    function kibanaLogsLink(ServiceRegistry: any): string;
-    function openLogsForPods(ServiceRegistry: any, $window: any, namespace: any, pods: any): void;
     function resizeController($http: any, KubernetesApiURL: any, replicationController: any, newReplicas: any, onCompleteFn?: any): void;
-    function statusTextToCssClass(text: any): string;
     function podStatus(pod: any): any;
-    function createAppViewPodCounters(appView: any): any[];
-    function createAppViewServiceViews(appView: any): any[];
     function gitPathToUrl(iconPath: any, branch?: string): string;
-    function enrichBuildConfig(buildConfig: any, sortedBuilds: any): void;
-    function enrichBuildConfigs(buildConfigs: any, sortedBuilds?: any): any;
-    function enrichBuilds(builds: any): {}[];
-    function enrichBuild(build: any): any;
-    function enrichDeploymentConfig(deploymentConfig: any): void;
-    function enrichDeploymentConfigs(deploymentConfigs: any): any;
-    function enrichImageRepository(imageRepository: any): void;
-    function enrichImageRepositories(imageRepositories: any): any;
-    function containerLabelClass(labelType: string): string;
-    function isForgeEnabled(): boolean;
-    function currentKubernetesNamespace(): any;
     function toRawJson(item: any): string;
 }

@@ -1,5 +1,4 @@
 /// <reference path="kubernetesApiPlugin.d.ts" />
-/// <reference path="kubernetesModel.d.ts" />
 declare module KubernetesAPI {
     class ServiceRegistryService {
         private model;

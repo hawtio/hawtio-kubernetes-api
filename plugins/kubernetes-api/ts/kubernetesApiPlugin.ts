@@ -70,7 +70,6 @@ module KubernetesAPI {
   }, true);
 
   hawtioPluginLoader.addModule('ngResource');
-  hawtioPluginLoader.addModule('restmod');
   hawtioPluginLoader.addModule(pluginName);
 
 }

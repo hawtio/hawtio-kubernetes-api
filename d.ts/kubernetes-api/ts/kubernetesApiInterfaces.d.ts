@@ -1,3 +1,12 @@
+interface SmokeSignals {
+    convert(obj: any, handlers?: any): any;
+}
+interface EventEnabled {
+    on(eventName: string, handler: Function): any;
+    once(eventName: string, handler: Function): any;
+    off(eventName: string, handler: Function): any;
+    emit(eventName: string, ...args: any[]): any;
+}
 declare module KubernetesAPI {
     class consts {
         NAMESPACE_STORAGE_KEY: string;

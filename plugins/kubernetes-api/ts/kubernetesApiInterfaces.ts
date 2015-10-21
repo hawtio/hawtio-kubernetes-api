@@ -1,3 +1,16 @@
+//def for third-party eventing library
+
+interface SmokeSignals {
+  convert(obj:any, handlers?:any);
+};
+
+interface EventEnabled {
+  on(eventName:string, handler:Function);
+  once(eventName:string, handler:Function);
+  off(eventName:string, handler:Function);
+  emit(eventName:string, ...args:any[]);
+};
+
 module KubernetesAPI {
 
   export class consts {

@@ -1,5 +1,4 @@
 /// <reference path="kubernetesApiPlugin.ts"/>
-/// <reference path="kubernetesModel.ts"/>
 
 module KubernetesAPI {
 
@@ -12,7 +11,7 @@ module KubernetesAPI {
    * underlying model has been created via dependency injection
    */
   export class ServiceRegistryService {
-    private model:KubernetesModelService = null;
+    private model:any = null;
 
     /**
      * Returns true if there is a service available for the given ID or false
@@ -58,7 +57,7 @@ module KubernetesAPI {
       return serviceLinkUrl(service);
     }
 
-    private getModel():KubernetesModelService {
+    private getModel():any {
       var answer = this.model;
       // lets allow lazy load so we can be invoked before the injector has been created
       if (!answer) {

@@ -1,10 +1,10 @@
 /// <reference path="kubernetesApiInterfaces.ts"/>
 /// <reference path="../../includes.ts"/>
 
+declare var smokesignals;
+
 module KubernetesAPI {
-  export var context = '/kubernetes';
-  export var hash = '#' + context;
-  export var defaultRoute = hash + '/apps';
+
   export var pluginName = 'KubernetesAPI';
   export var pluginPath = 'plugins/kubernetes-api/';
   export var templatePath = pluginPath + 'html/';
@@ -19,17 +19,16 @@ module KubernetesAPI {
   export var osConfig:KubernetesConfig = undefined;
   export var masterUrl = "";
 
-  export var defaultApiVersion = "v1";
-  export var defaultOSApiVersion = "v1";
+  export var K8S_PREFIX = 'api';
+  export var OS_PREFIX = 'oapi';
+
+  export var K8S_API_VERSION = 'v1';
+  export var OS_API_VERSION = 'v1';
+
+  export var defaultApiVersion = K8S_API_VERSION;
+  export var defaultOSApiVersion = OS_API_VERSION;
+
   export var labelFilterTextSeparator = ",";
-
   export var defaultNamespace = "default";
-
   export var appSuffix = ".app";
-
-  // kubernetes service names
-  export var kibanaServiceName = "kibana";
-  export var fabric8ForgeServiceName = "fabric8-forge";
-  export var gogsServiceName = "gogs";
-  export var isOpenShift = true;
 }

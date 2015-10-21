@@ -16,14 +16,12 @@
   ],
   "dependencies": {
     "angular-resource": "~1.3",
-    "angular-restmod": "~1.1.9",
     "hawtio-core": "~2.0.0",
     "hawtio-oauth": "~2.0.30",
     "hawtio-utilities": "~2.0.22"
   },
   "devDependencies": {
-    "hawtio-core-dts": "~2.0.0"
-  },
-  "resolutions": {
+    "hawtio-core-dts": "~2.0.0",
+    "bootstrap": "~3.3.5"
   }
 }

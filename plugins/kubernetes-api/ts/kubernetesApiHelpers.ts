@@ -2,6 +2,18 @@
 
 module KubernetesAPI {
 
+  /**
+   * Returns the current kubernetes selected namespace or the default one
+   */
+  export function currentKubernetesNamespace() {
+    var injector = HawtioCore.injector;
+    if (injector) {
+      var KubernetesState = injector.get("KubernetesState") || {};
+      return KubernetesState.selectedNamespace || defaultNamespace;
+    }
+    return defaultNamespace;
+  }
+
   export function kubernetesNamespacePath() {
     var ns = currentKubernetesNamespace();
     if (ns) {
@@ -14,7 +26,7 @@ module KubernetesAPI {
   export function apiPrefix() {
     var prefix = Core.pathGet(osConfig, ['api', 'k8s', 'prefix']);
     if (!prefix) {
-      prefix = 'api';
+      prefix = K8S_PREFIX;
     }
     return Core.trimLeading(prefix, '/');
   }
@@ -22,12 +34,15 @@ module KubernetesAPI {
   export function osApiPrefix() {
     var prefix = Core.pathGet(osConfig, ['api', 'openshift', 'prefix']);
     if (!prefix) {
-      prefix = 'oapi';
+      prefix = OS_PREFIX;
     }
     var answer = Core.trimLeading(prefix, '/');
+    /*
+      TODO - may not have a currently selected namespace
     if (!isOpenShift) {
-      return UrlHelpers.join(apiPrefix(), defaultOSApiVersion, "proxy", kubernetesNamespacePath(), "services/templates", answer);
+      return UrlHelpers.join(apiPrefix(), OS_API_VERSION, "proxy", kubernetesNamespacePath(), "services/templates", answer);
     }
+    */
     return answer;
   }
 
@@ -36,21 +51,21 @@ module KubernetesAPI {
   }
 
   export function kubernetesApiPrefix() {
-    return UrlHelpers.join(apiPrefix(), defaultApiVersion);
+    return UrlHelpers.join(apiPrefix(), OS_API_VERSION);
   }
 
   export function openshiftApiPrefix() {
-    return UrlHelpers.join(osApiPrefix(), defaultOSApiVersion);
+    return UrlHelpers.join(osApiPrefix(), K8S_API_VERSION);
   }
 
-  export function prefixForType(type:string) {
-    if (type === WatchTypes.NAMESPACES) {
+  export function prefixForKind(kind:string) {
+    if (kind === WatchTypes.NAMESPACES) {
       return kubernetesApiPrefix();
     }
-    if (_.any(NamespacedTypes.k8sTypes, (t) => t === type)) {
+    if (_.any(NamespacedTypes.k8sTypes, (t) => t === kind)) {
       return kubernetesApiPrefix();
     }
-    if (_.any(NamespacedTypes.osTypes, (t) => t === type)) {
+    if (_.any(NamespacedTypes.osTypes, (t) => t === kind)) {
       return openshiftApiPrefix();
     }
     return null;
@@ -118,7 +133,7 @@ module KubernetesAPI {
   }
 
   export function createResource(thing:string, urlTemplate:string, $resource: ng.resource.IResourceService, KubernetesModel) {
-    var prefix = prefixForType(thing);
+    var prefix = prefixForKind(thing);
     if (!prefix) {
       log.debug("Invalid type given: ", thing);
       return null;
@@ -174,6 +189,28 @@ module KubernetesAPI {
 
   export function templatesRestURL() {
     return UrlHelpers.join(openshiftApiUrl(), kubernetesNamespacePath(), "/templates");
+  }
+
+  export function wsScheme(url:string) {
+    var protocol = new URI(url).protocol() || 'http';
+    if (_.startsWith(protocol, 'https')) {
+      return 'wss';
+    } else {
+      return 'ws';
+    }
+  }
+
+  export function wsUrl(url:string) {
+    var protocol = wsScheme(url);
+    return new URI(url).scheme(protocol);
+  }
+
+  export function equals(left, right):boolean {
+    return getUID(left) === getUID(right);
+  }
+
+  export function getUID(entity) {
+    return Core.pathGet(entity, ['metadata', 'uid']);
   }
 
   export function getNamespace(entity) {
@@ -593,6 +630,7 @@ module KubernetesAPI {
   /**
    * Returns a link to the kibana logs web application
    */
+  /*
   export function kibanaLogsLink(ServiceRegistry) {
     var link = ServiceRegistry.serviceLink(kibanaServiceName);
     if (link) {
@@ -604,7 +642,9 @@ module KubernetesAPI {
       return null;
     }
   }
+  */
 
+  /*
   export function openLogsForPods(ServiceRegistry, $window, namespace, pods) {
     var link = kibanaLogsLink(ServiceRegistry);
     if (link) {
@@ -628,6 +668,7 @@ module KubernetesAPI {
       }
     }
   }
+  */
 
   export function resizeController($http, KubernetesApiURL, replicationController, newReplicas, onCompleteFn = null) {
     var id = getName(replicationController);
@@ -659,121 +700,8 @@ module KubernetesAPI {
       });
   }
 
-  export function statusTextToCssClass(text) {
-    if (text) {
-      var lower = text.toLowerCase();
-      if (lower.startsWith("run") || lower.startsWith("ok")) {
-        return 'fa fa-play-circle green';
-      } else if (lower.startsWith("wait") || lower.startsWith("pend")) {
-        return 'fa fa-download';
-      } else if (lower.startsWith("term") || lower.startsWith("error") || lower.startsWith("fail")) {
-        return 'fa fa-off orange';
-      } else if (lower.startsWith("succeeded")) {
-        return 'fa fa-check-circle-o green';
-      }
-    }
-    return 'fa fa-question red';
-  }
-
   export function podStatus(pod) {
     return getStatus(pod);
-  }
-
-  export function createAppViewPodCounters(appView) {
-    var array = [];
-    var map = {};
-    var pods = appView.pods;
-    var lowestDate = null;
-    angular.forEach(pods, pod => {
-      var selector = getLabels(pod);
-      var selectorText = labelsToString(selector, " ");
-      var answer = map[selector];
-      if (!answer) {
-        answer = {
-          labelText: selectorText,
-          podsLink: Core.url("/kubernetes/pods?q=" + encodeURIComponent(selectorText)),
-          valid: 0,
-          waiting: 0,
-          error: 0
-        };
-        map[selector] = answer;
-        array.push(answer);
-      }
-      var status = (podStatus(pod) || "Error").toLowerCase();
-      if (status.startsWith("run") || status.startsWith("ok")) {
-        answer.valid += 1;
-      } else if (status.startsWith("wait") || status.startsWith("pwnd")) {
-        answer.waiting += 1;
-      } else {
-        answer.error += 1;
-      }
-      var creationTimestamp = getCreationTimestamp(pod);
-      if (creationTimestamp) {
-        var d = new Date(creationTimestamp);
-        if (!lowestDate || d < lowestDate) {
-          lowestDate = d;
-        }
-      }
-    });
-    appView.$creationDate = lowestDate;
-    return array;
-  }
-
-  export function createAppViewServiceViews(appView) {
-    var array = [];
-    var pods = appView.pods;
-    angular.forEach(pods, pod => {
-      var id = getName(pod);
-      if (id) {
-        var abbrev = id;
-        var idx = id.indexOf("-");
-        if (idx > 1) {
-          abbrev = id.substring(0, idx);
-        }
-        pod.idAbbrev = abbrev;
-      }
-      pod.statusClass = statusTextToCssClass(podStatus(pod));
-    });
-
-    var services = appView.services || [];
-    var replicationControllers = appView.replicationControllers || [];
-    var size = Math.max(services.length, replicationControllers.length, 1);
-    var appName = appView.$info.name;
-    for (var i = 0; i < size; i++) {
-      var service = services[i];
-      var replicationController = replicationControllers[i];
-      var controllerId = getName(replicationController);
-      var name = getName(service) || controllerId;
-      var address = Core.pathGet(service, ["spec", "portalIP"]);
-      if (!name && pods.length) {
-        name = pods[0].idAbbrev;
-      }
-      if (!appView.$info.name) {
-        appView.$info.name = name;
-      }
-      if (!appView.id && pods.length) {
-        appView.id = getName(pods[0]);
-      }
-      if (i > 0) {
-        appName = name;
-      }
-      var podCount = pods.length;
-      var podCountText = podCount + " pod" + (podCount > 1 ? "s" : "");
-      var view = {
-        appName: appName || name,
-        name: name,
-        createdDate: appView.$creationDate,
-        podCount: podCount,
-        podCountText: podCountText,
-        address: address,
-        controllerId: controllerId,
-        service: service,
-        replicationController: replicationController,
-        pods: pods
-      };
-      array.push(view);
-    }
-    return array;
   }
 
   /**
@@ -783,343 +711,6 @@ module KubernetesAPI {
     return (HawtioCore.injector.get('AppLibraryURL') || '') + "/git/" + branch + iconPath;
   }
 
-
-  export function enrichBuildConfig(buildConfig, sortedBuilds) {
-    if (buildConfig) {
-      var triggerUrl:string = null;
-      var metadata = buildConfig.metadata || {};
-      var name = metadata.name;
-      buildConfig.$name = name;
-      if (name) {
-        angular.forEach([false, true], (flag) => {
-          angular.forEach(buildConfig.triggers, (trigger) => {
-            if (!triggerUrl) {
-              var type = trigger.type;
-              if (type === "generic" || flag) {
-                var generic = trigger[type];
-                if (type && generic) {
-                  var secret = generic.secret;
-                  if (secret) {
-                    triggerUrl = UrlHelpers.join(buildConfigHooksRestURL(), name, secret, type);
-                    buildConfig.$triggerUrl = triggerUrl;
-                  }
-                }
-              }
-            }
-          });
-        });
-
-        // lets find the latest build...
-        if (sortedBuilds) {
-          buildConfig.$lastBuild = _.find(sortedBuilds, {
-            metadata: {
-              labels: {
-                buildconfig: name
-              }
-            }
-          });
-        }
-      }
-      var $fabric8Views = {};
-
-      function defaultPropertiesIfNotExist(name, object, autoCreate = false) {
-        var view = $fabric8Views[name];
-        if (autoCreate && !view) {
-          view = {}
-          $fabric8Views[name] = view;
-        }
-        if (view) {
-          angular.forEach(object, (value, property) => {
-            var current = view[property];
-            if (!current) {
-              view[property] = value;
-            }
-          });
-        }
-      }
-
-      function defaultPropertiesIfNotExistStartsWith(prefix, object, autoCreate = false) {
-        angular.forEach($fabric8Views, (view, name) => {
-          if (view && name.startsWith(prefix)) {
-            angular.forEach(object, (value, property) => {
-              var current = view[property];
-              if (!current) {
-                view[property] = value;
-              }
-            });
-          }
-        });
-      }
-
-      var labels = metadata.labels || {};
-      var annotations = metadata.annotations || {};
-
-      // lets default the repo and user
-      buildConfig.$user = annotations["fabric8.jenkins/user"] || labels["user"];
-      buildConfig.$repo = annotations["fabric8.jenkins/repo"] || labels["repo"];
-
-      angular.forEach(annotations, (value, key) => {
-        var parts = key.split('/', 2);
-        if (parts.length > 1) {
-          var linkId = parts[0];
-          var property = parts[1];
-          if (linkId && property && linkId.startsWith("fabric8.link")) {
-            var link = $fabric8Views[linkId];
-            if (!link) {
-              link = {
-                class: linkId
-              };
-              $fabric8Views[linkId] = link;
-            }
-            link[property] = value;
-          }
-        }
-      });
-
-      if (buildConfig.$user && buildConfig.$repo) {
-        // browse gogs repo view
-        var gogsUrl = serviceLinkUrl(gogsServiceName);
-        if (gogsUrl) {
-          defaultPropertiesIfNotExist("fabric8.link.browseGogs.view", {
-            label: "Browse...",
-            url: UrlHelpers.join(gogsUrl, buildConfig.$user, buildConfig.$repo),
-            description: "Browse the source code of this repository",
-            iconClass: "fa fa-external-link"
-          }, true);
-        }
-
-        // run forge commands view
-        defaultPropertiesIfNotExist("fabric8.link.forgeCommand.view", {
-          label: "Command...",
-          url: UrlHelpers.join("/forge/commands/user", buildConfig.$user, buildConfig.$repo),
-          description: "Perform an action on this project",
-          iconClass: "fa fa-play-circle"
-        }, true);
-
-
-        // configure devops view
-        defaultPropertiesIfNotExist("fabric8.link.forgeCommand.devops.settings", {
-          label: "Settings",
-          url: UrlHelpers.join("/forge/command/devops-edit/user", buildConfig.$user, buildConfig.$repo),
-          description: "Configure the DevOps settings for this project",
-          iconClass: "fa fa-pencil-square-o"
-        }, true);
-
-      }
-
-      // add some icons and descriptions
-      defaultPropertiesIfNotExist("fabric8.link.repository.browse", {
-        label: "Browse...",
-        description: "Browse the source code of this repository",
-        iconClass: "fa fa-external-link"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.jenkins.job", {
-        iconClass: "fa fa-tasks",
-        description: "View the Jenkins Job for this build"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.jenkins.monitor", {
-        iconClass: "fa fa-tachometer",
-        description: "View the Jenkins Monitor dashboard for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.jenkins.pipeline", {
-        iconClass: "fa fa-arrow-circle-o-right",
-        description: "View the Jenkins Pipeline for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.letschat.room", {
-        iconClass: "fa fa-comment",
-        description: "Chat room for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.letschat.room", {
-        iconClass: "fa fa-comment",
-        description: "Chat room for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.taiga", {
-        iconClass: "fa fa-check-square-o",
-        description: "Issue tracker for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.issues", {
-        iconClass: "fa fa-check-square-o",
-        description: "Issues for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.releases", {
-        iconClass: "fa fa-tag",
-        description: "Issues for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.taiga.team", {
-        iconClass: "fa fa-users",
-        description: "Team members for this project"
-      });
-      defaultPropertiesIfNotExist("fabric8.link.team", {
-        iconClass: "fa fa-users",
-        description: "Team members for this project"
-      });
-      defaultPropertiesIfNotExistStartsWith("fabric8.link.environment.", {
-        iconClass: "fa fa-cloud",
-        description: "The kubernetes namespace for this environment"
-      });
-
-
-      // lets put the views into sections...
-      var $fabric8CodeViews = {};
-      var $fabric8BuildViews = {};
-      var $fabric8TeamViews = {};
-      var $fabric8EnvironmentViews = {};
-      angular.forEach($fabric8Views, (value, key) => {
-        var view;
-        if (key.indexOf("taiga") > 0 || key.indexOf(".issue") > 0 || key.indexOf("letschat") > 0|| key.indexOf(".team") > 0) {
-          view = $fabric8TeamViews;
-        } else if (key.indexOf("jenkins") > 0) {
-          view = $fabric8BuildViews;
-        } else if (key.indexOf(".environment.") > 0) {
-          view = $fabric8EnvironmentViews;
-        } else {
-          view = $fabric8CodeViews;
-        }
-        view[key] = value;
-      });
-
-
-      buildConfig.$fabric8Views = $fabric8Views;
-      buildConfig.$fabric8CodeViews = $fabric8CodeViews;
-      buildConfig.$fabric8BuildViews = $fabric8BuildViews;
-      buildConfig.$fabric8EnvironmentViews = $fabric8EnvironmentViews;
-      buildConfig.$fabric8TeamViews = $fabric8TeamViews;
-
-    }
-  }
-
-  export function enrichBuildConfigs(buildConfigs, sortedBuilds = null) {
-    angular.forEach(buildConfigs, (buildConfig) => {
-      enrichBuildConfig(buildConfig, sortedBuilds);
-    });
-    return buildConfigs;
-  }
-
-  export function enrichBuilds(builds) {
-    angular.forEach(builds, (build) => {
-      enrichBuild(build);
-    });
-    return _.sortBy(builds, "$creationDate").reverse();
-  }
-
-  export function enrichBuild(build) {
-    if (build) {
-      var metadata = build.metadata || {};
-      var name = getName(build);
-      var namespace = getNamespace(build);
-      build.$name = name;
-      build.$namespace = namespace;
-
-      var nameArray = name.split("-");
-      var nameArrayLength = nameArray.length;
-      build.$shortName = (nameArrayLength > 4) ? nameArray.slice(0, nameArrayLength - 4).join("-") : name.substring(0, 30);
-
-      // TODO - where's route from?
-      var route:any = {};
-
-      var labels = getLabels(route);
-      var configId = labels.buildconfig;
-      build.$configId = configId;
-      if (configId) {
-        build.$configLink = UrlHelpers.join("kubernetes/buildConfigs", configId);
-      }
-      var creationTimestamp = getCreationTimestamp(build);
-      if (creationTimestamp) {
-        var d = new Date(creationTimestamp);
-        build.$creationDate = d;
-      }
-      if (name) {
-        build.$viewLink = UrlHelpers.join("kubernetes/builds", name);
-        build.$logsLink = UrlHelpers.join("kubernetes/buildLogs", name);
-      }
-      var podName = build.podName;
-      if (podName && namespace) {
-        var podNameArray = podName.split("-");
-        var podNameArrayLength = podNameArray.length
-        build.$podShortName = (podNameArrayLength > 5) ? podNameArray[podNameArrayLength - 5] : podName.substring(0, 30);
-        build.$podLink = UrlHelpers.join("kubernetes/namespace", namespace, "pods", podName);
-      }
-    }
-    return build;
-  }
-
-
-  export function enrichDeploymentConfig(deploymentConfig) {
-    if (deploymentConfig) {
-      var triggerUrl:string = null;
-      var name = Core.pathGet(deploymentConfig, ["metadata", "name"]);
-      deploymentConfig.$name = name;
-      var found = false;
-      angular.forEach(deploymentConfig.triggers, (trigger) => {
-        var type = trigger.type;
-        if (!deploymentConfig.$imageChangeParams && type === "ImageChange") {
-          var imageChangeParams = trigger.imageChangeParams;
-          if (imageChangeParams) {
-            var containerNames = imageChangeParams.containerNames || [];
-            imageChangeParams.$containerNames = containerNames.join(" ");
-            deploymentConfig.$imageChangeParams = imageChangeParams;
-          }
-        }
-      });
-    }
-  }
-
-  export function enrichDeploymentConfigs(deploymentConfigs) {
-    angular.forEach(deploymentConfigs, (deploymentConfig) => {
-      enrichDeploymentConfig(deploymentConfig);
-    });
-    return deploymentConfigs;
-  }
-
-  export function enrichImageRepository(imageRepository) {
-    if (imageRepository) {
-      var triggerUrl:string = null;
-      var name = Core.pathGet(imageRepository, ["metadata", "name"]);
-      imageRepository.$name = name;
-    }
-  }
-
-  export function enrichImageRepositories(imageRepositories) {
-    angular.forEach(imageRepositories, (imageRepository) => {
-      enrichImageRepository(imageRepository);
-    });
-    return imageRepositories;
-  }
-
-
-  var labelColors = {
-    'version': 'background-blue',
-    'name': 'background-light-green',
-    'container': 'background-light-grey'
-  };
-
-  export function containerLabelClass(labelType:string) {
-    if (!(labelType in labelColors)) {
-      return 'mouse-pointer';
-    }
-    else return labelColors[labelType] + ' mouse-pointer';
-  }
-
-
-  /**
-   * Returns true if the fabric8 forge plugin is enabled
-   */
-  export function isForgeEnabled() {
-    // TODO should return true if the service "fabric8-forge" is valid
-    return true;
-  }
-
-  /**
-   * Returns the current kubernetes selected namespace or the default one
-   */
-  export function currentKubernetesNamespace() {
-    var injector = HawtioCore.injector;
-    if (injector) {
-      var KubernetesState = injector.get("KubernetesState") || {};
-      return KubernetesState.selectedNamespace || defaultNamespace;
-    }
-    return defaultNamespace;
-  }
 
   /**
    * Configures the json schema
