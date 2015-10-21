@@ -65,6 +65,7 @@ declare module KubernetesAPI {
         static POLICY_BINDINGS: string;
         static ROLE_BINDINGS: string;
         static ROLES: string;
+        static PROJECTS: string;
     }
     class NamespacedTypes {
         static k8sTypes: Array<string>;

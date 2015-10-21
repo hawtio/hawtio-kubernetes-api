@@ -51,6 +51,7 @@
   <body>
     <script type="text/ng-template" id="data">
       <h4>{{objectKind}}</h4>
+      <span class="pull-right"><a title="Delete block" href="" ng-click="deleteScope()">X</a></span>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -74,6 +75,12 @@
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
+    <div ng-controller="TestNamespacesController">
+      <div ng-include="'data'"></div>
+      <div>
+        <a href="" class="btn btn-default" ng-click="create()">Create</a>
+      </div>
+    </div>
     <div ng-controller="TestPodsController">
       <div ng-include="'data'"></div>
       <div>
@@ -86,13 +93,20 @@
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
+    <div ng-controller="TestProjectsController">
+      <div ng-include="'data'"></div>
+      <div>
+        <a href="" class="btn btn-default" ng-click="create()">Create</a>
+      </div>
+    </div>
     <script>
 
-      function initScope(factory, $scope, kind, namespace) {
+      function initScope(factory, $scope, $element, kind, namespace) {
         $scope.objectKind = kind;
         $scope.namespace = namespace;
         var client = $scope.client = factory.create(kind, namespace);
-        client.watch(function(objects) {
+        var handle = client.watch(function(objects) {
+          console.log("Callback fired for kind: ", kind);
           $scope.objects = objects;
           $scope.$apply();
         });
@@ -113,18 +127,30 @@
             console.log("Created: ", obj);         
           });
         };
+        $element.on('$destroy', () => {
+          $scope.$destroy();
+        });
+        $scope.$on('$destroy', () => {
+          factory.destroy(client, handle);
+        });
+        $scope.deleteScope = function() {
+          $element.remove();
+        }
         client.connect();
       }
 
       var _module = angular.module('Test', []);
-      _module.controller('TestNamespacesController', function($scope, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, 'namespaces');
+      _module.controller('TestNamespacesController', function($scope, $element, K8SClientFactory) {
+        initScope(K8SClientFactory, $scope, $element, 'namespaces');
       });
-      _module.controller('TestPodsController', function($scope, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, 'pods', 'default');
+      _module.controller('TestPodsController', function($scope, $element, K8SClientFactory) {
+        initScope(K8SClientFactory, $scope, $element, 'pods', 'default');
       });
-      _module.controller('TestServicesController', function($scope, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, 'services');
+      _module.controller('TestServicesController', function($scope, $element, K8SClientFactory) {
+        initScope(K8SClientFactory, $scope, $element, 'services');
+      });
+      _module.controller('TestProjectsController', function($scope, $element, K8SClientFactory) {
+        initScope(K8SClientFactory, $scope, $element, 'projects');
       });
       hawtioPluginLoader.addModule('Test');
     </script>

@@ -6,6 +6,10 @@ module KubernetesAPI {
 
   var log = Logger.get('k8s-objects');
 
+  function getKey(kind:string, namespace?: string) {
+    return namespace ? namespace + '-' + kind : kind;
+  }
+
   class ObjectList {
     public triggerChangedEvent = _.debounce(() => {
       this._ee.emit(WatchActions.ANY, this._objects);
@@ -98,7 +102,7 @@ module KubernetesAPI {
   class WSHandlers {
     private retries:number = 0;
     private connectTime:number = 0;
-    public socket:WebSocket;
+    private socket:WebSocket;
     private self:CollectionImpl = undefined;
     private _list:ObjectList;
 
@@ -167,6 +171,13 @@ module KubernetesAPI {
       var ws = this.socket = new WebSocket(this.self.wsUrl);
       this.setHandlers(this, ws);
     };
+
+    destroy() {
+      this.socket.onclose = () => {
+        log.debug("Connection closed");
+      }
+      this.socket.close();
+    }
   }
 
   export class CollectionImpl {
@@ -176,7 +187,6 @@ module KubernetesAPI {
     private _path:string;
     private _wsUrl:URI;
     private _restUrl:URI;
-    private _cb:(data:any) => void = undefined;
     private handlers:WSHandlers = undefined;
     private list:ObjectList = undefined;
 
@@ -204,6 +214,10 @@ module KubernetesAPI {
       this.handlers.list = list;
     };
 
+    public getKey() {
+      return getKey(this._kind, this._namespace);
+    }
+
     public get wsUrl() {
       return this._wsUrl.toString();
     };
@@ -224,21 +238,15 @@ module KubernetesAPI {
       return this.handlers.connected;
     };
 
-    private initializeCallback(cb:(data:any) => void) {
-      if (this._cb !== cb) {
-        this.list.events.off(WatchActions.ANY, this._cb);
-        this.list.events.off(WatchActions.ADDED, this._cb);
-        this.list.events.off(WatchActions.MODIFIED, this._cb);
-        this.list.events.off(WatchActions.DELETED, this._cb);
-        this._cb = cb;
-      }
-    }
-
     public connect() {
       if (!this.handlers.connected) {
         this.handlers.connect();
       }
     };
+
+    public destroy() {
+      this.handlers.destroy();
+    }
 
     // one time fetch of the data...
     public get(cb:(data:any) => void) {
@@ -270,11 +278,15 @@ module KubernetesAPI {
 
     // continually get updates
     public watch(cb:() => void) {
-      this.initializeCallback(cb);
       this.list.events.on(WatchActions.ANY, cb);
+      return cb;
     };
 
-    public put(item:any, cb:(data:any) => void) {
+    public unwatch(cb:() => void) {
+      this.list.events.off(WatchActions.ANY, cb);
+    }
+
+    public put(item:any, cb:(data:any) => void, error?:(err:any) => void) {
       var method = 'PUT';
       var url = this.restUrlFor(item);
       if (!this.list.hasNamedItem(item)) {
@@ -299,11 +311,15 @@ module KubernetesAPI {
         }, 
         error: (jqXHR, text, status) => {
           log.debug("Failed to create or update ", item, " jqXHR: ", jqXHR, " text: ", text, " status: ", status);
+          if (error) {
+            var responseText = angular.fromJson(jqXHR.responseText);
+            error(responseText);
+          }
         }
       });
     };
 
-    public delete(item:any, cb:(data:any) => void) {
+    public delete(item:any, cb:(data:any) => void, error?:(err:any) => void) {
       var url = this.restUrlFor(item);
       if (!url) {
         return;
@@ -324,14 +340,87 @@ module KubernetesAPI {
           log.debug("Failed to delete ", item, " jqXHR: ", jqXHR, " text: ", text, " status: ", status);
           this.list.added(item);
           this.list.triggerChangedEvent();
+          if (error) {
+            var responseText = angular.fromJson(jqXHR.responseText);
+            error(responseText);
+          }
         }
       });
     };
+  };
+
+  class ClientInstance {
+    private _refCount = 0;
+    private _collection:CollectionImpl = undefined;
+
+    constructor(_collection:CollectionImpl) {
+      this._collection = _collection;
+    };
+
+    public get refCount() {
+      return this._refCount;
+    }
+
+    public addRef() {
+      this._refCount = this._refCount + 1;
+    };
+
+    public removeRef() {
+      this._refCount = this._refCount - 1;
+    };
+
+    public get collection() {
+      return this._collection;
+    };
+
+    public disposable() {
+      return this._refCount <= 0;
+    };
+
+    public destroy() {
+      this._collection.destroy();
+      delete this._collection;
+    }
+  };
+
+  interface ClientMap {
+    [name:string]:ClientInstance;
   }
 
   class K8SClientFactoryImpl {
+    private log:Logging.Logger = Logger.get('k8s-client-factory');
+    private _clients = <ClientMap> {};
     public create(kind: string, namespace?: string) {
-      return new CollectionImpl(kind, namespace);
+      var key = getKey(kind, namespace);
+      if (key in this._clients) {
+        var client = this._clients[key];
+        client.addRef();
+        this.log.debug("Returning existing client for key: ", key, " refcount is: ", client.refCount);
+        return client.collection;
+      } else {
+        var client = new ClientInstance(new CollectionImpl(kind, namespace));
+        client.addRef();
+        this.log.debug("Creating new client for key: ", key, " refcount is: ", client.refCount);
+        this._clients[key] = client;
+        return client.collection;
+      }
+    }
+
+    public destroy(client:any, ...handles:any[]) {
+      _.forEach(handles, (handle) => {
+        client.unwatch(handle);
+      });
+      var key = client.getKey();
+      if (key in this._clients) {
+        var c = this._clients[key];
+        c.removeRef();
+        this.log.debug("Removed reference to client with key: ", key, " refcount is: ", c.refCount);
+        if (c.disposable()) {
+          delete this._clients[key];
+          c.destroy();
+          this.log.debug("Destroyed client for key: ", key);
+        }
+      }
     }
   }
 

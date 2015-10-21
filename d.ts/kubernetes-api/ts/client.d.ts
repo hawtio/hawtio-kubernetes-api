@@ -8,20 +8,21 @@ declare module KubernetesAPI {
         private _path;
         private _wsUrl;
         private _restUrl;
-        private _cb;
         private handlers;
         private list;
         constructor(kind: string, namespace?: string);
+        getKey(): string;
         wsUrl: string;
         namespace: string;
         kind: string;
         connected: boolean;
-        private initializeCallback(cb);
         connect(): void;
+        destroy(): void;
         get(cb: (data: any) => void): void;
         private restUrlFor(item, useName?);
-        watch(cb: () => void): void;
-        put(item: any, cb: (data: any) => void): void;
-        delete(item: any, cb: (data: any) => void): void;
+        watch(cb: () => void): () => void;
+        unwatch(cb: () => void): void;
+        put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
+        delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
     }
 }

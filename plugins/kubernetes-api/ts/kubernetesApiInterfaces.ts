@@ -79,6 +79,7 @@ module KubernetesAPI {
 		public static get POLICY_BINDINGS():string { return "policybindings"; }
 		public static get ROLE_BINDINGS():string { return "rolebindings"; }
 		public static get ROLES():string { return "roles"; }
+    public static get PROJECTS():string { return "projects"; }
 	}
 
   export class NamespacedTypes {
@@ -92,6 +93,7 @@ module KubernetesAPI {
     }
     public static get osTypes():Array<string> {
       return [
+        WatchTypes.PROJECTS,
         WatchTypes.TEMPLATES,
         WatchTypes.BUILD_CONFIGS,
         WatchTypes.ROUTES,
@@ -101,8 +103,8 @@ module KubernetesAPI {
         WatchTypes.IMAGE_STREAMS,
         WatchTypes.POLICIES,
         WatchTypes.POLICY_BINDINGS,
-        //WatchTypes.ROLE_BINDINGS,
-        //WatchTypes.ROLES
+        WatchTypes.ROLE_BINDINGS,
+        WatchTypes.ROLES
       ];
     }
   }
