@@ -20,6 +20,7 @@ declare module KubernetesAPI {
     function buildConfigsRestURL(): string;
     function routesRestURL(): string;
     function templatesRestURL(): string;
+    function getErrorObject(jqXHR: any): any;
     function wsScheme(url: string): string;
     function wsUrl(url: string): URI;
     function equals(left: any, right: any): boolean;

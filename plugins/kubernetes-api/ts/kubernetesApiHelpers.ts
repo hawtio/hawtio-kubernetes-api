@@ -191,6 +191,16 @@ module KubernetesAPI {
     return UrlHelpers.join(openshiftApiUrl(), kubernetesNamespacePath(), "/templates");
   }
 
+  export function getErrorObject(jqXHR) {
+    var answer:any = jqXHR.responseText;
+    try {
+      answer = angular.fromJson(answer);
+    } catch (err) {
+      // nothing to do...
+    }
+    return answer;
+  }
+
   export function wsScheme(url:string) {
     var protocol = new URI(url).protocol() || 'http';
     if (_.startsWith(protocol, 'https')) {
@@ -215,7 +225,8 @@ module KubernetesAPI {
 
   export function getNamespace(entity) {
     var answer = Core.pathGet(entity, ["metadata", "namespace"]);
-    return answer ? answer : defaultNamespace;
+    // some objects aren't namespaced, so this can return null;
+    return answer;
   }
 
   export function getLabels(entity) {

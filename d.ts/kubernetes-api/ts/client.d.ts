@@ -12,7 +12,8 @@ declare module KubernetesAPI {
         private list;
         constructor(kind: string, namespace?: string);
         getKey(): string;
-        wsUrl: string;
+        wsURL: string;
+        restURL: string;
         namespace: string;
         kind: string;
         connected: boolean;

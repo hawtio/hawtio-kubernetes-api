@@ -87,6 +87,12 @@
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
+    <div ng-controller="TestEventsController">
+      <div ng-include="'data'"></div>
+      <div>
+        <a href="" class="btn btn-default" ng-click="create()">Create</a>
+      </div>
+    </div>
     <div ng-controller="TestServicesController">
       <div ng-include="'data'"></div>
       <div>
@@ -142,6 +148,9 @@
       var _module = angular.module('Test', []);
       _module.controller('TestNamespacesController', function($scope, $element, K8SClientFactory) {
         initScope(K8SClientFactory, $scope, $element, 'namespaces');
+      });
+      _module.controller('TestEventsController', function($scope, $element, K8SClientFactory) {
+        initScope(K8SClientFactory, $scope, $element, 'events', 'default');
       });
       _module.controller('TestPodsController', function($scope, $element, K8SClientFactory) {
         initScope(K8SClientFactory, $scope, $element, 'pods', 'default');

@@ -10,6 +10,13 @@ module KubernetesAPI {
     return namespace ? namespace + '-' + kind : kind;
   }
 
+  function beforeSend(request) {
+    var token = HawtioOAuth.getOAuthToken();
+    if (token) {
+      request.setRequestHeader('Authorization', 'Bearer ' + token);
+    }
+  }
+
   /**
    *  Manages the array of k8s objects for a client instance
    **/
@@ -103,25 +110,163 @@ module KubernetesAPI {
     };
   };
 
+  interface CompareResult {
+    added:Array<any>;
+    modified:Array<any>;
+    deleted:Array<any>;
+  }
+
+  function compare(old:Array<any>, _new:Array<any>):CompareResult {
+    var answer = <CompareResult> {
+      added: [],
+      modified: [],
+      deleted: []
+    };
+    _.forEach(_new, (newObj) => {
+      var oldObj = _.find(old, (o) => equals(o, newObj));
+      if (!oldObj) {
+        answer.added.push(newObj);
+        return;
+      }
+      if (angular.toJson(oldObj) !== angular.toJson(newObj)) {
+        answer.modified.push(newObj);
+      }
+    });
+    _.forEach(old, (oldObj) => {
+      var newObj = _.find(_new, (o) => equals(o, oldObj));
+      if (!newObj) {
+        answer.deleted.push(oldObj);
+      }
+    });
+    return answer;
+  }
+
+  /*
+   * Manages polling the server for objects that don't support websocket connections
+   */
+  class ObjectPoller {
+
+    private _lastFetch = <Array<any>> [];
+    private log:Logging.Logger = undefined;
+    private _connected = false;
+    private _interval = 5000;
+    private retries:number = 0;
+    private tCancel:any = undefined;
+
+    constructor(private restURL:string, private handler:WSHandler) {
+      this.log = Logger.get('k8s-objects/' + getKey(handler.collection.kind, handler.collection.namespace));
+    };
+
+    public get connected () {
+      return this._connected;
+    };
+
+    private doGet() {
+      if (!this._connected) {
+        return;
+      } 
+      $.ajax(this.restURL, <any>{
+        method: 'GET',
+        success: (data) => {
+          if (!this._connected) {
+            return;
+          }
+          var items  = (data && data.items) ? data.items : [];
+          var result = compare(this._lastFetch, items);
+          this._lastFetch = items;
+          _.forIn(result, (items:any[], action:string) => {
+            _.forEach(items, (item:any) => {
+              // don't want to modify the original object
+              item = _.cloneDeep(item);
+              item.kind = this.handler.collection.kind;
+              this.handler.collection.namespace ? item.namespace = this.handler.collection.namespace : false;
+              var event = {
+                data: angular.toJson({
+                  type: action.toUpperCase(),
+                  object: item
+                  }, true)
+                };
+              this.handler.onmessage(event);
+            });
+          });
+          //log.debug("Result: ", result);
+          if (this._connected) {
+            this.tCancel = setTimeout(() => {
+              this.doGet();
+            }, this._interval);
+          }
+        },
+        error: (jqXHR, text, status) => {
+          if (!this._connected) {
+            return;
+          }
+          var error = getErrorObject(jqXHR);
+          if (this.retries >= 3) {
+            this._connected = false;
+            this.log.debug("Out of retries, stopping polling, error: ", error);
+          } else {
+            this.retries = this.retries - 1;
+            this.log.debug("Error polling, retry #", this.retries + 1, " error: ", error);
+            this.tCancel = setTimeout(() => {
+              this.doGet();
+            }, this._interval);
+          }
+        },
+        beforeSend: beforeSend
+      });
+    };
+
+    public start() {
+      if (this._connected) {
+        return;
+      }
+      this._connected = true;
+      this.tCancel = setTimeout(() => {
+        this.doGet();
+      }, 1);
+    };
+
+    public stop() {
+      this._connected = false;
+      if (this.tCancel) {
+        clearTimeout(this.tCancel);
+        this.tCancel = undefined;
+      }
+    };
+
+    public destroy() {
+      this.stop();
+      this.log.debug("Connection closed");
+    }
+
+  }
+
   /**
    * Manages the websocket connection to the backend and passes events to the ObjectList
    */
-  class WSHandlers {
+  class WSHandler {
     private retries:number = 0;
     private connectTime:number = 0;
     private socket:WebSocket;
+    private poller:ObjectPoller;
     private self:CollectionImpl = undefined;
     private _list:ObjectList;
+    private log:Logging.Logger = undefined;
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
+      this.log = Logger.get('k8s-objects/' + getKey(_self.kind, _self.namespace));
     }
 
     set list(_list:ObjectList) {
       this._list = _list;
     }
 
-    private setHandlers(self:WSHandlers, ws:WebSocket) {
+    get collection() {
+      return this._self;
+    }
+
+    private setHandlers(self:WSHandler, ws:WebSocket) {
       _.forIn(self, (value, key) => {
         if (_.startsWith(key, 'on')) {
           ws[key] = (event) => {
@@ -140,56 +285,73 @@ module KubernetesAPI {
 
     onmessage(event) {
       var data = JSON.parse(event.data);
+      this.log.debug("Event: ", data);
       var eventType = data.type.toLowerCase();
-      // log.debug("event: ", eventType, " object: ", data.object);
+      // this.log.debug("event: ", eventType, " object: ", data.object);
       this._list[eventType](data.object);
     };
 
     onopen(event) {
       this.retries = 0;
       this.connectTime = new Date().getTime();
-      log.debug("Connected: ", event);
+      this.log.debug("Connected: ", event);
     };
 
     onclose(event) {
       if (this.retries < 3 && this.connectTime && (new Date().getTime() - this.connectTime) > 5000) {
         var self = this;
         setTimeout(() => {
-          log.debug("Retrying after connection closed: ", event);
+          this.log.debug("Retrying after connection closed: ", event);
           this.retries = this.retries + 1;
-          log.debug("watch ", this.self.kind, " disconnected, retry #", this.retries);
-          var ws = this.socket = new WebSocket(this.self.wsUrl);
+          this.log.debug("watch ", this.self.kind, " disconnected, retry #", this.retries);
+          var ws = this.socket = new WebSocket(this.self.wsURL);
           this.setHandlers(self, ws);
         }, 5000);
       } else {
-        log.debug("Watch for ", this.self.kind, " failed");
-        log.debug("Closed: ", event);
+        this.log.debug("websocket for ", this.self.kind, " closed, event: ", event);
+        if (!event.wasClean) {
+          this.log.debug("Switching to polling mode");
+          delete this.socket;
+          this.poller = new ObjectPoller(this.self.restURL, this);
+          this.poller.start();
+        }
       }
     };
 
+    onerror(event) {
+      this.log.debug("web socket encountered error: ", event);
+    }
+
     get connected():boolean {
-      return this.socket && this.socket.readyState === WebSocket.OPEN;
+      return (this.socket && this.socket.readyState === WebSocket.OPEN) || (this.poller && this.poller.connected);
     };
 
     connect() {
-      if (!this.socket) {
-        log.debug("Connecting watch ", this.self.kind);
-        var ws = this.socket = new WebSocket(this.self.wsUrl);
+      if (!this.socket && !this.poller) {
+        this.log.debug("Connecting websocket for kind: ", this.self.kind);
+        var ws = this.socket = new WebSocket(this.self.wsURL);
         this.setHandlers(this, ws);
       }
     };
 
     destroy() {
-      this.socket.onclose = () => {
-        log.debug("Connection closed");
+      if (this.socket) {
+        this.socket.onclose = () => {
+          this.log.debug("Connection closed");
+          delete this.socket;
+        }
+        this.socket.close();
       }
-      this.socket.close();
+      if (this.poller) {
+        this.poller.destroy();
+        delete this.poller;
+      }
     }
   }
 
   /*
    * Implements the external API for working with k8s collections of objects
-   **/
+   */
   export class CollectionImpl {
 
     private _kind:string;
@@ -197,7 +359,7 @@ module KubernetesAPI {
     private _path:string;
     private _wsUrl:URI;
     private _restUrl:URI;
-    private handlers:WSHandlers = undefined;
+    private handlers:WSHandler = undefined;
     private list:ObjectList = undefined;
 
     constructor(kind:string, namespace?:string) {
@@ -219,17 +381,21 @@ module KubernetesAPI {
         watch: true,
         access_token: HawtioOAuth.getOAuthToken()
       });
-      this.handlers = new WSHandlers(this);
+      this.handlers = new WSHandler(this);
       var list = this.list = new ObjectList(kind, namespace);
       this.handlers.list = list;
     };
 
     public getKey() {
       return getKey(this._kind, this._namespace);
-    }
+    };
 
-    public get wsUrl() {
+    public get wsURL() {
       return this._wsUrl.toString();
+    };
+
+    public get restURL() {
+      return this._restUrl.toString();
     };
 
     get namespace() {
@@ -322,12 +488,13 @@ module KubernetesAPI {
           }
         }, 
         error: (jqXHR, text, status) => {
-          log.debug("Failed to create or update ", item, " jqXHR: ", jqXHR, " text: ", text, " status: ", status);
+          var err = getErrorObject(jqXHR);
+          log.debug("Failed to create or update, error: ", err);
           if (error) {
-            var responseText = angular.fromJson(jqXHR.responseText);
-            error(responseText);
+            error(err);
           }
-        }
+        },
+        beforeSend: beforeSend
       });
     };
 
@@ -349,14 +516,15 @@ module KubernetesAPI {
           }
         },
         error: (jqXHR, text, status) => {
-          log.debug("Failed to delete ", item, " jqXHR: ", jqXHR, " text: ", text, " status: ", status);
+          var err = getErrorObject(jqXHR);
+          log.debug("Failed to delete, error: ", err);
           this.list.added(item);
           this.list.triggerChangedEvent();
           if (error) {
-            var responseText = angular.fromJson(jqXHR.responseText);
-            error(responseText);
+            error(err);
           }
-        }
+        },
+        beforeSend: beforeSend
       });
     };
   };
@@ -445,8 +613,6 @@ module KubernetesAPI {
   _module.factory('K8SClientFactory', () => {
     return new K8SClientFactoryImpl()
   });
-
-
 
 }
 
