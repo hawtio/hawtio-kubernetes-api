@@ -1,2 +1,5 @@
 # hawtio-kubernetes-api
-hawtio plugin that maintains an in-memory model of kubernetes objects
+
+hawtio plugin that provides an easy API for working with a kubernets/openshift API server.
+
+
