@@ -2,7 +2,7 @@
 /// <reference path="kubernetesApiHelpers.d.ts" />
 /// <reference path="kubernetesApiPlugin.d.ts" />
 declare module KubernetesAPI {
-    class CollectionImpl {
+    class CollectionImpl implements Collection {
         private _kind;
         private _namespace;
         private _path;
@@ -19,10 +19,10 @@ declare module KubernetesAPI {
         connected: boolean;
         connect(): void;
         destroy(): void;
-        get(cb: (data: any) => void): void;
+        get(cb: (data: any[]) => void): void;
         private restUrlFor(item, useName?);
-        watch(cb: () => void): () => void;
-        unwatch(cb: () => void): void;
+        watch(cb: (data: any[]) => void): (data: any[]) => void;
+        unwatch(cb: (data: any[]) => void): void;
         put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
         delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
     }

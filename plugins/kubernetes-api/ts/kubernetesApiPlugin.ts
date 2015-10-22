@@ -8,6 +8,16 @@ module KubernetesAPI {
   export var _module = angular.module(pluginName, []);
 
   hawtioPluginLoader.registerPreBootstrapTask({
+    name: 'KubernetesApiConfig',
+    depends: 'KubernetesApiInit',
+    task: (next) => {
+      K8S_PREFIX = Core.trimLeading(Core.pathGet(osConfig, ['api', 'k8s', 'prefix']) || K8S_PREFIX, '/');
+      OS_PREFIX = Core.trimLeading(Core.pathGet(osConfig, ['api', 'openshift', 'prefix']) || OS_PREFIX, '/');
+      next();
+    }
+  });
+
+  hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesApiInit',
     task: (next) => {
       $.getScript('osconsole/config.js')
@@ -56,14 +66,11 @@ module KubernetesAPI {
           }
           if (master) {
             KubernetesAPI.masterUrl = master;
-            next();
-            return;
           }
+          next();
         })
       .fail((response) => {
-        log.debug("Error fetching OAUTH config: ", response);
-      })
-      .always(() => {
+        log.debug("Error fetching Kubernetes config: ", response);
         next();
       });
     }

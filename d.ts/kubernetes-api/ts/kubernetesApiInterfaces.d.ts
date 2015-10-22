@@ -88,8 +88,22 @@ declare module KubernetesAPI {
     interface ObjectMap {
         [uid: string]: any;
     }
-    interface KubePod {
-        id: string;
+    interface Collection {
+        wsURL: string;
+        restURL: string;
         namespace: string;
+        kind: string;
+        connected: boolean;
+        connect(): any;
+        get(cb: (data: any[]) => void): void;
+        watch(cb: (data: any[]) => void): void;
+        unwatch(cb: (data: any[]) => void): void;
+        put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
+        delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
+        getKey(): string;
+    }
+    interface K8SClientFactory {
+        create(kind: string, namespace?: string): Collection;
+        destroy(client: Collection, ...handles: Array<(data: any[]) => void>): void;
     }
 }

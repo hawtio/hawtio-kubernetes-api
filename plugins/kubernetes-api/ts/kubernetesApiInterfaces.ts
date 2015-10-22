@@ -1,4 +1,4 @@
-//def for third-party eventing library
+//defs for third-party eventing library
 
 interface SmokeSignals {
   convert(obj:any, handlers?:any);
@@ -138,9 +138,24 @@ module KubernetesAPI {
 		[uid:string]: any;		
 	}
 	
-  export interface KubePod {
-    id:string;
-    namespace:string;
+  export interface Collection {
+    wsURL:string;
+    restURL:string;
+    namespace: string;
+    kind: string;
+    connected: boolean;
+    connect();
+    get(cb:(data:any[]) => void):void;
+    watch(cb:(data:any[]) => void):void;
+    unwatch(cb:(data:any[]) => void):void;
+    put(item:any, cb:(data:any) => void, error?:(err:any) => void):void;
+    delete(item:any, cb:(data:any) => void, error?:(err:any) => void):void;
+    getKey():string;
+  }
+
+  export interface K8SClientFactory {
+    create(kind:string, namespace?: string):Collection;
+    destroy(client:Collection, ...handles:Array<(data:any[]) => void>):void;
   }
 
 	

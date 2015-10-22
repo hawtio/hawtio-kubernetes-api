@@ -178,7 +178,9 @@ module KubernetesAPI {
             _.forEach(items, (item:any) => {
               // don't want to modify the original object
               item = _.cloneDeep(item);
-              item.kind = this.handler.collection.kind;
+              // TODO this trimRight works for now, but might not work at some point
+              item.kind = _.trimRight(_.capitalize(this.handler.collection.kind), 's');
+              item.apiVersion = apiVersionForKind(this.handler.collection.kind);
               this.handler.collection.namespace ? item.namespace = this.handler.collection.namespace : false;
               var event = {
                 data: angular.toJson({
@@ -352,7 +354,7 @@ module KubernetesAPI {
   /*
    * Implements the external API for working with k8s collections of objects
    */
-  export class CollectionImpl {
+  export class CollectionImpl implements Collection {
 
     private _kind:string;
     private _namespace:string;
@@ -402,10 +404,6 @@ module KubernetesAPI {
       return this._namespace;
     };
 
-    set namespace(ns:string) {
-      this._namespace = ns;
-    };
-
     get kind() {
       return this._kind;
     };
@@ -427,7 +425,7 @@ module KubernetesAPI {
     }
 
     // one time fetch of the data...
-    public get(cb:(data:any) => void) {
+    public get(cb:(data:any[]) => void) {
       if (!this.list.initialized) {
         this.list.events.once(WatchActions.ANY, cb);
       } else {
@@ -455,12 +453,12 @@ module KubernetesAPI {
     }
 
     // continually get updates
-    public watch(cb:() => void) {
+    public watch(cb:(data:any[]) => void) {
       this.list.events.on(WatchActions.ANY, cb);
       return cb;
     };
 
-    public unwatch(cb:() => void) {
+    public unwatch(cb:(data:any[]) => void) {
       this.list.events.off(WatchActions.ANY, cb);
     }
 
@@ -576,7 +574,7 @@ module KubernetesAPI {
   class K8SClientFactoryImpl {
     private log:Logging.Logger = Logger.get('k8s-client-factory');
     private _clients = <ClientMap> {};
-    public create(kind: string, namespace?: string) {
+    public create(kind: string, namespace?: string):Collection {
       var key = getKey(kind, namespace);
       if (key in this._clients) {
         var client = this._clients[key];
@@ -592,7 +590,7 @@ module KubernetesAPI {
       }
     }
 
-    public destroy(client:any, ...handles:any[]) {
+    public destroy(client:Collection, ...handles:Array<(data:any[]) => void>) {
       _.forEach(handles, (handle) => {
         client.unwatch(handle);
       });
