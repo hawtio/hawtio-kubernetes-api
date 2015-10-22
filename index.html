@@ -69,37 +69,37 @@
         </tbody>
       </table>
     </script>
-    <div ng-controller="TestNamespacesController">
+    <div ng-controller="TestWatcherController" ng-init="init('routes');">
       <div ng-include="'data'"></div>
       <div>
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
-    <div ng-controller="TestNamespacesController">
+    <div ng-controller="TestWatcherController" ng-init="init('services');">
       <div ng-include="'data'"></div>
       <div>
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
-    <div ng-controller="TestPodsController">
+    <div ng-controller="TestWatcherController" ng-init="init('projects');">
       <div ng-include="'data'"></div>
       <div>
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
-    <div ng-controller="TestEventsController">
+    <div ng-controller="TestWatcherController" ng-init="init('namespaces');">
       <div ng-include="'data'"></div>
       <div>
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
-    <div ng-controller="TestServicesController">
+    <div ng-controller="TestWatcherController" ng-init="init('events', 'default');">
       <div ng-include="'data'"></div>
       <div>
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
       </div>
     </div>
-    <div ng-controller="TestProjectsController">
+    <div ng-controller="TestWatcherController" ng-init="init('pods', 'default');">
       <div ng-include="'data'"></div>
       <div>
         <a href="" class="btn btn-default" ng-click="create()">Create</a>
@@ -146,20 +146,10 @@
       }
 
       var _module = angular.module('Test', []);
-      _module.controller('TestNamespacesController', function($scope, $element, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, $element, 'namespaces');
-      });
-      _module.controller('TestEventsController', function($scope, $element, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, $element, 'events', 'default');
-      });
-      _module.controller('TestPodsController', function($scope, $element, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, $element, 'pods', 'default');
-      });
-      _module.controller('TestServicesController', function($scope, $element, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, $element, 'services');
-      });
-      _module.controller('TestProjectsController', function($scope, $element, K8SClientFactory) {
-        initScope(K8SClientFactory, $scope, $element, 'projects');
+      _module.controller('TestWatcherController', function($scope, $element, K8SClientFactory) {
+        $scope.init = function(kind, namespace) {
+          initScope(K8SClientFactory, $scope, $element, kind, namespace);
+        }
       });
       hawtioPluginLoader.addModule('Test');
     </script>

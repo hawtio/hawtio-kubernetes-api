@@ -200,78 +200,6 @@ module KubernetesAPI {
   }
 
   /**
-   * Returns the service link URL for either the service name or the service object
-   */
-  export function serviceLinkUrl(service) {
-    if (angular.isObject(service)) {
-      var portalIP = service.$host;
-      // lets assume no custom port for now for external routes
-      var port = null;
-      var protocol = "http://";
-      var spec = service.spec;
-      if (spec) {
-        if (!portalIP) {
-          portalIP = spec.portalIP;
-        }
-        var hasHttps = false;
-        var hasHttp = false;
-        angular.forEach(spec.ports, (portSpec) => {
-          var p = portSpec.port;
-          if (p) {
-            if (p === 443) {
-              hasHttps = true;
-            } else if (p === 80) {
-              hasHttp = true;
-            }
-            if (!port) {
-              port = p;
-            }
-          }
-        });
-      }
-      if (portalIP) {
-        if (hasHttps) {
-          return "https://" + portalIP;
-        } else if (hasHttp) {
-          return "http://" + portalIP;
-        } else if (port) {
-          return protocol + portalIP + ":" + port + "/";
-        } else {
-          return protocol + portalIP;
-        }
-      }
-    } else if (service) {
-      var serviceId = service.toString();
-      if (serviceId) {
-        var ServiceRegistry = getServiceRegistry();
-        if (ServiceRegistry) {
-          return ServiceRegistry.serviceLink(serviceId) || "";
-        }
-      }
-    }
-    return "";
-  }
-
-  export function kubernetesProxyUrlForService(KubernetesApiURL, service, path = null) {
-    var pathSegment = "";
-    if (path) {
-      pathSegment = "/" + Core.trimLeading(path, "/");
-    } else {
-      pathSegment = "/";
-    }
-    var namespace = getNamespace(service);
-    return null;
-    /*
-    if (isV1beta1Or2()) {
-      var postfix = "?namespace=" + namespace;
-      return UrlHelpers.join(KubernetesApiURL, "/api/" + defaultApiVersion + "/proxy" + kubernetesNamespacePath() + "/services/" + getName(service) + pathSegment + postfix);
-    } else {
-      return UrlHelpers.join(KubernetesApiURL, "/api/" + defaultApiVersion + "/proxy/namespaces/" + namespace + "/services/" + getName(service) + pathSegment);
-    }
-    */
-  }
-
-  /**
    * Returns true if the current status of the pod is running
    */
   export function isRunning(podCurrentState) {
@@ -301,14 +229,6 @@ module KubernetesAPI {
     } else {
       return false;
     }
-  }
-
-  /**
-   * Returns the service registry
-   */
-  export function getServiceRegistry() {
-    var injector = HawtioCore.injector;
-    return injector ? injector.get("ServiceRegistry") : null;
   }
 
   export function podStatus(pod) {

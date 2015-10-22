@@ -27,10 +27,7 @@ declare module KubernetesAPI {
     function getPorts(service: any): any;
     function getCreationTimestamp(entity: any): any;
     function labelsToString(labels: any, seperatorText?: string): string;
-    function serviceLinkUrl(service: any): any;
-    function kubernetesProxyUrlForService(KubernetesApiURL: any, service: any, path?: any): any;
     function isRunning(podCurrentState: any): any;
     function selectorMatches(selector: any, labels: any): boolean;
-    function getServiceRegistry(): any;
     function podStatus(pod: any): any;
 }
