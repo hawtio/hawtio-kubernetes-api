@@ -10,6 +10,9 @@ module KubernetesAPI {
     return namespace ? namespace + '-' + kind : kind;
   }
 
+  /**
+   *  Manages the array of k8s objects for a client instance
+   **/
   class ObjectList {
     public triggerChangedEvent = _.debounce(() => {
       this._ee.emit(WatchActions.ANY, this._objects);
@@ -90,15 +93,19 @@ module KubernetesAPI {
     };
 
     public deleted(object) {
-      //log.debug("deleted object: ", object);
-      _.remove(this._objects, (obj) => {
-        this._ee.emit(WatchActions.DELETED, object);
-        this.triggerChangedEvent();
+      var deleted = _.remove(this._objects, (obj) => {
         return equals(obj, object);
       }, this);
+      if (deleted) {
+        this._ee.emit(WatchActions.DELETED, deleted[0]);
+        this.triggerChangedEvent();
+      }
     };
   };
 
+  /**
+   * Manages the websocket connection to the backend and passes events to the ObjectList
+   */
   class WSHandlers {
     private retries:number = 0;
     private connectTime:number = 0;
@@ -142,7 +149,6 @@ module KubernetesAPI {
       this.retries = 0;
       this.connectTime = new Date().getTime();
       log.debug("Connected: ", event);
-      //this.emitter.emit(eventName('open'), event);
     };
 
     onclose(event) {
@@ -158,7 +164,6 @@ module KubernetesAPI {
       } else {
         log.debug("Watch for ", this.self.kind, " failed");
         log.debug("Closed: ", event);
-        //this.emitter.emit(eventName('close'), event);
       }
     };
 
@@ -167,9 +172,11 @@ module KubernetesAPI {
     };
 
     connect() {
-      log.debug("Connecting watch ", this.self.kind);
-      var ws = this.socket = new WebSocket(this.self.wsUrl);
-      this.setHandlers(this, ws);
+      if (!this.socket) {
+        log.debug("Connecting watch ", this.self.kind);
+        var ws = this.socket = new WebSocket(this.self.wsUrl);
+        this.setHandlers(this, ws);
+      }
     };
 
     destroy() {
@@ -180,6 +187,9 @@ module KubernetesAPI {
     }
   }
 
+  /*
+   * Implements the external API for working with k8s collections of objects
+   **/
   export class CollectionImpl {
 
     private _kind:string;
@@ -246,6 +256,8 @@ module KubernetesAPI {
 
     public destroy() {
       this.handlers.destroy();
+      delete this.handlers;
+      delete this.list;
     }
 
     // one time fetch of the data...
@@ -349,6 +361,9 @@ module KubernetesAPI {
     };
   };
 
+  /*
+   * Manages references to collection instances to allow them to be shared between views
+   */
   class ClientInstance {
     private _refCount = 0;
     private _collection:CollectionImpl = undefined;
@@ -387,6 +402,9 @@ module KubernetesAPI {
     [name:string]:ClientInstance;
   }
 
+  /*
+   * Factory implementation that's available as an angular service
+   */
   class K8SClientFactoryImpl {
     private log:Logging.Logger = Logger.get('k8s-client-factory');
     private _clients = <ClientMap> {};
