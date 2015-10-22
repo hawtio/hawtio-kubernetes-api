@@ -2,39 +2,12 @@
 
 module KubernetesAPI {
 
-  /**
-   * Returns the current kubernetes selected namespace or the default one
-   */
-  export function currentKubernetesNamespace() {
-    var injector = HawtioCore.injector;
-    if (injector) {
-      var KubernetesState = injector.get("KubernetesState") || {};
-      return KubernetesState.selectedNamespace || defaultNamespace;
-    }
-    return defaultNamespace;
-  }
-
-  export function kubernetesNamespacePath() {
-    var ns = currentKubernetesNamespace();
-    if (ns) {
-      return "/namespaces/" + ns;
-    } else {
-      return "";
-    }
-  }
-
   export function apiPrefix() {
     return K8S_PREFIX;
   }
 
   export function osApiPrefix() {
     return OS_PREFIX;
-    /*
-      TODO - may not have a currently selected namespace
-    if (!isOpenShift) {
-      return UrlHelpers.join(apiPrefix(), OS_API_VERSION, "proxy", kubernetesNamespacePath(), "services/templates", answer);
-    }
-    */
   }
 
   export function masterApiUrl() {

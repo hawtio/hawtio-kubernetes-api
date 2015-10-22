@@ -1,7 +1,5 @@
 /// <reference path="kubernetesApiGlobals.d.ts" />
 declare module KubernetesAPI {
-    function currentKubernetesNamespace(): any;
-    function kubernetesNamespacePath(): string;
     function apiPrefix(): string;
     function osApiPrefix(): string;
     function masterApiUrl(): string;
