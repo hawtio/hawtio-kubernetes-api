@@ -287,7 +287,6 @@ module KubernetesAPI {
 
     onmessage(event) {
       var data = JSON.parse(event.data);
-      this.log.debug("Event: ", data);
       var eventType = data.type.toLowerCase();
       // this.log.debug("event: ", eventType, " object: ", data.object);
       this._list[eventType](data.object);
