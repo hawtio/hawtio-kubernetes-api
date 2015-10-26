@@ -30,4 +30,9 @@ declare module KubernetesAPI {
     function get(options: K8SOptions): void;
     function del(options: any): void;
     function put(options: any): void;
+    function watch(options: any): {
+        client: Collection;
+        handle: (data: any[]) => void;
+        disconnect: () => void;
+    };
 }

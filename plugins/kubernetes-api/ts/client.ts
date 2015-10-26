@@ -461,7 +461,7 @@ module KubernetesAPI {
     }
 
     // continually get updates
-    public watch(cb:(data:any[]) => void) {
+    public watch(cb:(data:any[]) => void):(data:any[]) => void {
       this.list.events.on(WatchActions.ANY, cb);
       return cb;
     };
@@ -630,17 +630,20 @@ module KubernetesAPI {
     return K8SClientFactory;
   });
 
+  var NO_KIND = "No kind in supplied options";
+  var NO_OBJECT = "No object in supplied options";
+  var NO_OBJECTS = "No objects in list object";
+
   /*
    * Static functions for manipulating k8s obj3cts
    */
-
 
   /*
    * Get a collection
    */
   export function get(options:K8SOptions) {
     if (!options.kind) {
-      // TODO throw an error
+      throw NO_KIND;
       return;
     }
     var client = K8SClientFactory.create(options.kind, options.namespace);
@@ -660,7 +663,7 @@ module KubernetesAPI {
 
   function handleListAction(options:any, action:(object:any, success:(data:any) => void, error:(err:any) => void) => void) {
     if (!options.object.objects) {
-      // TODO throw error
+      throw NO_OBJECTS;
       return;
     }
     var answer = {};
@@ -707,10 +710,10 @@ module KubernetesAPI {
       }
     }
     if (!options.object) {
-      throw "No object in supplied options";
+      throw NO_OBJECT;
     }
     if (!options.object.kind) {
-      throw "No kind in supplied object";
+      throw NO_KIND;
     }
     log.debug("Options object normalized: ", options);
     return options;
@@ -731,10 +734,6 @@ module KubernetesAPI {
     }
     var kind = toCollectionName(options.object);
     var namespace = getNamespace(options.object);
-    if (!kind) {
-      // TODO throw an error
-      return;
-    }
     var client = K8SClientFactory.create(kind, namespace);
     var success = (data) => {
       if (options.success) {
@@ -777,10 +776,6 @@ module KubernetesAPI {
     }
     var kind = toCollectionName(options.object);
     var namespace = getNamespace(options.object);
-    if (!kind) {
-      // TODO throw an error
-      return;
-    }
     var client = K8SClientFactory.create(kind, namespace);
     client.get((objects) => {
       var success = (data) => {
@@ -808,7 +803,23 @@ module KubernetesAPI {
     client.connect();
   }
 
-
+  export function watch(options:any) {
+    if (!options.kind) {
+      throw NO_KIND;
+      return;
+    }
+    var client = K8SClientFactory.create(options.kind, options.namespace);
+    var handle = client.watch(options.success);
+    var self = {
+      client: client,
+      handle: handle,
+      disconnect: () => {
+        K8SClientFactory.destroy(self.client, self.handle);
+      }
+    };
+    client.connect();
+    return self;
+  }
 
 }
 

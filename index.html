@@ -139,9 +139,9 @@
         client.connect();
       }
 
-      function initStaticScope($scope, kind, namespace) {
+      function initStaticScope($scope, $element, kind, namespace) {
         $scope.objectKind = kind;
-        KubernetesAPI.get({
+        var connection = KubernetesAPI.watch({
           kind: kind,
           namespace: namespace,
           success: function(objects) {
@@ -150,6 +150,17 @@
             $scope.$apply();
           }
         });
+        $element.on('$destroy', () => {
+          console.log("Static controller[" + kind + ", " + namespace + "] element destroyed");         
+          $scope.$destroy();
+        });
+        $scope.$on('$destroy', () => {
+          console.log("Static controller[" + kind + ", " + namespace + "] scope destroyed");         
+          connection.disconnect();
+        });
+        $scope.deleteScope = function() {
+          $element.remove();
+        }
       }
 
       var _module = angular.module('Test', []);
@@ -158,9 +169,9 @@
           initWatcherScope(K8SClientFactory, $scope, $element, kind, namespace);
         }
       });
-      _module.controller('TestStaticController', function($scope) {
+      _module.controller('TestStaticController', function($scope, $element) {
         $scope.init = function(kind, namespace) {
-          initStaticScope($scope, kind, namespace);
+          initStaticScope($scope, $element, kind, namespace);
         }
         setTimeout(function() {
           KubernetesAPI.put({

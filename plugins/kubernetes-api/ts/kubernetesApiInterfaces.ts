@@ -156,7 +156,7 @@ module KubernetesAPI {
     connected: boolean;
     connect();
     get(cb:(data:any[]) => void):void;
-    watch(cb:(data:any[]) => void):void;
+    watch(cb:(data:any[]) => void):(data:any[]) => void;
     unwatch(cb:(data:any[]) => void):void;
     put(item:any, cb:(data:any) => void, error?:(err:any) => void):void;
     delete(item:any, cb:(data:any) => void, error?:(err:any) => void):void;
