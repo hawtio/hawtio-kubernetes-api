@@ -50,6 +50,7 @@ declare module KubernetesAPI {
         selectedNamespace: string;
     }
     class WatchTypes {
+        static LIST: string;
         static ENDPOINTS: string;
         static EVENTS: string;
         static NAMESPACES: string;
@@ -79,7 +80,15 @@ declare module KubernetesAPI {
         static k8sTypes: Array<string>;
         static osTypes: Array<string>;
     }
+    interface K8SOptions {
+        kind?: string;
+        namespace?: string;
+        object?: any;
+        success?: (objs: any[]) => void;
+        error?: (err: any) => void;
+    }
     class WatchActions {
+        static INIT: string;
         static ANY: string;
         static ADDED: string;
         static MODIFIED: string;

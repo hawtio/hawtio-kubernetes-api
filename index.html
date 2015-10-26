@@ -50,78 +50,70 @@
 
   <body>
     <script type="text/ng-template" id="data">
-      <h4>{{objectKind}}</h4>
-      <span class="pull-right"><a title="Delete block" href="" ng-click="deleteScope()">X</a></span>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Delete</th>
-            <th>Kind</th>
-            <th>Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-repeat="obj in objects track by $index">
-            <td><a href="" ng-click="delete(obj)">X</a>
-            <td>{{obj.kind}}</td>
-            <td>{{obj.metadata.name}}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <h4>{{kind}}<span ng-show="namespace"> in namespace "{{namespace}}"></span></h4>
+        <span class="pull-right"><a title="Delete block" href="" ng-click="deleteScope()">X</a></span>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Delete</th>
+              <th>Kind</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="obj in objects track by $index">
+              <td><a href="" ng-click="delete(obj)">X</a>
+              <td>{{obj.kind}}</td>
+              <td>{{obj.metadata.name}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <a href="" class="btn btn-default" ng-click="create()">Create</a>
+        </div>
+      </div>
     </script>
+    <div ng-controller="TestStaticController" ng-init="init('routes');">
+      <div ng-include="'data'"></div>
+    </div>
     <div ng-controller="TestWatcherController" ng-init="init('routes');">
       <div ng-include="'data'"></div>
-      <div>
-        <a href="" class="btn btn-default" ng-click="create()">Create</a>
-      </div>
     </div>
+    <!--
     <div ng-controller="TestWatcherController" ng-init="init('services');">
       <div ng-include="'data'"></div>
-      <div>
-        <a href="" class="btn btn-default" ng-click="create()">Create</a>
-      </div>
     </div>
     <div ng-controller="TestWatcherController" ng-init="init('projects');">
       <div ng-include="'data'"></div>
-      <div>
-        <a href="" class="btn btn-default" ng-click="create()">Create</a>
-      </div>
     </div>
     <div ng-controller="TestWatcherController" ng-init="init('namespaces');">
       <div ng-include="'data'"></div>
-      <div>
-        <a href="" class="btn btn-default" ng-click="create()">Create</a>
-      </div>
     </div>
     <div ng-controller="TestWatcherController" ng-init="init('events', 'default');">
       <div ng-include="'data'"></div>
-      <div>
-        <a href="" class="btn btn-default" ng-click="create()">Create</a>
-      </div>
     </div>
     <div ng-controller="TestWatcherController" ng-init="init('pods', 'default');">
       <div ng-include="'data'"></div>
-      <div>
-        <a href="" class="btn btn-default" ng-click="create()">Create</a>
-      </div>
     </div>
+    -->
     <script>
 
-      function initScope(factory, $scope, $element, kind, namespace) {
-        $scope.objectKind = kind;
+      function initWatcherScope(factory, $scope, $element, kind, namespace) {
+        $scope.kind = kind;
         $scope.namespace = namespace;
         var client = $scope.client = factory.create(kind, namespace);
         var handle = client.watch(function(objects) {
-          console.log("Callback fired for kind: ", kind);
+          console.log("Watcher controller[" + kind + ", " + namespace + "] got data: ", objects);
           $scope.objects = objects;
           $scope.$apply();
         });
         $scope.$watchCollection('objects', function(newValue) {
-          console.log($scope.objectKind + " collection changed");
+          console.log("Watcher controller[" + kind + ", " + namespace + "] collection changed");
         });
         $scope.delete = function(obj) {
           client.delete(obj, function(obj) {
-            console.log("Deleted: ", obj);
+            console.log("Watcher controller[" + kind + ", " + namespace + "] deleted: ", obj);
           });
         };
         $scope.create = function() {
@@ -130,13 +122,15 @@
           delete item.metadata.uid;
           item.metadata.name = "new-" + item.metadata.name;
           client.put(item, function(obj) {
-            console.log("Created: ", obj);         
+            console.log("Watcher controller[" + kind + ", " + namespace + "] created: ", obj);         
           });
         };
         $element.on('$destroy', () => {
+          console.log("Watcher controller[" + kind + ", " + namespace + "] element destroyed");         
           $scope.$destroy();
         });
         $scope.$on('$destroy', () => {
+          console.log("Watcher controller[" + kind + ", " + namespace + "] scope destroyed");         
           factory.destroy(client, handle);
         });
         $scope.deleteScope = function() {
@@ -145,11 +139,74 @@
         client.connect();
       }
 
+      function initStaticScope($scope, kind, namespace) {
+        $scope.objectKind = kind;
+        KubernetesAPI.get({
+          kind: kind,
+          namespace: namespace,
+          success: function(objects) {
+            console.log("Static controller[" + kind + ", " + namespace + "] got data: ", objects);
+            $scope.objects = objects;
+            $scope.$apply();
+          }
+        });
+      }
+
       var _module = angular.module('Test', []);
       _module.controller('TestWatcherController', function($scope, $element, K8SClientFactory) {
         $scope.init = function(kind, namespace) {
-          initScope(K8SClientFactory, $scope, $element, kind, namespace);
+          initWatcherScope(K8SClientFactory, $scope, $element, kind, namespace);
         }
+      });
+      _module.controller('TestStaticController', function($scope) {
+        $scope.init = function(kind, namespace) {
+          initStaticScope($scope, kind, namespace);
+        }
+        setTimeout(function() {
+          KubernetesAPI.put({
+            success: function(data) {
+              console.log("Put result: ", data);
+            },
+            
+            object: {
+            apiVersion: 'v1',
+            kind: 'List',
+            objects: [
+                {
+                  apiVersion: 'v1',
+                  kind: 'Route',
+                  metadata: {
+                    namespace: 'default',
+                    name: 'foo'
+                  },
+                  spec: {
+                    host: "foo.vagrant.f8",
+                    to: {
+                      kind: "Service",
+                      name: "fabric8"
+                    }
+                  }
+                },
+                {
+                  apiVersion: 'v1',
+                  kind: 'Route',
+                  metadata: {
+                    namespace: 'default',
+                    name: 'bar'
+                  },
+                  spec: {
+                    host: "bar.vagrant.f8",
+                    to: {
+                      kind: "Service",
+                      name: "fabric8"
+                    }
+                  }
+                }
+              ]
+            }
+          });
+
+        }, 5000);
       });
       hawtioPluginLoader.addModule('Test');
     </script>

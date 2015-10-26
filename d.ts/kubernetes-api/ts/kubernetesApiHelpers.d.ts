@@ -12,8 +12,16 @@ declare module KubernetesAPI {
     function openshiftApiUrl(): string;
     function getErrorObject(jqXHR: any): any;
     function wsScheme(url: string): string;
+    function toKindName(kind: any): any;
+    function toCollectionName(kind: any): string;
     function wsUrl(url: string): URI;
     function equals(left: any, right: any): boolean;
+    function createList(...objects: any[]): {
+        apiVersion: string;
+        kind: any;
+        objects: any[];
+    };
+    function fullName(entity: any): string;
     function getUID(entity: any): any;
     function getNamespace(entity: any): any;
     function getLabels(entity: any): any;

@@ -64,6 +64,7 @@ module KubernetesAPI {
   }
 
 	export class WatchTypes {
+    public static get LIST():string { return "list"; }
 		public static get ENDPOINTS():string { return "endpoints"; }
 		public static get EVENTS():string { return "events"; }
     public static get NAMESPACES():string { return "namespaces"; }
@@ -126,12 +127,21 @@ module KubernetesAPI {
       ];
     }
   }
+
+  export interface K8SOptions {
+    kind?: string;
+    namespace?: string;
+    object?: any;
+    success?: (objs:any[]) => void;
+    error?: (err:any) => void;
+  }
 	
 	export class WatchActions {
-		public static get ANY():string { return "*"; }
-		public static get ADDED():string { return "ADDED"; }
-		public static get MODIFIED():string { return "MODIFIED"; }
-		public static get DELETED():string { return "DELETED"; }
+    public static get INIT():string { return "INIT"; };
+		public static get ANY():string { return "*"; };
+		public static get ADDED():string { return "ADDED"; };
+		public static get MODIFIED():string { return "MODIFIED"; };
+		public static get DELETED():string { return "DELETED"; };
 	}
 	
 	export interface ObjectMap {

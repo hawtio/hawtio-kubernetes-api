@@ -2,6 +2,8 @@
 
 module KubernetesAPI {
 
+  declare var K8SClientFactory:K8SClientFactory;
+
   export function apiPrefix() {
     return K8S_PREFIX;
   }
@@ -97,6 +99,34 @@ module KubernetesAPI {
   }
 
   /*
+   * Returns the single 'kind' of an object from the collection kind
+   */
+  export function toKindName(kind:any) {
+    if (angular.isObject(kind)) {
+      return getKind(kind);
+    }
+    if (!kind) {
+      return undefined;
+    }
+    // TODO this trimRight works for now, but might not work at some point
+    return _.trimRight(_.capitalize(kind), 's');
+  }
+
+  /*
+   * Returns the collection kind of an object from the singular kind
+   */
+  export function toCollectionName(kind:any) {
+    if (angular.isObject(kind)) {
+      kind = getKind(kind);
+    }
+    if (!kind) {
+      return undefined;
+    }
+    // TODO this trimRight works for now, but might not work at some point
+    return kind.toLowerCase() + 's';
+  }
+
+  /*
    * Returns the websocket URL for the supplied URL
    */
   export function wsUrl(url:string) {
@@ -116,6 +146,33 @@ module KubernetesAPI {
    * Kubernetes object helpers
    *
    **/
+  export function createList(...objects:any[]) {
+    var answer = {
+      apiVersion: K8S_API_VERSION,
+      kind: toKindName(WatchTypes.LIST),
+      objects: []
+    }
+    _.forEach(objects, (object) => {
+      if (angular.isArray(object)) {
+        _.forEach(object, (o) => {
+          answer.objects.push(o);
+        });
+      } else {
+        answer.objects.push(object);
+      }
+    });
+    return answer;
+  }
+
+  /**
+   * Returns a fully scoped name with the namespace/kind, suitable to use as a key in maps
+   **/
+  export function fullName(entity) {
+    var namespace = getNamespace(entity);
+    var kind = getKind(entity);
+    var name = getName(entity);
+    return UrlHelpers.join((namespace ? namespace : ""), kind, name);
+  }
 
   export function getUID(entity) {
     return Core.pathGet(entity, ['metadata', 'uid']);

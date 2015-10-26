@@ -49,7 +49,11 @@ module KubernetesAPI {
         });
       }
       this._ee.on(WatchActions.ANY, (objects) => {
-        this.initialized = true;
+        var initialized = this.initialized;
+        this._initialized = true;
+        if (!initialized) {
+          this._ee.emit(WatchActions.INIT, this._objects);
+        }
       });
     };
 
@@ -68,6 +72,12 @@ module KubernetesAPI {
     public hasNamedItem(item:any) {
       return _.any(this._objects, (obj:any) => {
         return getName(obj) === getName(item);
+      });
+    }
+
+    public getNamedItem(name:string) {
+      return _.find(this._objects, (obj:any) => {
+        return getName(obj) === name;
       });
     }
 
@@ -178,8 +188,7 @@ module KubernetesAPI {
             _.forEach(items, (item:any) => {
               // don't want to modify the original object
               item = _.cloneDeep(item);
-              // TODO this trimRight works for now, but might not work at some point
-              item.kind = _.trimRight(_.capitalize(this.handler.collection.kind), 's');
+              item.kind = toCollectionName(item);
               item.apiVersion = apiVersionForKind(this.handler.collection.kind);
               this.handler.collection.namespace ? item.namespace = this.handler.collection.namespace : false;
               var event = {
@@ -426,7 +435,7 @@ module KubernetesAPI {
     // one time fetch of the data...
     public get(cb:(data:any[]) => void) {
       if (!this.list.initialized) {
-        this.list.events.once(WatchActions.ANY, cb);
+        this.list.events.once(WatchActions.INIT, cb);
       } else {
         setTimeout(() => {
           cb(this.list.objects);
@@ -468,6 +477,14 @@ module KubernetesAPI {
         // creating a new object
         method = 'POST';
         url = this.restUrlFor(item, false);
+      } else {
+        // updating an existing object
+        var resourceVersion = item.metadata.resourceVersion;
+        if (!resourceVersion) {
+          var current = this.list.getNamedItem(getName(item));
+          resourceVersion = current.metadata.resourceVersion;
+          item.metadata.resourceVersion = resourceVersion;
+        }
       }
       if (!url) {
         return;
@@ -607,9 +624,129 @@ module KubernetesAPI {
     }
   }
 
+  export var K8SClientFactory:K8SClientFactory = new K8SClientFactoryImpl();
+
   _module.factory('K8SClientFactory', () => {
-    return new K8SClientFactoryImpl()
+    return K8SClientFactory;
   });
+
+  /*
+   * Static functions for manipulating k8s obj3cts
+   */
+
+
+  /*
+   * Get a collection
+   */
+  export function get(options:K8SOptions) {
+    if (!options.kind) {
+      // TODO throw an error
+      return;
+    }
+    var client = K8SClientFactory.create(options.kind, options.namespace);
+    var success = (data:any[]) => {
+      if (options.success) {
+        try {
+          options.success(data);
+        } catch (err) {
+          log.debug("Supplied success callback threw error: ", err);
+        }
+      }
+      K8SClientFactory.destroy(client);
+    }
+    client.get(success);
+    client.connect();
+  }
+
+  /*
+   * Add/replace an object, or a list of objects
+   */
+  export function put(options:any) {
+    // let's try and support also just supplying k8s objects directly
+    if (options.metadata || getKind(options) === toKindName(WatchTypes.LIST)) {
+      var object = options;
+      options = {
+        object: object
+      };
+      if (object.objects) {
+        options.kind = toKindName(WatchTypes.LIST);
+      }
+    }
+    // support putting a list of objects
+    if (options.object.kind === toKindName(WatchTypes.LIST)) {
+      if (!options.object.objects) {
+        // TODO throw error
+        return;
+      }
+      var answer = {};
+      var objects = _.cloneDeep(options.object.objects);
+      function addResult(id, data) {
+        answer[id] = data;
+        next();
+      };
+      function next() {
+        if (objects.length === 0) {
+          log.debug("processed all objects, returning status");
+          try {
+            if (options.success) {
+              options.success(answer);
+            }
+          } catch (err) {
+            log.debug("Supplied success callback threw error: ", err);
+          }
+          return;
+        }
+        var object = objects.shift();
+        log.debug("Processing object: ", getName(object));
+        var success = (data) => {
+          addResult(fullName(object), data);
+        };
+        var error = (data) => {
+          addResult(fullName(object), data);
+        };
+        put({
+          object: object,
+          success: success,
+          error: error
+        });
+      }
+      next();
+      return;
+    }
+    var kind = toCollectionName(options.object);
+    var namespace = getNamespace(options.object);
+    if (!kind) {
+      // TODO throw an error
+      return;
+    }
+    var client = K8SClientFactory.create(kind, namespace);
+    client.get((objects) => {
+      var success = (data) => {
+        if (options.success) {
+          try {
+            options.success(data);
+          } catch (err) {
+            log.debug("Supplied success callback threw error: ", err);
+          }
+        }
+        K8SClientFactory.destroy(client);
+      };
+      var error = (err) => {
+        if (options.error) {
+          try {
+            options.error(err);
+          } catch (err) {
+            log.debug("Supplied error callback threw error: ", err);
+          }
+        }
+        K8SClientFactory.destroy(client);
+      };
+      client.put(options.object, success, error);
+    });
+    client.connect();
+  }
+
+
 
 }
 

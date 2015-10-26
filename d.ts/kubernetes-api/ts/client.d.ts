@@ -26,4 +26,7 @@ declare module KubernetesAPI {
         put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
         delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
     }
+    var K8SClientFactory: K8SClientFactory;
+    function get(options: K8SOptions): void;
+    function put(options: any): void;
 }
