@@ -28,5 +28,6 @@ declare module KubernetesAPI {
     }
     var K8SClientFactory: K8SClientFactory;
     function get(options: K8SOptions): void;
+    function del(options: any): void;
     function put(options: any): void;
 }

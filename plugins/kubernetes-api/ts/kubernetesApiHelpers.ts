@@ -146,6 +146,10 @@ module KubernetesAPI {
    * Kubernetes object helpers
    *
    **/
+
+  /**
+   * Create a list of kubernetes objects suitable for posting a bunch of objects
+   */
   export function createList(...objects:any[]) {
     var answer = {
       apiVersion: K8S_API_VERSION,
@@ -162,6 +166,20 @@ module KubernetesAPI {
       }
     });
     return answer;
+  }
+
+  /**
+   * Create an object suitable for delete/del
+   */
+  export function createShallowObject(name:string, kind:string, namespace?:string) {
+    return {
+      apiVersion: K8S_API_VERSION,
+      kind: toKindName(kind),
+      metadata: {
+        name: name,
+        namespace: namespace
+      }
+    };
   }
 
   /**

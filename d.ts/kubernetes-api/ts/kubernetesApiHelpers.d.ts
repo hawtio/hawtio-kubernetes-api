@@ -21,6 +21,14 @@ declare module KubernetesAPI {
         kind: any;
         objects: any[];
     };
+    function createShallowObject(name: string, kind: string, namespace?: string): {
+        apiVersion: string;
+        kind: any;
+        metadata: {
+            name: string;
+            namespace: string;
+        };
+    };
     function fullName(entity: any): string;
     function getUID(entity: any): any;
     function getNamespace(entity: any): any;

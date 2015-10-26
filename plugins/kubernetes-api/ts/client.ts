@@ -658,10 +658,44 @@ module KubernetesAPI {
     client.connect();
   }
 
-  /*
-   * Add/replace an object, or a list of objects
-   */
-  export function put(options:any) {
+  function handleListAction(options:any, action:(object:any, success:(data:any) => void, error:(err:any) => void) => void) {
+    if (!options.object.objects) {
+      // TODO throw error
+      return;
+    }
+    var answer = {};
+    var objects = _.cloneDeep(options.object.objects);
+    function addResult(id, data) {
+      answer[id] = data;
+      next();
+    };
+    function next() {
+      if (objects.length === 0) {
+        log.debug("processed all objects, returning status");
+        try {
+          if (options.success) {
+            options.success(answer);
+          }
+        } catch (err) {
+          log.debug("Supplied success callback threw error: ", err);
+        }
+        return;
+      }
+      var object = objects.shift();
+      log.debug("Processing object: ", getName(object));
+      var success = (data) => {
+      addResult(fullName(object), data);
+      };
+      var error = (data) => {
+      addResult(fullName(object), data);
+      };
+      action(object, success, error);
+    }
+    next();
+  }
+
+  function normalizeOptions(options:any) {
+    log.debug("Normalizing supplied options: ", options);
     // let's try and support also just supplying k8s objects directly
     if (options.metadata || getKind(options) === toKindName(WatchTypes.LIST)) {
       var object = options;
@@ -672,45 +706,73 @@ module KubernetesAPI {
         options.kind = toKindName(WatchTypes.LIST);
       }
     }
+    if (!options.object) {
+      throw "No object in supplied options";
+    }
+    if (!options.object.kind) {
+      throw "No kind in supplied object";
+    }
+    log.debug("Options object normalized: ", options);
+    return options;
+  }
+
+  export function del(options:any) {
+    options = normalizeOptions(options);
+    // support deleting a list of objects
+    if (options.object.kind === toKindName(WatchTypes.LIST)) {
+      handleListAction(options, (object:any, success, error) => {
+        del({
+          object: object,
+          success: success,
+          error: error
+        });
+      });
+      return;
+    }
+    var kind = toCollectionName(options.object);
+    var namespace = getNamespace(options.object);
+    if (!kind) {
+      // TODO throw an error
+      return;
+    }
+    var client = K8SClientFactory.create(kind, namespace);
+    var success = (data) => {
+      if (options.success) {
+        try {
+          options.success(data);
+        } catch (err) {
+          log.debug("Supplied success callback threw error: ", err);
+        }
+      }
+      K8SClientFactory.destroy(client);
+    };
+    var error = (err) => {
+      if (options.error) {
+        try {
+          options.error(err);
+        } catch (err) {
+          log.debug("Supplied error callback threw error: ", err);
+        }
+      }
+      K8SClientFactory.destroy(client);
+    };
+    client.delete(options.object, success, error);
+  }
+
+  /*
+   * Add/replace an object, or a list of objects
+   */
+  export function put(options:any) {
+    options = normalizeOptions(options);
     // support putting a list of objects
     if (options.object.kind === toKindName(WatchTypes.LIST)) {
-      if (!options.object.objects) {
-        // TODO throw error
-        return;
-      }
-      var answer = {};
-      var objects = _.cloneDeep(options.object.objects);
-      function addResult(id, data) {
-        answer[id] = data;
-        next();
-      };
-      function next() {
-        if (objects.length === 0) {
-          log.debug("processed all objects, returning status");
-          try {
-            if (options.success) {
-              options.success(answer);
-            }
-          } catch (err) {
-            log.debug("Supplied success callback threw error: ", err);
-          }
-          return;
-        }
-        var object = objects.shift();
-        log.debug("Processing object: ", getName(object));
-        var success = (data) => {
-          addResult(fullName(object), data);
-        };
-        var error = (data) => {
-          addResult(fullName(object), data);
-        };
+      handleListAction(options, (object:any, success, error) => {
         put({
           object: object,
           success: success,
           error: error
         });
-      }
-      next();
+      });
       return;
     }
     var kind = toCollectionName(options.object);

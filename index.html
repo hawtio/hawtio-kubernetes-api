@@ -166,6 +166,14 @@
           KubernetesAPI.put({
             success: function(data) {
               console.log("Put result: ", data);
+              setTimeout(function() {
+                KubernetesAPI.del(
+                  KubernetesAPI.createList(
+                    KubernetesAPI.createShallowObject("foo", KubernetesAPI.WatchTypes.ROUTES, "default"),
+                    KubernetesAPI.createShallowObject("bar", KubernetesAPI.WatchTypes.ROUTES, "default")), function(status) {
+                      console.log("Deleted items, status: ", status);
+                    });
+              }, 5000);
             },
             
             object: {
@@ -205,7 +213,6 @@
               ]
             }
           });
-
         }, 5000);
       });
       hawtioPluginLoader.addModule('Test');
