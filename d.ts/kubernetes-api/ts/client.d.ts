@@ -19,9 +19,10 @@ declare module KubernetesAPI {
         connected: boolean;
         connect(): void;
         destroy(): void;
-        get(cb: (data: any[]) => void): void;
+        private addLabelFilter(cb, labelSelector);
+        get(cb: (data: any[]) => void, labelSelector?: LabelMap): void;
         private restUrlFor(item, useName?);
-        watch(cb: (data: any[]) => void): (data: any[]) => void;
+        watch(cb: (data: any[]) => void, labelSelector?: LabelMap): (data: any[]) => void;
         unwatch(cb: (data: any[]) => void): void;
         put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
         delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
@@ -30,7 +31,7 @@ declare module KubernetesAPI {
     function get(options: K8SOptions): void;
     function del(options: any): void;
     function put(options: any): void;
-    function watch(options: any): {
+    function watch(options: K8SOptions): {
         client: Collection;
         handle: (data: any[]) => void;
         disconnect: () => void;

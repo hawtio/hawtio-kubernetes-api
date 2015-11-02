@@ -432,8 +432,20 @@ module KubernetesAPI {
       delete this.list;
     }
 
+    private addLabelFilter(cb:(data:any[]) => void, labelSelector:LabelMap) {
+      log.debug("Adding label filter: ", labelSelector);
+      var cbOld = cb;
+      return (data:any[]) => {
+        data = filterByLabel(data, labelSelector);
+        cbOld(data);
+      };
+    }
+
     // one time fetch of the data...
-    public get(cb:(data:any[]) => void) {
+    public get(cb:(data:any[]) => void, labelSelector?:LabelMap) {
+      if (labelSelector) {
+        cb = this.addLabelFilter(cb, labelSelector);
+      }
       if (!this.list.initialized) {
         this.list.events.once(WatchActions.INIT, cb);
       } else {
@@ -461,7 +473,10 @@ module KubernetesAPI {
     }
 
     // continually get updates
-    public watch(cb:(data:any[]) => void):(data:any[]) => void {
+    public watch(cb:(data:any[]) => void, labelSelector?:LabelMap):(data:any[]) => void {
+      if (labelSelector) {
+        cb = this.addLabelFilter(cb, labelSelector);
+      }
       this.list.events.on(WatchActions.ANY, cb);
       return cb;
     };
@@ -657,7 +672,7 @@ module KubernetesAPI {
       }
       K8SClientFactory.destroy(client);
     }
-    client.get(success);
+    client.get(success, options.labelSelector);
     client.connect();
   }
 
@@ -803,13 +818,13 @@ module KubernetesAPI {
     client.connect();
   }
 
-  export function watch(options:any) {
+  export function watch(options:K8SOptions) {
     if (!options.kind) {
       throw NO_KIND;
       return;
     }
-    var client = K8SClientFactory.create(options.kind, options.namespace);
-    var handle = client.watch(options.success);
+    var client = <Collection> K8SClientFactory.create(options.kind, options.namespace);
+    var handle = client.watch(options.success, options.labelSelector);
     var self = {
       client: client,
       handle: handle,

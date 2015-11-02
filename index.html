@@ -51,7 +51,10 @@
   <body>
     <script type="text/ng-template" id="data">
       <div>
-        <h4>{{kind}}<span ng-show="namespace"> in namespace "{{namespace}}"></span></h4>
+        <h4>{{kind}}
+          <span ng-show="namespace"> in namespace "{{namespace}}"</span>
+          <span ng-show="labelSelector"> with labels: {{labelSelector}}</span>
+        </h4>
         <span class="pull-right"><a title="Delete block" href="" ng-click="deleteScope()">X</a></span>
         <table class="table table-striped">
           <thead>
@@ -59,6 +62,7 @@
               <th>Delete</th>
               <th>Kind</th>
               <th>Name</th>
+              <th>Labels</th>
             </tr>
           </thead>
           <tbody>
@@ -66,6 +70,12 @@
               <td><a href="" ng-click="delete(obj)">X</a>
               <td>{{obj.kind}}</td>
               <td>{{obj.metadata.name}}</td>
+              <th>
+                <dl ng-repeat="(value, key) in obj.metadata.labels">
+                  <dt>{{key}}</dt>
+                  <dd>{{value}}</dd>
+                </dl>
+              </th>
             </tr>
           </tbody>
         </table>
@@ -74,10 +84,10 @@
         </div>
       </div>
     </script>
-    <div ng-controller="TestStaticController" ng-init="init('routes');">
+    <div ng-controller="TestStaticController" ng-init="init('replicationcontrollers', undefined);">
       <div ng-include="'data'"></div>
     </div>
-    <div ng-controller="TestWatcherController" ng-init="init('routes');">
+    <div ng-controller="TestWatcherController" ng-init="init('replicationcontrollers', undefined);">
       <div ng-include="'data'"></div>
     </div>
     <!--
@@ -102,12 +112,17 @@
       function initWatcherScope(factory, $scope, $element, kind, namespace) {
         $scope.kind = kind;
         $scope.namespace = namespace;
-        var client = $scope.client = factory.create(kind, namespace);
+        var labelSelector = $scope.labelSelector = { 
+          provider: 'fabric8',
+          component: 'fabric8Forge'
+        };
+        console.log("watcher scope: ", $scope);
+        var client = $scope.client = factory.create(kind, namespace, labelSelector);
         var handle = client.watch(function(objects) {
           console.log("Watcher controller[" + kind + ", " + namespace + "] got data: ", objects);
           $scope.objects = objects;
           $scope.$apply();
-        });
+        }, labelSelector);
         $scope.$watchCollection('objects', function(newValue) {
           console.log("Watcher controller[" + kind + ", " + namespace + "] collection changed");
         });
@@ -140,10 +155,14 @@
       }
 
       function initStaticScope($scope, $element, kind, namespace) {
-        $scope.objectKind = kind;
+        $scope.kind = kind;
+        $scope.namespace = namespace;
+        var labelSelector = $scope.labelSelector = { 'router': 'router' };
+        console.log("Static function scope: ", $scope);
         var connection = KubernetesAPI.watch({
           kind: kind,
           namespace: namespace,
+          labelSelector: labelSelector,
           success: function(objects) {
             console.log("Static controller[" + kind + ", " + namespace + "] got data: ", objects);
             $scope.objects = objects;

@@ -83,6 +83,7 @@ declare module KubernetesAPI {
     interface K8SOptions {
         kind?: string;
         namespace?: string;
+        labelSelector?: LabelMap;
         object?: any;
         success?: (objs: any[]) => void;
         error?: (err: any) => void;
@@ -97,6 +98,9 @@ declare module KubernetesAPI {
     interface ObjectMap {
         [uid: string]: any;
     }
+    interface LabelMap {
+        [name: string]: string;
+    }
     interface Collection {
         wsURL: string;
         restURL: string;
@@ -104,8 +108,8 @@ declare module KubernetesAPI {
         kind: string;
         connected: boolean;
         connect(): any;
-        get(cb: (data: any[]) => void): void;
-        watch(cb: (data: any[]) => void): (data: any[]) => void;
+        get(cb: (data: any[]) => void, labelSelector?: LabelMap): void;
+        watch(cb: (data: any[]) => void, labelSelector?: LabelMap): (data: any[]) => void;
         unwatch(cb: (data: any[]) => void): void;
         put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
         delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;

@@ -29,6 +29,7 @@ declare module KubernetesAPI {
             namespace: string;
         };
     };
+    function filterByLabel(objects: Array<any>, labelSelector: LabelMap): any[];
     function fullName(entity: any): string;
     function getUID(entity: any): any;
     function getNamespace(entity: any): any;
