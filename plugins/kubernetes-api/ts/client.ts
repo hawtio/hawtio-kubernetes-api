@@ -477,6 +477,11 @@ module KubernetesAPI {
       if (labelSelector) {
         cb = this.addLabelFilter(cb, labelSelector);
       }
+      if (this.list.initialized) {
+        setTimeout(() => {
+          cb(this.list.objects);
+        }, 10);
+      }
       this.list.events.on(WatchActions.ANY, cb);
       return cb;
     };
