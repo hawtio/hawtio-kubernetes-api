@@ -213,10 +213,10 @@ module KubernetesAPI {
           }
           var error = getErrorObject(jqXHR);
           if (this.retries >= 3) {
-            this._connected = false;
             this.log.debug("Out of retries, stopping polling, error: ", error);
+            this.stop();
           } else {
-            this.retries = this.retries - 1;
+            this.retries = this.retries + 1;
             this.log.debug("Error polling, retry #", this.retries + 1, " error: ", error);
             this.tCancel = setTimeout(() => {
               this.doGet();
