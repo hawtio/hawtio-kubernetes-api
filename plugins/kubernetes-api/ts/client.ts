@@ -32,7 +32,7 @@ module KubernetesAPI {
 
     constructor(kind:string, namespace?:string) {
       var loggerName = 'k8s-objects/' + (namespace ? UrlHelpers.join(namespace, kind) : kind);
-      this.log = Logger.get(loggerName);
+      this.log = log;
       this._ee = smokesignals.convert(this);
       if (this.log.enabledFor(Logger.DEBUG)) {
         this._ee.on(WatchActions.ADDED, (object) => {
@@ -164,7 +164,7 @@ module KubernetesAPI {
     private tCancel:any = undefined;
 
     constructor(private restURL:string, private handler:WSHandler) {
-      this.log = Logger.get('k8s-objects/' + getKey(handler.collection.kind, handler.collection.namespace));
+      this.log = log; // Logger.get('k8s-objects/' + getKey(handler.collection.kind, handler.collection.namespace));
     };
 
     public get connected () {
@@ -266,7 +266,7 @@ module KubernetesAPI {
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
-      this.log = Logger.get('k8s-objects/' + getKey(_self.kind, _self.namespace));
+      this.log = log; //Logger.get('k8s-objects/' + getKey(_self.kind, _self.namespace));
     }
 
     set list(_list:ObjectList) {
@@ -351,9 +351,7 @@ module KubernetesAPI {
           delete this.socket;
         }
         try {
-          if (this.socket.readyState > 1) {
-            this.socket.close();
-          }
+          this.socket.close();
         } catch (err) {
           // nothing to do, assume it's already closed
           delete this.socket;
