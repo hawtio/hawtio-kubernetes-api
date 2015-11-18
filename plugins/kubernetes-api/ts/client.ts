@@ -350,7 +350,14 @@ module KubernetesAPI {
           this.log.debug("Connection closed");
           delete this.socket;
         }
-        this.socket.close();
+        try {
+          if (this.socket.readyState > 1) {
+            this.socket.close();
+          }
+        } catch (err) {
+          // nothing to do, assume it's already closed
+          delete this.socket;
+        }
       }
       if (this.poller) {
         this.poller.destroy();
