@@ -17,6 +17,8 @@ module KubernetesAPI {
     }
   }
 
+  var pollingOnly = ['projects'];
+
   /**
    *  Manages the array of k8s objects for a client instance
    **/
@@ -338,9 +340,15 @@ module KubernetesAPI {
 
     connect() {
       if (!this.socket && !this.poller) {
-        this.log.debug("Connecting websocket for kind: ", this.self.kind);
-        var ws = this.socket = new WebSocket(this.self.wsURL);
-        this.setHandlers(this, ws);
+        if (_.any(pollingOnly, (kind) => kind === this.self.kind)) {
+          this.log.info("Using polling for kind: ", this.self.kind);
+          this.poller = new ObjectPoller(this.self.restURL, this);
+          this.poller.start();
+        } else {
+          this.log.debug("Connecting websocket for kind: ", this.self.kind);
+          var ws = this.socket = new WebSocket(this.self.wsURL);
+          this.setHandlers(this, ws);
+        }
       }
     };
 
