@@ -71,6 +71,14 @@ module KubernetesAPI {
       return this._objects;
     }
 
+    public set objects(objs:any[]) {
+      this._objects.length = 0;
+      _.forEach(objs, (obj) => {
+        this._objects.push(obj);
+      });
+      this.triggerChangedEvent();
+    }
+
     public hasNamedItem(item:any) {
       return _.any(this._objects, (obj:any) => {
         return getName(obj) === getName(item);
@@ -345,9 +353,25 @@ module KubernetesAPI {
           this.poller = new ObjectPoller(this.self.restURL, this);
           this.poller.start();
         } else {
-          this.log.debug("Connecting websocket for kind: ", this.self.kind);
-          var ws = this.socket = new WebSocket(this.self.wsURL);
-          this.setHandlers(this, ws);
+          var doConnect = () => {
+            log.debug("Connecting websocket for kind: ", this.self.kind);
+            var ws = this.socket = new WebSocket(this.self.wsURL);
+            this.setHandlers(this, ws);
+          }
+          $.ajax(this.self.restURL, <any> {
+            method: 'GET',
+            processData: false,
+            success: (data) => {
+              this._list.objects = data.items || [];
+              doConnect();
+            }, error: (jqXHR, text, status) => {
+              var err = getErrorObject(jqXHR);
+              log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, " error: ", err);
+              doConnect();
+            },
+            beforeSend: beforeSend
+
+          });
         }
       }
     };
