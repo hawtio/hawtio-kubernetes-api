@@ -84,7 +84,9 @@ module KubernetesAPI {
 		public static get BUILD_CONFIGS():string { return "buildconfigs"; }
 		public static get BUILDS():string { return "builds"; }
 		public static get DEPLOYMENT_CONFIGS():string { return "deploymentconfigs"; }
+		public static get IMAGES():string { return "images"; }
 		public static get IMAGE_STREAMS():string { return "imagestreams"; }
+		public static get IMAGE_STREAM_TAGS():string { return "imagestreamtags"; }
 		public static get POLICIES():string { return "policies"; }
 		public static get POLICY_BINDINGS():string { return "policybindings"; }
     public static get PROJECTS():string { return "projects"; }
@@ -117,7 +119,9 @@ module KubernetesAPI {
         WatchTypes.BUILDS,
         WatchTypes.BUILD_CONFIGS,
         WatchTypes.DEPLOYMENT_CONFIGS,
+        WatchTypes.IMAGES,
         WatchTypes.IMAGE_STREAMS,
+        WatchTypes.IMAGE_STREAM_TAGS,
         WatchTypes.OAUTH_CLIENTS,
         WatchTypes.POLICIES,
         WatchTypes.POLICY_BINDINGS,

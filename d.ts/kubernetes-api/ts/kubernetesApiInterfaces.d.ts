@@ -69,7 +69,9 @@ declare module KubernetesAPI {
         static BUILD_CONFIGS: string;
         static BUILDS: string;
         static DEPLOYMENT_CONFIGS: string;
+        static IMAGES: string;
         static IMAGE_STREAMS: string;
+        static IMAGE_STREAM_TAGS: string;
         static POLICIES: string;
         static POLICY_BINDINGS: string;
         static PROJECTS: string;
