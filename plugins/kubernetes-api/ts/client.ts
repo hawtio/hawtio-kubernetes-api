@@ -17,7 +17,7 @@ module KubernetesAPI {
     }
   }
 
-  var pollingOnly = ['projects'];
+  var pollingOnly = [WatchTypes.PROJECTS, WatchTypes.IMAGE_STREAM_TAGS];
 
   /**
    *  Manages the array of k8s objects for a client instance
@@ -25,7 +25,7 @@ module KubernetesAPI {
   class ObjectList {
     public triggerChangedEvent = _.debounce(() => {
       this._ee.emit(WatchActions.ANY, this._objects);
-    }, 500, { trailing: true });
+    }, 75, { trailing: true });
 
     private _ee:EventEnabled = undefined;
     private _initialized = false;
