@@ -3,9 +3,10 @@ var gulp = require('gulp'),
     eventStream = require('event-stream'),
     gulpLoadPlugins = require('gulp-load-plugins'),
     fs = require('fs'),
+    del = require('del'),
     path = require('path'),
     size = require('gulp-size'),
-    uri = require('URIjs'),
+    uri = require('urijs'),
     urljoin = require('url-join'),
     s = require('underscore.string'),
     stringifyObject = require('stringify-object'),
@@ -62,8 +63,7 @@ gulp.task('path-adjust', function() {
 });
 
 gulp.task('clean-defs', function() {
-  return gulp.src('defs.d.ts', { read: false })
-    .pipe(plugins.clean());
+  return del('defs.d.ts');
 });
 
 gulp.task('example-tsc', ['tsc'], function() {
@@ -98,8 +98,7 @@ gulp.task('example-concat', ['example-template'], function() {
 });
 
 gulp.task('example-clean', ['example-concat'], function() {
-  return gulp.src(['test-templates.js', 'test-compiled.js'], { read: false })
-    .pipe(plugins.clean());
+  return del(['test-templates.js', 'test-compiled.js']);
 });
 
 gulp.task('tsc', ['clean-defs'], function() {
@@ -150,8 +149,7 @@ gulp.task('concat', ['template'], function() {
 });
 
 gulp.task('clean', ['concat'], function() {
-  return gulp.src(['templates.js', 'compiled.js'], { read: false })
-    .pipe(plugins.clean());
+  return del(['templates.js', 'compiled.js']);
 });
 
 gulp.task('watch', ['build', 'build-example'], function() {
