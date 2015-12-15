@@ -34,6 +34,9 @@ module KubernetesAPI {
     if (_.any(NamespacedTypes.osTypes, (t) => t === kind)) {
       return OS_PREFIX;
     }
+    if (kind === WatchTypes.IMAGES) {
+      return OS_PREFIX;
+    }
     return null;
   }
 

@@ -119,7 +119,7 @@ module KubernetesAPI {
         WatchTypes.BUILDS,
         WatchTypes.BUILD_CONFIGS,
         WatchTypes.DEPLOYMENT_CONFIGS,
-        WatchTypes.IMAGES,
+        //WatchTypes.IMAGES,
         WatchTypes.IMAGE_STREAMS,
         WatchTypes.IMAGE_STREAM_TAGS,
         WatchTypes.OAUTH_CLIENTS,
