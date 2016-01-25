@@ -10,6 +10,7 @@ var gulp = require('gulp'),
     urljoin = require('url-join'),
     s = require('underscore.string'),
     stringifyObject = require('stringify-object'),
+    argv = require('yargs').argv,
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
@@ -24,7 +25,7 @@ var config = {
   testTemplates: ['test-plugins/**/*.html'],
   templateModule: pkg.name + '-templates',
   testTemplateModule: pkg.name + '-test-templates',
-  dist: './dist/',
+  dist: argv.out || './dist/',
   js: pkg.name + '.js',
   testJs: pkg.name + '-test.js',
   css: pkg.name + '.css',
