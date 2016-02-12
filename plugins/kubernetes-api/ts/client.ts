@@ -347,6 +347,13 @@ module KubernetesAPI {
     };
 
     connect() {
+      // in case a custom URL is going to be used
+      if (this.self.restURL === '' && this.self.wsURL === '') {
+        setTimeout(() => {
+          this.connect();
+        }, 2500);
+        return;
+      }
       if (!this.socket && !this.poller) {
         if (_.any(pollingOnly, (kind) => kind === this.self.kind)) {
           this.log.info("Using polling for kind: ", this.self.kind);
@@ -370,7 +377,6 @@ module KubernetesAPI {
               doConnect();
             },
             beforeSend: beforeSend
-
           });
         }
       }
@@ -404,14 +410,12 @@ module KubernetesAPI {
     private _kind:string;
     private _namespace:string;
     private _path:string;
-    private _wsUrl:URI;
-    private _restUrl:URI;
     private handlers:WSHandler = undefined;
     private list:ObjectList = undefined;
 
-    constructor(kind:string, namespace?:string) {
-      this._kind = kind;
-      this._namespace = namespace || null;
+    constructor(private options:K8SOptions) {
+      this._kind = options.kind;
+      this._namespace = options.namespace || null;
 
       var pref = prefixForKind(this._kind);
       if (!pref) {
@@ -422,27 +426,51 @@ module KubernetesAPI {
       } else {
         this._path = UrlHelpers.join(pref, this._kind);
       }
-
-      this._restUrl = new URI(UrlHelpers.join(masterApiUrl(), this._path));
-      this._wsUrl = wsUrl(UrlHelpers.join(masterApiUrl(), this._path)).query(<any>{
-        watch: true,
-        access_token: HawtioOAuth.getOAuthToken()
-      });
       this.handlers = new WSHandler(this);
-      var list = this.list = new ObjectList(kind, namespace);
+      var list = this.list = new ObjectList(options.kind, options.namespace);
       this.handlers.list = list;
     };
+
+    private get _restUrl() {
+      if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
+        var answer = this.options.urlFunction(this.options);
+        if (answer === null || !answer) {
+          return null;
+        }
+        return new URI(answer);
+      } else {
+        return new URI(UrlHelpers.join(masterApiUrl(), this._path));
+      }
+    }
+
+    private get _wsUrl() {
+      if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
+        var answer = this.options.urlFunction(this.options);
+        if (answer === null || !answer) {
+          return null;
+        }
+        return wsUrl(answer).query(<any> {
+          watch: true,
+          access_token: HawtioOAuth.getOAuthToken()
+        });
+      } else {
+        return wsUrl(UrlHelpers.join(masterApiUrl(), this._path)).query(<any> {
+          watch: true,
+          access_token: HawtioOAuth.getOAuthToken()
+        });
+      }
+    }
 
     public getKey() {
       return getKey(this._kind, this._namespace);
     };
 
     public get wsURL() {
-      return this._wsUrl.toString();
+      return (this._wsUrl || "").toString();
     };
 
     public get restURL() {
-      return this._restUrl.toString();
+      return (this._restUrl || "").toString();
     };
 
     get namespace() {
@@ -647,7 +675,19 @@ module KubernetesAPI {
   class K8SClientFactoryImpl {
     private log:Logging.Logger = Logger.get('k8s-client-factory');
     private _clients = <ClientMap> {};
-    public create(kind: string, namespace?: string):Collection {
+    public create(options: any, namespace?: any):Collection {
+      var kind = options;
+      var namespace = namespace;
+      var _options = options;
+      if (angular.isObject(options)) {
+        kind = options.kind;
+        namespace = options.namespace || namespace;
+      } else {
+        _options = {
+          kind: kind,
+          namespace: namespace
+        };
+      }
       var key = getKey(kind, namespace);
       if (key in this._clients) {
         var client = this._clients[key];
@@ -655,7 +695,7 @@ module KubernetesAPI {
         this.log.debug("Returning existing client for key: ", key, " refcount is: ", client.refCount);
         return client.collection;
       } else {
-        var client = new ClientInstance(new CollectionImpl(kind, namespace));
+        var client = new ClientInstance(new CollectionImpl(_options));
         client.addRef();
         this.log.debug("Creating new client for key: ", key, " refcount is: ", client.refCount);
         this._clients[key] = client;
@@ -703,7 +743,7 @@ module KubernetesAPI {
       throw NO_KIND;
       return;
     }
-    var client = K8SClientFactory.create(options.kind, options.namespace);
+    var client = K8SClientFactory.create(options);
     var success = (data:any[]) => {
       if (options.success) {
         try {
@@ -789,9 +829,9 @@ module KubernetesAPI {
       });
       return;
     }
-    var kind = toCollectionName(options.object);
-    var namespace = getNamespace(options.object);
-    var client = K8SClientFactory.create(kind, namespace);
+    options.kind = options.kind || toCollectionName(options.object);
+    options.namespace = options.namespace || getNamespace(options.object);
+    var client = K8SClientFactory.create(options);
     var success = (data) => {
       if (options.success) {
         try {
@@ -831,9 +871,9 @@ module KubernetesAPI {
       });
       return;
     }
-    var kind = toCollectionName(options.object);
-    var namespace = getNamespace(options.object);
-    var client = K8SClientFactory.create(kind, namespace);
+    options.kind = options.kind || toCollectionName(options.object);
+    options.namespace = options.namespace || getNamespace(options.object);
+    var client = K8SClientFactory.create(options);
     client.get((objects) => {
       var success = (data) => {
         if (options.success) {
@@ -865,7 +905,7 @@ module KubernetesAPI {
       throw NO_KIND;
       return;
     }
-    var client = <Collection> K8SClientFactory.create(options.kind, options.namespace);
+    var client = <Collection> K8SClientFactory.create(options);
     var handle = client.watch(options.success, options.labelSelector);
     var self = {
       client: client,

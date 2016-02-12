@@ -89,6 +89,7 @@ declare module KubernetesAPI {
         object?: any;
         success?: (objs: any[]) => void;
         error?: (err: any) => void;
+        urlFunction?: (options: K8SOptions) => string;
     }
     class WatchActions {
         static INIT: string;
@@ -118,7 +119,7 @@ declare module KubernetesAPI {
         getKey(): string;
     }
     interface K8SClientFactory {
-        create(kind: string, namespace?: string): Collection;
+        create(kind: any, namespace?: string): Collection;
         destroy(client: Collection, ...handles: Array<(data: any[]) => void>): void;
     }
 }

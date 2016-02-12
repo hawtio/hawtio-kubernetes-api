@@ -3,14 +3,15 @@
 /// <reference path="kubernetesApiPlugin.d.ts" />
 declare module KubernetesAPI {
     class CollectionImpl implements Collection {
+        private options;
         private _kind;
         private _namespace;
         private _path;
-        private _wsUrl;
-        private _restUrl;
         private handlers;
         private list;
-        constructor(kind: string, namespace?: string);
+        constructor(options: K8SOptions);
+        private _restUrl;
+        private _wsUrl;
         getKey(): string;
         wsURL: string;
         restURL: string;

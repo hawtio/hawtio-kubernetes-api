@@ -139,6 +139,7 @@ module KubernetesAPI {
     object?: any;
     success?: (objs:any[]) => void;
     error?: (err:any) => void;
+    urlFunction?: (options:K8SOptions) => string;
   }
 	
 	export class WatchActions {
@@ -173,7 +174,7 @@ module KubernetesAPI {
   }
 
   export interface K8SClientFactory {
-    create(kind:string, namespace?: string):Collection;
+    create(kind:any, namespace?: string):Collection;
     destroy(client:Collection, ...handles:Array<(data:any[]) => void>):void;
   }
 
