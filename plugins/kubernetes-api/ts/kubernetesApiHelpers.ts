@@ -16,6 +16,22 @@ module KubernetesAPI {
     return masterUrl || "";
   }
 
+  export function namespaced(kind:string) {
+    switch (kind) {
+      case KubernetesAPI.WatchTypes.POLICIES:
+      case KubernetesAPI.WatchTypes.OAUTH_CLIENTS:
+      case KubernetesAPI.WatchTypes.NODES:
+      case KubernetesAPI.WatchTypes.PERSISTENT_VOLUMES:
+      case KubernetesAPI.WatchTypes.PERSISTENT_VOLUME_CLAIMS:
+      case KubernetesAPI.WatchTypes.PROJECTS:
+      case KubernetesAPI.WatchTypes.TEMPLATES:
+        return false;
+
+      default:
+        return true;
+    }
+  }
+
   export function kubernetesApiPrefix() {
     return UrlHelpers.join(apiPrefix(), OS_API_VERSION);
   }
