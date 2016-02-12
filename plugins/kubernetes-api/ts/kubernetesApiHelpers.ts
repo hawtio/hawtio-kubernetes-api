@@ -157,7 +157,12 @@ module KubernetesAPI {
    * Compare two k8s objects based on their UID
    */
   export function equals(left, right):boolean {
-    return getUID(left) === getUID(right);
+    var leftUID = getUID(left);
+    var rightUID = getUID(right);
+    if (!leftUID && !rightUID) {
+      return angular.toJson(left) === angular.toJson(right);
+    }
+    return leftUID === rightUID;
   }
 
   /**

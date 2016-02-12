@@ -175,6 +175,8 @@ module KubernetesAPI {
 
     constructor(private restURL:string, private handler:WSHandler) {
       this.log = log; // Logger.get('k8s-objects/' + getKey(handler.collection.kind, handler.collection.namespace));
+      this._lastFetch = this.handler.list.objects;
+      log.warn("This: ", this);
     };
 
     public get connected () {
@@ -196,15 +198,10 @@ module KubernetesAPI {
           this._lastFetch = items;
           _.forIn(result, (items:any[], action:string) => {
             _.forEach(items, (item:any) => {
-              // don't want to modify the original object
-              item = _.cloneDeep(item);
-              item.kind = toCollectionName(item);
-              item.apiVersion = apiVersionForKind(this.handler.collection.kind);
-              this.handler.collection.namespace ? item.namespace = this.handler.collection.namespace : false;
               var event = {
                 data: angular.toJson({
                   type: action.toUpperCase(),
-                  object: item
+                  object: _.clone(item)
                   }, true)
                 };
               this.handler.onmessage(event);
@@ -281,6 +278,10 @@ module KubernetesAPI {
 
     set list(_list:ObjectList) {
       this._list = _list;
+    }
+
+    get list() {
+      return this._list || <ObjectList> { objects: [] };
     }
 
     get collection() {
