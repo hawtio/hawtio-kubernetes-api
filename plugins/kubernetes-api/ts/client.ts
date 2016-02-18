@@ -577,6 +577,7 @@ module KubernetesAPI {
       }
       $.ajax(url, <any> {
         method: method,
+        contentType: 'application/json',
         data: angular.toJson(item),
         processData: false,
         success: (data) => {
