@@ -176,7 +176,6 @@ module KubernetesAPI {
     constructor(private restURL:string, private handler:WSHandler) {
       this.log = log; // Logger.get('k8s-objects/' + getKey(handler.collection.kind, handler.collection.namespace));
       this._lastFetch = this.handler.list.objects;
-      log.warn("This: ", this);
     };
 
     public get connected () {
@@ -743,7 +742,6 @@ module KubernetesAPI {
   export function get(options:K8SOptions) {
     if (!options.kind) {
       throw NO_KIND;
-      return;
     }
     var client = K8SClientFactory.create(options);
     var success = (data:any[]) => {
@@ -763,7 +761,6 @@ module KubernetesAPI {
   function handleListAction(options:any, action:(object:any, success:(data:any) => void, error:(err:any) => void) => void) {
     if (!options.object.objects) {
       throw NO_OBJECTS;
-      return;
     }
     var answer = {};
     var objects = _.cloneDeep(options.object.objects);
@@ -905,7 +902,6 @@ module KubernetesAPI {
   export function watch(options:K8SOptions) {
     if (!options.kind) {
       throw NO_KIND;
-      return;
     }
     var client = <Collection> K8SClientFactory.create(options);
     var handle = client.watch(options.success, options.labelSelector);

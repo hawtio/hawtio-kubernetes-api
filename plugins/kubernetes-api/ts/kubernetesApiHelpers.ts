@@ -61,10 +61,8 @@ module KubernetesAPI {
     switch(api) {
       case K8S_API_VERSION:
         return kubernetesApiPrefix();
-        break;
       case OS_API_VERSION:
         return openshiftApiPrefix();
-        break;
       default:
         return null;
     }
@@ -75,10 +73,8 @@ module KubernetesAPI {
     switch(api) {
       case K8S_PREFIX:
         return kubernetesApiPrefix();
-        break;
       case OS_PREFIX:
         return openshiftApiPrefix();
-        break;
       default:
         return null;
     }
