@@ -24,7 +24,7 @@ module KubernetesAPI {
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUMES:
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUME_CLAIMS:
       case KubernetesAPI.WatchTypes.PROJECTS:
-      case KubernetesAPI.WatchTypes.TEMPLATES:
+      //case KubernetesAPI.WatchTypes.TEMPLATES:
         return false;
 
       default:
