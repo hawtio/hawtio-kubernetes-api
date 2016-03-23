@@ -12,6 +12,10 @@ module KubernetesAPI {
     return OS_PREFIX;
   }
 
+  export function extPrefix() {
+    return K8S_EXT_PREFIX;
+  }
+
   export function masterApiUrl() {
     return masterUrl || "";
   }
@@ -24,7 +28,6 @@ module KubernetesAPI {
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUMES:
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUME_CLAIMS:
       case KubernetesAPI.WatchTypes.PROJECTS:
-      //case KubernetesAPI.WatchTypes.TEMPLATES:
         return false;
 
       default:
@@ -213,6 +216,18 @@ module KubernetesAPI {
   }
 
   /**
+   * Apply the given namespace to an object if it isn't already set
+   */
+  export function applyNamespace(obj:any, namespace: string) {
+    if (!obj.kind || !namespace) {
+      return;
+    }
+    if (namespaced(obj.kind) && !obj.metadata.namespace) {
+      obj.metadata.namespace = namespace;
+    }
+  }
+
+  /**
    * Returns a fully scoped name with the namespace/kind, suitable to use as a key in maps
    **/
   export function fullName(entity) {
@@ -230,6 +245,10 @@ module KubernetesAPI {
     var answer = Core.pathGet(entity, ["metadata", "namespace"]);
     // some objects aren't namespaced, so this can return null;
     return answer;
+  }
+
+  export function getApiVersion(entity) {
+    return Core.pathGet(entity, ['apiVersion']);
   }
 
   export function getLabels(entity) {

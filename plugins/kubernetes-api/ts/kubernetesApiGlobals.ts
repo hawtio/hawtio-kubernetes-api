@@ -21,6 +21,7 @@ module KubernetesAPI {
 
   export var K8S_PREFIX = 'api';
   export var OS_PREFIX = 'oapi';
+  export var K8S_EXT_PREFIX = 'apis';
 
   export var K8S_API_VERSION = 'v1';
   export var OS_API_VERSION = 'v1';

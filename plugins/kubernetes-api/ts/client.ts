@@ -410,16 +410,22 @@ module KubernetesAPI {
     private _kind:string;
     private _namespace:string;
     private _path:string;
+    private _apiVersion:string;
     private handlers:WSHandler = undefined;
     private list:ObjectList = undefined;
 
     constructor(private options:K8SOptions) {
       this._kind = options.kind;
+      this._apiVersion = options.apiVersion;
       this._namespace = options.namespace || null;
 
       var pref = prefixForKind(this._kind);
       if (!pref) {
-        throw new Error('Unknown kind: ' + this._kind);
+        if (this._apiVersion && _.startsWith(this._apiVersion, 'extensions')) {
+          pref = UrlHelpers.join(K8S_EXT_PREFIX, this._apiVersion);
+        } else {
+          throw new Error('Unknown kind: ' + this._kind);
+        }
       }
       if (this._namespace) {
         this._path = UrlHelpers.join(pref, 'namespaces', this._namespace, this._kind);
@@ -526,9 +532,9 @@ module KubernetesAPI {
         log.debug("Name missing from item: ", item);
         return undefined;
       }
-      var namespace = getNamespace(item);
       var url = UrlHelpers.join(this._restUrl.toString());
-      if (this._kind !== WatchTypes.NAMESPACES && namespace && !this._namespace) {
+      if (namespaced(toCollectionName(item.kind))) {
+        var namespace = getNamespace(item) || this._namespace;
         url = UrlHelpers.join(masterApiUrl(), prefixForKind(this._kind), 'namespaces', namespace, this._kind);
       }
       if (useName) {
@@ -575,8 +581,8 @@ module KubernetesAPI {
         return;
       }
       // Custom checks for specific cases
-      switch (item.metadata.kind) {
-        case 'Service':
+      switch (this._kind) {
+        case WatchTypes.SERVICES:
           if (item.spec.clusterIP === '') {
             delete item.spec.clusterIP;
           }
@@ -584,28 +590,32 @@ module KubernetesAPI {
         default:
 
       }
-      $.ajax(url, <any> {
-        method: method,
-        contentType: 'application/json',
-        data: angular.toJson(item),
-        processData: false,
-        success: (data) => {
-          try {
-            var response = angular.fromJson(data);
-            cb(response);
-          } catch (err) {
-            cb({});
-          }
-        }, 
-        error: (jqXHR, text, status) => {
-          var err = getErrorObject(jqXHR);
-          log.debug("Failed to create or update, error: ", err);
-          if (error) {
-            error(err);
-          }
-        },
-        beforeSend: beforeSend
-      });
+      try {
+        $.ajax(url, <any> {
+          method: method,
+          contentType: 'application/json',
+          data: angular.toJson(item),
+          processData: false,
+          success: (data) => {
+            try {
+              var response = angular.fromJson(data);
+              cb(response);
+            } catch (err) {
+              cb({});
+            }
+          }, 
+          error: (jqXHR, text, status) => {
+            var err = getErrorObject(jqXHR);
+            log.debug("Failed to create or update, error: ", err);
+            if (error) {
+              error(err);
+            }
+          },
+          beforeSend: beforeSend
+        });
+      } catch (err) {
+        error(err);
+      }
     };
 
     public delete(item:any, cb:(data:any) => void, error?:(err:any) => void) {
@@ -615,27 +625,31 @@ module KubernetesAPI {
       }
       this.list.deleted(item);
       this.list.triggerChangedEvent();
-      $.ajax(url, <any>{
-        method: 'DELETE',
-        success: (data) => {
-          try {
-            var response = angular.fromJson(data);
-            cb(response);
-          } catch (err) {
-            cb({});
-          }
-        },
-        error: (jqXHR, text, status) => {
-          var err = getErrorObject(jqXHR);
-          log.debug("Failed to delete, error: ", err);
-          this.list.added(item);
-          this.list.triggerChangedEvent();
-          if (error) {
-            error(err);
-          }
-        },
-        beforeSend: beforeSend
-      });
+      try {
+        $.ajax(url, <any>{
+          method: 'DELETE',
+          success: (data) => {
+            try {
+              var response = angular.fromJson(data);
+              cb(response);
+            } catch (err) {
+              cb({});
+            }
+          },
+          error: (jqXHR, text, status) => {
+            var err = getErrorObject(jqXHR);
+            log.debug("Failed to delete, error: ", err);
+            this.list.added(item);
+            this.list.triggerChangedEvent();
+            if (error) {
+              error(err);
+            }
+          },
+          beforeSend: beforeSend
+        });
+      } catch (err) {
+        error(err);
+      }
     };
   };
 
@@ -839,7 +853,8 @@ module KubernetesAPI {
       return;
     }
     options.kind = options.kind || toCollectionName(options.object);
-    options.namespace = options.namespace || getNamespace(options.object);
+    options.namespace = namespaced(options.kind) ? options.namespace || getNamespace(options.object) : null;
+    options.apiVersion = options.apiVersion || getApiVersion(options.object);
     var client = K8SClientFactory.create(options);
     var success = (data) => {
       if (options.success) {
@@ -881,7 +896,8 @@ module KubernetesAPI {
       return;
     }
     options.kind = options.kind || toCollectionName(options.object);
-    options.namespace = options.namespace || getNamespace(options.object);
+    options.namespace = namespaced(options.kind) ? options.namespace || getNamespace(options.object) : null;
+    options.apiVersion = options.apiVersion || getApiVersion(options.object);
     var client = K8SClientFactory.create(options);
     client.get((objects) => {
       var success = (data) => {

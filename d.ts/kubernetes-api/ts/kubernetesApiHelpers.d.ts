@@ -2,6 +2,7 @@
 declare module KubernetesAPI {
     function apiPrefix(): string;
     function osApiPrefix(): string;
+    function extPrefix(): string;
     function masterApiUrl(): string;
     function namespaced(kind: string): boolean;
     function kubernetesApiPrefix(): string;
@@ -31,9 +32,11 @@ declare module KubernetesAPI {
         };
     };
     function filterByLabel(objects: Array<any>, labelSelector: LabelMap): any[];
+    function applyNamespace(obj: any, namespace: string): void;
     function fullName(entity: any): string;
     function getUID(entity: any): any;
     function getNamespace(entity: any): any;
+    function getApiVersion(entity: any): any;
     function getLabels(entity: any): any;
     function getName(entity: any): any;
     function getKind(entity: any): any;

@@ -136,6 +136,7 @@ module KubernetesAPI {
   export interface K8SOptions {
     kind?: string;
     namespace?: string;
+    apiVersion?: string;
     labelSelector?: LabelMap;
     object?: any;
     success?: (objs:any[]) => void;

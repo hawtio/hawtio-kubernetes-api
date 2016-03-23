@@ -7,6 +7,7 @@ declare module KubernetesAPI {
         private _kind;
         private _namespace;
         private _path;
+        private _apiVersion;
         private handlers;
         private list;
         constructor(options: K8SOptions);

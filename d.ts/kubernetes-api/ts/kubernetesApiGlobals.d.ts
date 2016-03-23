@@ -13,6 +13,7 @@ declare module KubernetesAPI {
     var masterUrl: string;
     var K8S_PREFIX: string;
     var OS_PREFIX: string;
+    var K8S_EXT_PREFIX: string;
     var K8S_API_VERSION: string;
     var OS_API_VERSION: string;
     var defaultApiVersion: string;
