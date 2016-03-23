@@ -23,6 +23,7 @@ declare module KubernetesAPI {
         destroy(): void;
         private addLabelFilter(cb, labelSelector);
         get(cb: (data: any[]) => void, labelSelector?: LabelMap): void;
+        private getPrefix();
         private restUrlFor(item, useName?);
         watch(cb: (data: any[]) => void, labelSelector?: LabelMap): (data: any[]) => void;
         unwatch(cb: (data: any[]) => void): void;

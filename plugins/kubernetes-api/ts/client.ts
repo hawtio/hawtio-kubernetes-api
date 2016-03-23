@@ -419,14 +419,8 @@ module KubernetesAPI {
       this._apiVersion = options.apiVersion;
       this._namespace = options.namespace || null;
 
-      var pref = prefixForKind(this._kind);
-      if (!pref) {
-        if (this._apiVersion && _.startsWith(this._apiVersion, 'extensions')) {
-          pref = UrlHelpers.join(K8S_EXT_PREFIX, this._apiVersion);
-        } else {
-          throw new Error('Unknown kind: ' + this._kind);
-        }
-      }
+      var pref = this.getPrefix();
+
       if (this._namespace) {
         this._path = UrlHelpers.join(pref, 'namespaces', this._namespace, this._kind);
       } else {
@@ -526,6 +520,18 @@ module KubernetesAPI {
       }
     };
 
+    private getPrefix() {
+      var pref = prefixForKind(this._kind);
+      if (!pref) {
+        if (this._apiVersion && _.startsWith(this._apiVersion, 'extensions')) {
+          pref = UrlHelpers.join(K8S_EXT_PREFIX, this._apiVersion);
+        } else {
+          throw new Error('Unknown kind: ' + this._kind);
+        }
+      }
+      return pref;
+    }
+
     private restUrlFor(item:any, useName:boolean = true) {
       var name = getName(item);
       if (useName && !name) {
@@ -535,7 +541,7 @@ module KubernetesAPI {
       var url = UrlHelpers.join(this._restUrl.toString());
       if (namespaced(toCollectionName(item.kind))) {
         var namespace = getNamespace(item) || this._namespace;
-        url = UrlHelpers.join(masterApiUrl(), prefixForKind(this._kind), 'namespaces', namespace, this._kind);
+        url = UrlHelpers.join(masterApiUrl(), this.getPrefix(), 'namespaces', namespace, this._kind);
       }
       if (useName) {
         url = UrlHelpers.join(url, name);

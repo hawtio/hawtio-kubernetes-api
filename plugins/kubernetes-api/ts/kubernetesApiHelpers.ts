@@ -222,7 +222,7 @@ module KubernetesAPI {
     if (!obj.kind || !namespace) {
       return;
     }
-    if (namespaced(obj.kind) && !obj.metadata.namespace) {
+    if (namespaced(toCollectionName(obj.kind)) && !obj.metadata.namespace) {
       obj.metadata.namespace = namespace;
     }
   }
