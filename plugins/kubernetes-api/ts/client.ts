@@ -574,6 +574,16 @@ module KubernetesAPI {
       if (!url) {
         return;
       }
+      // Custom checks for specific cases
+      switch (item.metadata.kind) {
+        case 'Service':
+          if (item.spec.clusterIP === '') {
+            delete item.spec.clusterIP;
+          }
+          break;
+        default:
+
+      }
       $.ajax(url, <any> {
         method: method,
         contentType: 'application/json',

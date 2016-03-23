@@ -92,6 +92,7 @@ module KubernetesAPI {
     public static get PROJECTS():string { return "projects"; }
 		public static get ROLE_BINDINGS():string { return "rolebindings"; }
 		public static get ROLES():string { return "roles"; }
+    //public static get DAEMONSETS():string { return "daemonsets"; }
 	}
 
   export class NamespacedTypes {
