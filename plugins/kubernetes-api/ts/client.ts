@@ -839,7 +839,11 @@ module KubernetesAPI {
       throw NO_OBJECT;
     }
     if (!options.object.kind) {
-      throw NO_KIND;
+      if (options.kind) {
+        options.object.kind = toKindName(options.kind);
+      } else {
+        throw NO_KIND;
+      }
     }
     log.debug("Options object normalized: ", options);
     return options;
