@@ -24,6 +24,7 @@ module KubernetesAPI {
     switch (kind) {
       case KubernetesAPI.WatchTypes.POLICIES:
       case KubernetesAPI.WatchTypes.OAUTH_CLIENTS:
+      case KubernetesAPI.WatchTypes.NAMESPACES:
       case KubernetesAPI.WatchTypes.NODES:
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUMES:
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUME_CLAIMS:
