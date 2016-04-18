@@ -99,6 +99,7 @@ module KubernetesAPI {
   export class NamespacedTypes {
     public static get k8sTypes():Array<string> {
       return [
+        WatchTypes.CONFIG_MAPS,
         WatchTypes.ENDPOINTS,
         WatchTypes.EVENTS,
         WatchTypes.NODES,
