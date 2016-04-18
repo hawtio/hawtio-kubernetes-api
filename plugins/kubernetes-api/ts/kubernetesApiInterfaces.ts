@@ -78,6 +78,7 @@ module KubernetesAPI {
 		public static get SECRETS():string { return "secrets"; }
 		public static get SERVICES():string { return "services"; }
 		public static get SERVICE_ACCOUNTS():string { return "serviceaccounts"; }
+		public static get CONFIG_MAPS():string { return "configmaps"; }
 
 		public static get TEMPLATES():string { return "templates"; }
 		public static get ROUTES():string { return "routes"; }
