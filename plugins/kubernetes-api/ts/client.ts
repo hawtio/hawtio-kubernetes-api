@@ -361,10 +361,15 @@ module KubernetesAPI {
           this.poller.start();
         } else {
           var doConnect = () => {
-            log.debug("Connecting websocket for kind: ", this.self.kind);
-            var ws = this.socket = new WebSocket(this.self.wsURL);
-            this.setHandlers(this, ws);
-          }
+            var wsURL = this.self.wsURL;
+            if (wsURL) {
+              log.debug("Connecting websocket for kind: ", this.self.kind);
+              var ws = this.socket = new WebSocket(wsURL);
+              this.setHandlers(this, ws);
+            } else {
+              log.info("No wsURL for kind: " + this.self.kind);
+            }
+          };
           $.ajax(this.self.restURL, <any> {
             method: 'GET',
             processData: false,
