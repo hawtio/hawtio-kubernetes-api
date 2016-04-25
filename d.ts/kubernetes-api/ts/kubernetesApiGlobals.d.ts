@@ -11,6 +11,7 @@ declare module KubernetesAPI {
     var hostIconUrl: string;
     var osConfig: KubernetesConfig;
     var masterUrl: string;
+    var isOpenShift: boolean;
     var K8S_PREFIX: string;
     var OS_PREFIX: string;
     var K8S_EXT_PREFIX: string;

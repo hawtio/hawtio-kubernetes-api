@@ -18,6 +18,7 @@ module KubernetesAPI {
   // this gets set as a pre-bootstrap task
   export var osConfig:KubernetesConfig = undefined;
   export var masterUrl = "";
+  export var isOpenShift = false;
 
   export var K8S_PREFIX = 'api';
   export var OS_PREFIX = 'oapi';

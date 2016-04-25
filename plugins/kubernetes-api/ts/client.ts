@@ -544,9 +544,18 @@ module KubernetesAPI {
         return undefined;
       }
       var url = UrlHelpers.join(this._restUrl.toString());
-      if (namespaced(toCollectionName(item.kind))) {
-        var namespace = getNamespace(item) || this._namespace;
-        url = UrlHelpers.join(masterApiUrl(), this.getPrefix(), 'namespaces', namespace, this._kind);
+      if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
+        // lets trust the url to be correct
+      } else {
+        if (namespaced(toCollectionName(item.kind))) {
+          var namespace = getNamespace(item) || this._namespace;
+          var prefix = this.getPrefix();
+          var kind = this._kind;
+          if (!KubernetesAPI.isOpenShift && (kind === "buildconfigs" || kind === "BuildConfig")) {
+            prefix = UrlHelpers.join("/api/v1/proxy/namespaces/default/services/jenkinshift:80/", prefix);
+          }
+          url = UrlHelpers.join(masterApiUrl(), prefix, 'namespaces', namespace, kind);
+        }
       }
       if (useName) {
         url = UrlHelpers.join(url, name);

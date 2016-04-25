@@ -37,19 +37,22 @@ module KubernetesAPI {
           GoogleOAuthConfig = config.google;
           KeycloakConfig = config.keycloak;
 
-          if (OSOAuthConfig && !master) {
-            // TODO auth.master_uri no longer used right?
-            // master = OSOAuthConfig.master_uri;
+          if (OSOAuthConfig) {
+            KubernetesAPI.isOpenShift = true;
             if (!master) {
-              var oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
-              if (oauth_authorize_uri) {
-                var text = oauth_authorize_uri;
-                var idx = text.indexOf("://");
-                if (idx > 0) {
-                  idx += 3;
-                  idx = text.indexOf("/", idx);
+              // TODO auth.master_uri no longer used right?
+              // master = OSOAuthConfig.master_uri;
+              if (!master) {
+                var oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
+                if (oauth_authorize_uri) {
+                  var text = oauth_authorize_uri;
+                  var idx = text.indexOf("://");
                   if (idx > 0) {
-                    master = text.substring(0, ++idx);
+                    idx += 3;
+                    idx = text.indexOf("/", idx);
+                    if (idx > 0) {
+                      master = text.substring(0, ++idx);
+                    }
                   }
                 }
               }
