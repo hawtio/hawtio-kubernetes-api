@@ -65,6 +65,7 @@ declare module KubernetesAPI {
         static SERVICES: string;
         static SERVICE_ACCOUNTS: string;
         static CONFIG_MAPS: string;
+        static INGRESSES: string;
         static TEMPLATES: string;
         static ROUTES: string;
         static BUILD_CONFIGS: string;

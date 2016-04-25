@@ -79,6 +79,7 @@ module KubernetesAPI {
 		public static get SERVICES():string { return "services"; }
 		public static get SERVICE_ACCOUNTS():string { return "serviceaccounts"; }
 		public static get CONFIG_MAPS():string { return "configmaps"; }
+		public static get INGRESSES():string { return "ingresses"; }
 
 		public static get TEMPLATES():string { return "templates"; }
 		public static get ROUTES():string { return "routes"; }
@@ -102,6 +103,7 @@ module KubernetesAPI {
         WatchTypes.CONFIG_MAPS,
         WatchTypes.ENDPOINTS,
         WatchTypes.EVENTS,
+        WatchTypes.INGRESSES,
         WatchTypes.NODES,
         WatchTypes.PERSISTENT_VOLUMES,
         WatchTypes.PERSISTENT_VOLUME_CLAIMS,
