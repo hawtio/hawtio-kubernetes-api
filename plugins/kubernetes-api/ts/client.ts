@@ -32,7 +32,7 @@ module KubernetesAPI {
     private _objects:Array<any> = [];
     private log:Logging.Logger = undefined;
 
-    constructor(kind:string, namespace?:string) {
+    constructor(private kind:string, private namespace?:string) {
       var loggerName = 'k8s-objects/' + (namespace ? UrlHelpers.join(namespace, kind) : kind);
       this.log = log;
       this._ee = smokesignals.convert(this);
@@ -91,7 +91,18 @@ module KubernetesAPI {
       });
     }
 
+    // filter out objects from other namespaces that could be returned
+    private belongs(object) {
+      if (this.namespace && getNamespace(object) !== this.namespace) {
+        return false;
+      }
+      return true;
+    }
+
     public added(object) {
+      if (!this.belongs(object)) {
+        return;
+      }
       if (_.any(this._objects, (obj) => {
         return equals(obj, object);
       })) {
@@ -104,6 +115,9 @@ module KubernetesAPI {
     };
 
     public modified(object) {
+      if (!this.belongs(object)) {
+        return;
+      }
       if (!_.any(this._objects, (obj) => {
         return equals(obj, object);
       })) {
@@ -120,6 +134,9 @@ module KubernetesAPI {
     };
 
     public deleted(object) {
+      if (!this.belongs(object)) {
+        return;
+      }
       var deleted = _.remove(this._objects, (obj) => {
         return equals(obj, object);
       }, this);
