@@ -17,7 +17,8 @@ module KubernetesAPI {
     }
   }
 
-  var pollingOnly = [WatchTypes.PROJECTS, WatchTypes.IMAGE_STREAM_TAGS];
+  // Allow clients to add other types to force polling under whatever circumstances
+  export var pollingOnly = [WatchTypes.PROJECTS, WatchTypes.IMAGE_STREAM_TAGS];
 
   /**
    *  Manages the array of k8s objects for a client instance
@@ -33,7 +34,6 @@ module KubernetesAPI {
     private log:Logging.Logger = undefined;
 
     constructor(private kind:string, private namespace?:string) {
-      var loggerName = 'k8s-objects/' + (namespace ? UrlHelpers.join(namespace, kind) : kind);
       this.log = log;
       this._ee = smokesignals.convert(this);
       if (this.log.enabledFor(Logger.DEBUG)) {
@@ -191,7 +191,7 @@ module KubernetesAPI {
     private tCancel:any = undefined;
 
     constructor(private restURL:string, private handler:WSHandler) {
-      this.log = log; // Logger.get('k8s-objects/' + getKey(handler.collection.kind, handler.collection.namespace));
+      this.log = log; 
       this._lastFetch = this.handler.list.objects;
     };
 
@@ -289,7 +289,7 @@ module KubernetesAPI {
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
-      this.log = log; //Logger.get('k8s-objects/' + getKey(_self.kind, _self.namespace));
+      this.log = log; 
     }
 
     set list(_list:ObjectList) {

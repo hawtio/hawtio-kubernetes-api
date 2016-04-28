@@ -2,6 +2,7 @@
 /// <reference path="kubernetesApiHelpers.d.ts" />
 /// <reference path="kubernetesApiPlugin.d.ts" />
 declare module KubernetesAPI {
+    var pollingOnly: string[];
     class CollectionImpl implements Collection {
         private options;
         private _kind;
