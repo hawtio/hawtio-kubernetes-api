@@ -31,33 +31,44 @@ module KubernetesAPI {
     private _ee:EventEnabled = undefined;
     private _initialized = false;
     private _objects:Array<any> = [];
-    private log:Logging.Logger = undefined;
+    private log:Logging.Logger = log;
 
-    constructor(private kind:string, private namespace?:string) {
-      this.log = log;
+    constructor(private _kind:string, private namespace?:string) {
       this._ee = smokesignals.convert(this);
       if (this.log.enabledFor(Logger.DEBUG)) {
         this._ee.on(WatchActions.ADDED, (object) => {
-          this.log.debug("added object: ", object);
+          this.log.debug("added", this.kind, ":", object);
         });
         this._ee.on(WatchActions.MODIFIED, (object) => {
-          this.log.debug("modified object: ", object);
+          this.log.debug("modified", this.kind, ":", object);
         });
         this._ee.on(WatchActions.DELETED, (object) => {
-          this.log.debug("deleted object: ", object);
+          this.log.debug("deleted", this.kind, ":", object);
         });
         this._ee.on(WatchActions.ANY, (objects) => {
-          this.log.debug("objects changed: ", objects);
+          this.log.debug(this.kind, "changed:", objects);
+        });
+        this._ee.on(WatchActions.INIT, (objects) => {
+          this.log.debug(this.kind, "initialized");
         });
       }
       this._ee.on(WatchActions.ANY, (objects) => {
-        var initialized = this.initialized;
-        this._initialized = true;
-        if (!initialized) {
-          this._ee.emit(WatchActions.INIT, this._objects);
-        }
+        this.initialize();
       });
     };
+
+    public get kind() {
+      return this._kind;
+    }
+
+    public initialize() {
+      if (this.initialized) {
+        return;
+      }
+      this._initialized = true;
+      this._ee.emit(WatchActions.INIT, this._objects);
+      this.triggerChangedEvent();
+    }
 
     public get initialized() {
       return this._initialized;
@@ -76,6 +87,7 @@ module KubernetesAPI {
       _.forEach(objs, (obj) => {
         this._objects.push(obj);
       });
+      this.initialize();
       this.triggerChangedEvent();
     }
 
@@ -209,6 +221,7 @@ module KubernetesAPI {
           if (!this._connected) {
             return;
           }
+          log.debug(this.handler.kind, "fetched data:", data);
           var items  = (data && data.items) ? data.items : [];
           var result = compare(this._lastFetch, items);
           this._lastFetch = items;
@@ -223,9 +236,11 @@ module KubernetesAPI {
               this.handler.onmessage(event);
             });
           });
+          this.handler.list.initialize();
           //log.debug("Result: ", result);
           if (this._connected) {
             this.tCancel = setTimeout(() => {
+              log.debug(this.handler.kind, "polling");
               this.doGet();
             }, this._interval);
           }
@@ -236,11 +251,11 @@ module KubernetesAPI {
           }
           var error = getErrorObject(jqXHR);
           if (this.retries >= 3) {
-            this.log.debug("Out of retries, stopping polling, error: ", error);
+            this.log.debug(this.handler.kind, "- Out of retries, stopping polling, error: ", error);
             this.stop();
           } else {
             this.retries = this.retries + 1;
-            this.log.debug("Error polling, retry #", this.retries + 1, " error: ", error);
+            this.log.debug(this.handler.kind, "- Error polling, retry #", this.retries + 1, " error: ", error);
             this.tCancel = setTimeout(() => {
               this.doGet();
             }, this._interval);
@@ -262,7 +277,9 @@ module KubernetesAPI {
 
     public stop() {
       this._connected = false;
+      this.log.debug(this.handler.kind, " - disconnecting");
       if (this.tCancel) {
+        this.log.debug(this.handler.kind, " - cancelling polling");
         clearTimeout(this.tCancel);
         this.tCancel = undefined;
       }
@@ -270,7 +287,7 @@ module KubernetesAPI {
 
     public destroy() {
       this.stop();
-      this.log.debug("Connection closed");
+      this.log.debug(this.handler.kind, " - destroyed");
     }
 
   }
@@ -286,6 +303,7 @@ module KubernetesAPI {
     private self:CollectionImpl = undefined;
     private _list:ObjectList;
     private log:Logging.Logger = undefined;
+    private destroyed = false;
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
@@ -302,6 +320,10 @@ module KubernetesAPI {
 
     get collection() {
       return this._self;
+    }
+
+    get kind() {
+      return this._self.kind;
     }
 
     private setHandlers(self:WSHandler, ws:WebSocket) {
@@ -364,11 +386,14 @@ module KubernetesAPI {
     };
 
     connect() {
+      if (this.destroyed) {
+        return;
+      }
       // in case a custom URL is going to be used
       if (this.self.restURL === '' && this.self.wsURL === '') {
         setTimeout(() => {
           this.connect();
-        }, 2500);
+        }, 500);
         return;
       }
       if (!this.socket && !this.poller) {
@@ -405,6 +430,7 @@ module KubernetesAPI {
     };
 
     destroy() {
+      this.destroyed = true;
       if (this.socket) {
         this.socket.onclose = () => {
           this.log.debug("Connection closed");
@@ -451,6 +477,7 @@ module KubernetesAPI {
       this.handlers = new WSHandler(this);
       var list = this.list = new ObjectList(options.kind, options.namespace);
       this.handlers.list = list;
+      log.debug("creating new collection for", this.kind);
     };
 
     private get _restUrl() {
@@ -570,6 +597,7 @@ module KubernetesAPI {
           var kind = this._kind;
           if (!KubernetesAPI.isOpenShift && (kind === "buildconfigs" || kind === "BuildConfig")) {
             prefix = UrlHelpers.join("/api/v1/proxy/namespaces/default/services/jenkinshift:80/", prefix);
+            console.log("Using buildconfigs URL override");
           }
           url = UrlHelpers.join(masterApiUrl(), prefix, 'namespaces', namespace, kind);
         }
@@ -587,14 +615,20 @@ module KubernetesAPI {
       }
       if (this.list.initialized) {
         setTimeout(() => {
+          log.debug(this.kind, "passing existing objects:", this.list.objects);
           cb(this.list.objects);
         }, 10);
       }
-      this.list.events.on(WatchActions.ANY, cb);
+      log.debug(this.kind, "adding watch callback:", cb);
+      this.list.events.on(WatchActions.ANY, (data) => {
+        log.debug(this.kind, "got data:", data);
+        cb(data);
+      });
       return cb;
     };
 
     public unwatch(cb:(data:any[]) => void) {
+      log.debug(this.kind, "removing watch callback:", cb);
       this.list.events.off(WatchActions.ANY, cb);
     }
 

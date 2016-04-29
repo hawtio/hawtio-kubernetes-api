@@ -9,13 +9,26 @@ module KubernetesAPI {
 
   hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesApiConfig',
-    depends: 'KubernetesApiInit',
+    depends: ['KubernetesApiInit'],
     task: (next) => {
       K8S_PREFIX = Core.trimLeading(Core.pathGet(osConfig, ['api', 'k8s', 'prefix']) || K8S_PREFIX, '/');
       OS_PREFIX = Core.trimLeading(Core.pathGet(osConfig, ['api', 'openshift', 'prefix']) || OS_PREFIX, '/');
       next();
     }
   });
+
+  // Since we're using jenkinshift in vanilla k8s, let's poll build configs by default
+  hawtioPluginLoader.registerPreBootstrapTask({
+    name: 'AddPolledTypes',
+    depends: ['KubernetesApiInit'],
+    task: (next) => {
+      if (!isOpenShift) {
+        KubernetesAPI.pollingOnly.push(KubernetesAPI.WatchTypes.BUILD_CONFIGS);
+      }
+      next();
+    }
+  });
+
 
   hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesApiInit',
