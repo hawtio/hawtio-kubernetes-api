@@ -253,6 +253,9 @@ module KubernetesAPI {
           if (this.retries >= 3) {
             this.log.debug(this.handler.kind, "- Out of retries, stopping polling, error: ", error);
             this.stop();
+            if (this.handler.error) {
+              this.handler.error(error);
+            }
           } else {
             this.retries = this.retries + 1;
             this.log.debug(this.handler.kind, "- Error polling, retry #", this.retries + 1, " error: ", error);
@@ -320,6 +323,10 @@ module KubernetesAPI {
 
     get collection() {
       return this._self;
+    }
+
+    get error() {
+      return this._self.options.error;
     }
 
     get kind() {
@@ -462,10 +469,10 @@ module KubernetesAPI {
     private handlers:WSHandler = undefined;
     private list:ObjectList = undefined;
 
-    constructor(private options:K8SOptions) {
-      this._kind = options.kind;
-      this._apiVersion = options.apiVersion;
-      this._namespace = options.namespace || null;
+    constructor(private _options:K8SOptions) {
+      this._kind = _options.kind;
+      this._apiVersion = _options.apiVersion;
+      this._namespace = _options.namespace || null;
 
       var pref = this.getPrefix();
 
@@ -475,10 +482,14 @@ module KubernetesAPI {
         this._path = UrlHelpers.join(pref, this._kind);
       }
       this.handlers = new WSHandler(this);
-      var list = this.list = new ObjectList(options.kind, options.namespace);
+      var list = this.list = new ObjectList(_options.kind, _options.namespace);
       this.handlers.list = list;
       log.debug("creating new collection for", this.kind);
     };
+
+    public get options():K8SOptions {
+      return this._options;
+    }
 
     private get _restUrl() {
       if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {

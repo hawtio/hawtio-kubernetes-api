@@ -4,14 +4,15 @@
 declare module KubernetesAPI {
     var pollingOnly: string[];
     class CollectionImpl implements Collection {
-        private options;
+        private _options;
         private _kind;
         private _namespace;
         private _path;
         private _apiVersion;
         private handlers;
         private list;
-        constructor(options: K8SOptions);
+        constructor(_options: K8SOptions);
+        options: K8SOptions;
         private _restUrl;
         private _wsUrl;
         getKey(): string;
