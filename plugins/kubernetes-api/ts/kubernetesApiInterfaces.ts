@@ -73,7 +73,7 @@ module KubernetesAPI {
 		public static get PERSISTENT_VOLUME_CLAIMS():string { return "persistentvolumeclaims"; }
 		public static get PODS():string { return "pods"; }
 		public static get REPLICATION_CONTROLLERS():string { return "replicationcontrollers"; }
-    public static get REPLICA_SETS():string { return "replicaset"; }
+    public static get REPLICA_SETS():string { return "replicasets"; }
 		public static get RESOURCE_QUOTAS():string { return "resourcequotas"; }
 		public static get OAUTH_CLIENTS():string { return "oauthclients"; }
 		public static get SECRETS():string { return "secrets"; }
@@ -96,8 +96,18 @@ module KubernetesAPI {
     public static get PROJECTS():string { return "projects"; }
 		public static get ROLE_BINDINGS():string { return "rolebindings"; }
 		public static get ROLES():string { return "roles"; }
-    //public static get DAEMONSETS():string { return "daemonsets"; }
+    public static get DAEMONSETS():string { return "daemonsets"; }
 	}
+
+  export class ExtensionTypes {
+    public static get extensions():Array<string> {
+      return [
+        WatchTypes.DAEMONSETS,
+        WatchTypes.REPLICA_SETS,
+        WatchTypes.DEPLOYMENTS
+      ];
+    }
+  }
 
   export class NamespacedTypes {
     public static get k8sTypes():Array<string> {

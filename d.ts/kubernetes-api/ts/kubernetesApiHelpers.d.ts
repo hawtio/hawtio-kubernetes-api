@@ -6,6 +6,7 @@ declare module KubernetesAPI {
     function masterApiUrl(): string;
     function namespaced(kind: string): boolean;
     function kubernetesApiPrefix(): string;
+    function kubernetesApiExtensionPrefix(): string;
     function openshiftApiPrefix(): string;
     function apiForKind(kind: string): string;
     function apiVersionForKind(kind: string): string;

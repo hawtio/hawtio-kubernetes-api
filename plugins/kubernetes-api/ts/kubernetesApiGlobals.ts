@@ -26,6 +26,8 @@ module KubernetesAPI {
 
   export var K8S_API_VERSION = 'v1';
   export var OS_API_VERSION = 'v1';
+  export var K8S_EXT_VERSION = 'v1beta1';
+  export var K8S_EXTENSIONS = 'extensions';
 
   export var defaultApiVersion = K8S_API_VERSION;
   export var defaultOSApiVersion = OS_API_VERSION;

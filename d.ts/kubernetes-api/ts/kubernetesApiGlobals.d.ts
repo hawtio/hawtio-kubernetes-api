@@ -17,6 +17,8 @@ declare module KubernetesAPI {
     var K8S_EXT_PREFIX: string;
     var K8S_API_VERSION: string;
     var OS_API_VERSION: string;
+    var K8S_EXT_VERSION: string;
+    var K8S_EXTENSIONS: string;
     var defaultApiVersion: string;
     var defaultOSApiVersion: string;
     var labelFilterTextSeparator: string;

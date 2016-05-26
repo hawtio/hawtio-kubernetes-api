@@ -37,16 +37,23 @@ module KubernetesAPI {
   }
 
   export function kubernetesApiPrefix() {
-    return UrlHelpers.join(apiPrefix(), OS_API_VERSION);
+    return UrlHelpers.join(apiPrefix(), K8S_API_VERSION);
+  }
+
+  export function kubernetesApiExtensionPrefix() {
+    return UrlHelpers.join(K8S_EXT_PREFIX, K8S_EXTENSIONS, K8S_EXT_VERSION); 
   }
 
   export function openshiftApiPrefix() {
-    return UrlHelpers.join(osApiPrefix(), K8S_API_VERSION);
+    return UrlHelpers.join(osApiPrefix(), OS_API_VERSION);
   }
 
   export function apiForKind(kind:string) {
     if (kind === WatchTypes.NAMESPACES) {
       return K8S_PREFIX;
+    }
+    if (_.any(ExtensionTypes.extensions, (t) => t === kind)) {
+      return K8S_EXT_PREFIX;
     }
     if (_.any(NamespacedTypes.k8sTypes, (t) => t === kind)) {
       return K8S_PREFIX;
@@ -63,6 +70,8 @@ module KubernetesAPI {
   export function apiVersionForKind(kind:string) {
     var api = apiForKind(kind);
     switch(api) {
+      case K8S_EXT_PREFIX:
+        return kubernetesApiExtensionPrefix();
       case K8S_API_VERSION:
         return kubernetesApiPrefix();
       case OS_API_VERSION:
@@ -75,6 +84,8 @@ module KubernetesAPI {
   export function prefixForKind(kind:string) {
     var api = apiForKind(kind);
     switch(api) {
+      case K8S_EXT_PREFIX:
+        return kubernetesApiExtensionPrefix();
       case K8S_PREFIX:
         return kubernetesApiPrefix();
       case OS_PREFIX:

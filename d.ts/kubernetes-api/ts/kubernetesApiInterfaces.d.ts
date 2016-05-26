@@ -81,6 +81,10 @@ declare module KubernetesAPI {
         static PROJECTS: string;
         static ROLE_BINDINGS: string;
         static ROLES: string;
+        static DAEMONSETS: string;
+    }
+    class ExtensionTypes {
+        static extensions: Array<string>;
     }
     class NamespacedTypes {
         static k8sTypes: Array<string>;
