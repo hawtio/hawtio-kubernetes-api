@@ -73,6 +73,7 @@ module KubernetesAPI {
 		public static get PERSISTENT_VOLUME_CLAIMS():string { return "persistentvolumeclaims"; }
 		public static get PODS():string { return "pods"; }
 		public static get REPLICATION_CONTROLLERS():string { return "replicationcontrollers"; }
+    public static get REPLICA_SETS():string { return "replicaset"; }
 		public static get RESOURCE_QUOTAS():string { return "resourcequotas"; }
 		public static get OAUTH_CLIENTS():string { return "oauthclients"; }
 		public static get SECRETS():string { return "secrets"; }
@@ -86,6 +87,7 @@ module KubernetesAPI {
 		public static get BUILD_CONFIGS():string { return "buildconfigs"; }
 		public static get BUILDS():string { return "builds"; }
 		public static get DEPLOYMENT_CONFIGS():string { return "deploymentconfigs"; }
+    public static get DEPLOYMENTS():string { return "deployments"; }
 		public static get IMAGES():string { return "images"; }
 		public static get IMAGE_STREAMS():string { return "imagestreams"; }
 		public static get IMAGE_STREAM_TAGS():string { return "imagestreamtags"; }
@@ -113,7 +115,9 @@ module KubernetesAPI {
         WatchTypes.PERSISTENT_VOLUMES,
         WatchTypes.SECRETS,
         WatchTypes.SERVICES,
-        WatchTypes.SERVICE_ACCOUNTS
+        WatchTypes.SERVICE_ACCOUNTS,
+        WatchTypes.REPLICA_SETS,
+        WatchTypes.DEPLOYMENTS
       ];
     }
     public static get osTypes():Array<string> {

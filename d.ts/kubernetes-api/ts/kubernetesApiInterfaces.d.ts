@@ -59,6 +59,7 @@ declare module KubernetesAPI {
         static PERSISTENT_VOLUME_CLAIMS: string;
         static PODS: string;
         static REPLICATION_CONTROLLERS: string;
+        static REPLICA_SETS: string;
         static RESOURCE_QUOTAS: string;
         static OAUTH_CLIENTS: string;
         static SECRETS: string;
@@ -71,6 +72,7 @@ declare module KubernetesAPI {
         static BUILD_CONFIGS: string;
         static BUILDS: string;
         static DEPLOYMENT_CONFIGS: string;
+        static DEPLOYMENTS: string;
         static IMAGES: string;
         static IMAGE_STREAMS: string;
         static IMAGE_STREAM_TAGS: string;
