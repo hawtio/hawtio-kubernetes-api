@@ -16,7 +16,7 @@
     "plugins"
   ],
   "dependencies": {
-    "angular-resource": "~1.3",
+    "angular-resource": ">= 1.1.0 <= 1.6.0",
     "hawtio-core": "~2.0.0",
     "hawtio-oauth": "~2.0.30",
     "hawtio-utilities": "~2.0.22"
@@ -24,8 +24,5 @@
   "devDependencies": {
     "hawtio-core-dts": "~2.0.0",
     "bootstrap": "~3.3.5"
-  },
-  "resolutions": {
-    "angular": ">= 1.1.0 <= 1.6.0"
   }
 }
