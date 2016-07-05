@@ -514,7 +514,19 @@ module KubernetesAPI {
           access_token: HawtioOAuth.getOAuthToken()
         });
       } else {
-        return wsUrl(UrlHelpers.join(masterApiUrl(), this._path)).query(<any> {
+        var url = UrlHelpers.join(masterApiUrl(), this._path);
+        var location = Core.windowLocation();
+        if (location && url.indexOf("://") < 0) {
+          var hostname = location.hostname;
+          if (hostname) {
+            var port = location.port;
+            if (port) {
+              hostname += ":" + port;
+            }
+            url = UrlHelpers.join(hostname, masterApiUrl(), this._path);
+          }
+        }
+        return wsUrl(url).query(<any> {
           watch: true,
           access_token: HawtioOAuth.getOAuthToken()
         });
