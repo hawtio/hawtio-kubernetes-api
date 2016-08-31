@@ -250,6 +250,10 @@ module KubernetesAPI {
             return;
           }
           var error = getErrorObject(jqXHR);
+          if (jqXHR.status === 403) {
+            this.log.info(this.handler.kind, "- Failed to poll objects, user is not authorized");
+            return;
+          }
           if (this.retries >= 3) {
             this.log.debug(this.handler.kind, "- Out of retries, stopping polling, error: ", error);
             this.stop();
@@ -427,8 +431,13 @@ module KubernetesAPI {
               doConnect();
             }, error: (jqXHR, text, status) => {
               var err = getErrorObject(jqXHR);
-              log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, " error: ", err);
-              doConnect();
+              if (jqXHR.status === 403) {
+                log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, ", user is not authorized");
+                this._list.objects = [];
+              } else {
+                log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, " error: ", err);
+                doConnect();
+              }
             },
             beforeSend: beforeSend
           });
