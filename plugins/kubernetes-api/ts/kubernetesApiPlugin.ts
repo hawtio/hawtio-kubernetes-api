@@ -79,7 +79,7 @@ module KubernetesAPI {
           if (master === "k8s") {
             log.info("master_url set to 'k8s', assuming proxy is being used");
             var href = location.href;
-            master = new URI(href).path(master).toString();
+            master = new URI(href).query("").path(master).toString();
           }
           log.info("Using kubernetes API URL: ", master);
           KubernetesAPI.masterUrl = master;
