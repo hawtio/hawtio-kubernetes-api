@@ -49,6 +49,40 @@ declare module KubernetesAPI {
         namespaces: Array<string>;
         selectedNamespace: string;
     }
+    class KindTypes {
+        static LIST: string;
+        static ENDPOINTS: string;
+        static EVENTS: string;
+        static NAMESPACES: string;
+        static NODES: string;
+        static PERSISTENT_VOLUMES: string;
+        static PERSISTENT_VOLUME_CLAIMS: string;
+        static PODS: string;
+        static REPLICATION_CONTROLLERS: string;
+        static REPLICA_SETS: string;
+        static RESOURCE_QUOTAS: string;
+        static OAUTH_CLIENTS: string;
+        static SECRETS: string;
+        static SERVICES: string;
+        static SERVICE_ACCOUNTS: string;
+        static CONFIG_MAPS: string;
+        static INGRESSES: string;
+        static TEMPLATES: string;
+        static ROUTES: string;
+        static BUILD_CONFIGS: string;
+        static BUILDS: string;
+        static DEPLOYMENT_CONFIGS: string;
+        static DEPLOYMENTS: string;
+        static IMAGES: string;
+        static IMAGE_STREAMS: string;
+        static IMAGE_STREAM_TAGS: string;
+        static POLICIES: string;
+        static POLICY_BINDINGS: string;
+        static PROJECTS: string;
+        static ROLE_BINDINGS: string;
+        static ROLES: string;
+        static DAEMONSETS: string;
+    }
     class WatchTypes {
         static LIST: string;
         static ENDPOINTS: string;

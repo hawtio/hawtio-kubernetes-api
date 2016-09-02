@@ -85,6 +85,9 @@ module KubernetesAPI {
     public set objects(objs:any[]) {
       this._objects.length = 0;
       _.forEach(objs, (obj) => {
+        if (!obj.kind) {
+          obj.kind = toKindName(this.kind);
+        }
         this._objects.push(obj);
       });
       this.initialize();
@@ -115,6 +118,9 @@ module KubernetesAPI {
       if (!this.belongs(object)) {
         return;
       }
+      if (!object.kind) {
+        object.kind = toKindName(this.kind);
+      }
       if (_.any(this._objects, (obj) => {
         return equals(obj, object);
       })) {
@@ -129,6 +135,9 @@ module KubernetesAPI {
     public modified(object) {
       if (!this.belongs(object)) {
         return;
+      }
+      if (!object.kind) {
+        object.kind = toKindName(this.kind);
       }
       if (!_.any(this._objects, (obj) => {
         return equals(obj, object);

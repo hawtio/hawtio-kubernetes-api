@@ -135,11 +135,41 @@ module KubernetesAPI {
     if (angular.isObject(kind)) {
       return getKind(kind);
     }
-    if (!kind) {
-      return undefined;
+    switch (kind) {
+      case WatchTypes.LIST: return KindTypes.LIST;
+      case WatchTypes.ENDPOINTS:  return KindTypes.ENDPOINTS; 
+      case WatchTypes.EVENTS:  return KindTypes.EVENTS; 
+      case WatchTypes.NAMESPACES:  return KindTypes.NAMESPACES; 
+      case WatchTypes.NODES:  return KindTypes.NODES; 
+      case WatchTypes.PERSISTENT_VOLUMES:  return KindTypes.PERSISTENT_VOLUMES; 
+      case WatchTypes.PERSISTENT_VOLUME_CLAIMS:  return KindTypes.PERSISTENT_VOLUME_CLAIMS; 
+      case WatchTypes.PODS:  return KindTypes.PODS; 
+      case WatchTypes.REPLICATION_CONTROLLERS:  return KindTypes.REPLICATION_CONTROLLERS; 
+      case WatchTypes.REPLICA_SETS:  return KindTypes.REPLICA_SETS; 
+      case WatchTypes.RESOURCE_QUOTAS:  return KindTypes.RESOURCE_QUOTAS; 
+      case WatchTypes.OAUTH_CLIENTS:  return KindTypes.OAUTH_CLIENTS; 
+      case WatchTypes.SECRETS:  return KindTypes.SECRETS; 
+      case WatchTypes.SERVICES:  return KindTypes.SERVICES; 
+      case WatchTypes.SERVICE_ACCOUNTS:  return KindTypes.SERVICE_ACCOUNTS; 
+      case WatchTypes.CONFIG_MAPS:  return KindTypes.CONFIG_MAPS; 
+      case WatchTypes.INGRESSES:  return KindTypes.INGRESSES; 
+      case WatchTypes.TEMPLATES:  return KindTypes.TEMPLATES; 
+      case WatchTypes.ROUTES:  return KindTypes.ROUTES; 
+      case WatchTypes.BUILD_CONFIGS:  return KindTypes.BUILD_CONFIGS; 
+      case WatchTypes.BUILDS:  return KindTypes.BUILDS; 
+      case WatchTypes.DEPLOYMENT_CONFIGS:  return KindTypes.DEPLOYMENT_CONFIGS; 
+      case WatchTypes.DEPLOYMENTS:  return KindTypes.DEPLOYMENTS; 
+      case WatchTypes.IMAGES:  return KindTypes.IMAGES; 
+      case WatchTypes.IMAGE_STREAMS:  return KindTypes.IMAGE_STREAMS; 
+      case WatchTypes.IMAGE_STREAM_TAGS:  return KindTypes.IMAGE_STREAM_TAGS; 
+      case WatchTypes.POLICIES:  return KindTypes.POLICIES; 
+      case WatchTypes.POLICY_BINDINGS:  return KindTypes.POLICY_BINDINGS; 
+      case WatchTypes.PROJECTS:  return KindTypes.PROJECTS; 
+      case WatchTypes.ROLE_BINDINGS:  return KindTypes.ROLE_BINDINGS; 
+      case WatchTypes.ROLES:  return KindTypes.ROLES; 
+      case WatchTypes.DAEMONSETS:  return KindTypes.DAEMONSETS; 
+      default: return kind;
     }
-    // TODO this trimRight works for now, but might not work at some point
-    return _.trimRight(_.capitalize(kind), 's');
   }
 
   /*
@@ -149,11 +179,41 @@ module KubernetesAPI {
     if (angular.isObject(kind)) {
       kind = getKind(kind);
     }
-    if (!kind) {
-      return undefined;
+    switch (kind) {
+      case KindTypes.LIST: return WatchTypes.LIST;
+      case KindTypes.ENDPOINTS:  return WatchTypes.ENDPOINTS; 
+      case KindTypes.EVENTS:  return WatchTypes.EVENTS; 
+      case KindTypes.NAMESPACES:  return WatchTypes.NAMESPACES; 
+      case KindTypes.NODES:  return WatchTypes.NODES; 
+      case KindTypes.PERSISTENT_VOLUMES:  return WatchTypes.PERSISTENT_VOLUMES; 
+      case KindTypes.PERSISTENT_VOLUME_CLAIMS:  return WatchTypes.PERSISTENT_VOLUME_CLAIMS; 
+      case KindTypes.PODS:  return WatchTypes.PODS; 
+      case KindTypes.REPLICATION_CONTROLLERS:  return WatchTypes.REPLICATION_CONTROLLERS; 
+      case KindTypes.REPLICA_SETS:  return WatchTypes.REPLICA_SETS; 
+      case KindTypes.RESOURCE_QUOTAS:  return WatchTypes.RESOURCE_QUOTAS; 
+      case KindTypes.OAUTH_CLIENTS:  return WatchTypes.OAUTH_CLIENTS; 
+      case KindTypes.SECRETS:  return WatchTypes.SECRETS; 
+      case KindTypes.SERVICES:  return WatchTypes.SERVICES; 
+      case KindTypes.SERVICE_ACCOUNTS:  return WatchTypes.SERVICE_ACCOUNTS; 
+      case KindTypes.CONFIG_MAPS:  return WatchTypes.CONFIG_MAPS; 
+      case KindTypes.INGRESSES:  return WatchTypes.INGRESSES; 
+      case KindTypes.TEMPLATES:  return WatchTypes.TEMPLATES; 
+      case KindTypes.ROUTES:  return WatchTypes.ROUTES; 
+      case KindTypes.BUILD_CONFIGS:  return WatchTypes.BUILD_CONFIGS; 
+      case KindTypes.BUILDS:  return WatchTypes.BUILDS; 
+      case KindTypes.DEPLOYMENT_CONFIGS:  return WatchTypes.DEPLOYMENT_CONFIGS; 
+      case KindTypes.DEPLOYMENTS:  return WatchTypes.DEPLOYMENTS; 
+      case KindTypes.IMAGES:  return WatchTypes.IMAGES; 
+      case KindTypes.IMAGE_STREAMS:  return WatchTypes.IMAGE_STREAMS; 
+      case KindTypes.IMAGE_STREAM_TAGS:  return WatchTypes.IMAGE_STREAM_TAGS; 
+      case KindTypes.POLICIES:  return WatchTypes.POLICIES; 
+      case KindTypes.POLICY_BINDINGS:  return WatchTypes.POLICY_BINDINGS; 
+      case KindTypes.PROJECTS:  return WatchTypes.PROJECTS; 
+      case KindTypes.ROLE_BINDINGS:  return WatchTypes.ROLE_BINDINGS; 
+      case KindTypes.ROLES:  return WatchTypes.ROLES; 
+      case KindTypes.DAEMONSETS:  return WatchTypes.DAEMONSETS; 
+      default: return kind;
     }
-    // TODO this trimRight works for now, but might not work at some point
-    return kind.toLowerCase() + 's';
   }
 
   /*

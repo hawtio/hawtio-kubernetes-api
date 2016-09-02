@@ -16,7 +16,7 @@ declare module KubernetesAPI {
     function getErrorObject(jqXHR: any): any;
     function wsScheme(url: string): string;
     function toKindName(kind: any): any;
-    function toCollectionName(kind: any): string;
+    function toCollectionName(kind: any): any;
     function wsUrl(url: string): URI;
     function equals(left: any, right: any): boolean;
     function createList(...objects: any[]): {

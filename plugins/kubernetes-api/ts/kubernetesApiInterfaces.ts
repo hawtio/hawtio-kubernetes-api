@@ -63,6 +63,42 @@ module KubernetesAPI {
     selectedNamespace: string;
   }
 
+  export class KindTypes {
+    public static get LIST():string { return "List"; }
+		public static get ENDPOINTS():string { return "Endpoint"; }
+		public static get EVENTS():string { return "Event"; }
+    public static get NAMESPACES():string { return "Namespace"; }
+		public static get NODES():string { return "Node"; }
+		public static get PERSISTENT_VOLUMES():string { return "PersistentVolume"; }
+		public static get PERSISTENT_VOLUME_CLAIMS():string { return "PersistentVolumeClaim"; }
+		public static get PODS():string { return "Pod"; }
+		public static get REPLICATION_CONTROLLERS():string { return "ReplicationController"; }
+    public static get REPLICA_SETS():string { return "ReplicaSet"; }
+		public static get RESOURCE_QUOTAS():string { return "ResourceQuota"; }
+		public static get OAUTH_CLIENTS():string { return "OAuthClient"; }
+		public static get SECRETS():string { return "Secret"; }
+		public static get SERVICES():string { return "Service"; }
+		public static get SERVICE_ACCOUNTS():string { return "ServiceAccount"; }
+		public static get CONFIG_MAPS():string { return "ConfigMap"; }
+		public static get INGRESSES():string { return "Ingress"; }
+
+		public static get TEMPLATES():string { return "Template"; }
+		public static get ROUTES():string { return "Route"; }
+		public static get BUILD_CONFIGS():string { return "BuildConfig"; }
+		public static get BUILDS():string { return "Build"; }
+		public static get DEPLOYMENT_CONFIGS():string { return "DeploymentConfig"; }
+    public static get DEPLOYMENTS():string { return "Deployment"; }
+		public static get IMAGES():string { return "Image"; }
+		public static get IMAGE_STREAMS():string { return "ImageStream"; }
+		public static get IMAGE_STREAM_TAGS():string { return "ImageStreamTag"; }
+		public static get POLICIES():string { return "Policy"; }
+		public static get POLICY_BINDINGS():string { return "PolicyBinding"; }
+    public static get PROJECTS():string { return "Project"; }
+		public static get ROLE_BINDINGS():string { return "RoleBinding"; }
+		public static get ROLES():string { return "Role"; }
+    public static get DAEMONSETS():string { return "DaemonSet"; }
+  }
+
 	export class WatchTypes {
     public static get LIST():string { return "list"; }
 		public static get ENDPOINTS():string { return "endpoints"; }
