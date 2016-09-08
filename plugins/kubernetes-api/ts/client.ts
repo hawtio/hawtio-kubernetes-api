@@ -347,7 +347,7 @@ module KubernetesAPI {
     }
 
     private setHandlers(self:WSHandler, ws:WebSocket) {
-      _.forIn(self, (value, key) => {
+      _.forOwn(self, (value, key) => {
         if (_.startsWith(key, 'on')) {
           ws[key] = (event) => {
             self[key](event);
@@ -363,7 +363,25 @@ module KubernetesAPI {
       this.socket.send(data);
     }
 
+    shouldClose(event) {
+      if (this.destroyed && this.socket.readyState === WebSocket.OPEN) {
+        log.debug("Connection destroyed but still receiving messages, closing websocket");
+        try {
+          log.debug("Closing websocket for kind: ", this.self.kind);
+          this.socket.close();
+          log.debug("Close called on websocket for kind: ", this.self.kind);
+        } catch (err) {
+          // nothing to do, assume it's already closed
+        }
+        return true;
+      }
+      return false;
+    }
+
     onmessage(event) {
+      if (this.shouldClose(event)) {
+        return;
+      }
       var data = JSON.parse(event.data);
       var eventType = data.type.toLowerCase();
       // this.log.debug("event: ", eventType, " object: ", data.object);
@@ -371,12 +389,19 @@ module KubernetesAPI {
     };
 
     onopen(event) {
+      if (this.shouldClose(event)) {
+        return;
+      }
       this.retries = 0;
       this.connectTime = new Date().getTime();
       this.log.debug("Connected: ", event);
     };
 
     onclose(event) {
+      if (this.destroyed) {
+        log.debug("websocket for kind: ", this.self.kind, " destroyed: ", event);
+        return;
+      }
       if (this.retries < 3 && this.connectTime && (new Date().getTime() - this.connectTime) > 5000) {
         var self = this;
         setTimeout(() => {
@@ -398,7 +423,10 @@ module KubernetesAPI {
     };
 
     onerror(event) {
-      this.log.debug("web socket encountered error: ", event);
+      log.debug("websocket for kind: ", this.self.kind, " received an error: ", event);
+      if (this.shouldClose(event)) {
+        return;
+      }
     }
 
     get connected():boolean {
@@ -456,21 +484,17 @@ module KubernetesAPI {
 
     destroy() {
       this.destroyed = true;
-      if (this.socket) {
-        this.socket.onclose = () => {
-          this.log.debug("Connection closed");
-          delete this.socket;
-        }
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         try {
+          log.debug("Closing websocket for kind: ", this.self.kind);
           this.socket.close();
+          log.debug("Close called on websocket for kind: ", this.self.kind);
         } catch (err) {
           // nothing to do, assume it's already closed
-          delete this.socket;
         }
       }
       if (this.poller) {
         this.poller.destroy();
-        delete this.poller;
       }
     }
   }
@@ -583,8 +607,10 @@ module KubernetesAPI {
 
     public destroy() {
       this.handlers.destroy();
+      /*
       delete this.handlers;
       delete this.list;
+      */
     }
 
     private addLabelFilter(cb:(data:any[]) => void, labelSelector:LabelMap) {
@@ -638,7 +664,7 @@ module KubernetesAPI {
           var kind = this._kind;
           if (!KubernetesAPI.isOpenShift && (kind === "buildconfigs" || kind === "BuildConfig")) {
             prefix = UrlHelpers.join("/api/v1/proxy/namespaces/default/services/jenkinshift:80/", prefix);
-            console.log("Using buildconfigs URL override");
+            log.debug("Using buildconfigs URL override");
           }
           url = UrlHelpers.join(masterApiUrl(), prefix, 'namespaces', namespace, kind);
         }
@@ -798,7 +824,7 @@ module KubernetesAPI {
 
     public destroy() {
       this._collection.destroy();
-      delete this._collection;
+      // delete this._collection;
     }
   };
 
@@ -826,7 +852,7 @@ module KubernetesAPI {
         };
       }
       var key = getKey(kind, namespace);
-      if (key in this._clients) {
+      if (this._clients[key]) {
         var client = this._clients[key];
         client.addRef();
         this.log.debug("Returning existing client for key: ", key, " refcount is: ", client.refCount);
@@ -845,12 +871,12 @@ module KubernetesAPI {
         client.unwatch(handle);
       });
       var key = client.getKey();
-      if (key in this._clients) {
+      if (this._clients[key]) {
         var c = this._clients[key];
         c.removeRef();
         this.log.debug("Removed reference to client with key: ", key, " refcount is: ", c.refCount);
         if (c.disposable()) {
-          delete this._clients[key];
+          this._clients[key] = undefined;
           c.destroy();
           this.log.debug("Destroyed client for key: ", key);
         }
