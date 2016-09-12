@@ -27,7 +27,6 @@ module KubernetesAPI {
       case KubernetesAPI.WatchTypes.NAMESPACES:
       case KubernetesAPI.WatchTypes.NODES:
       case KubernetesAPI.WatchTypes.PERSISTENT_VOLUMES:
-      case KubernetesAPI.WatchTypes.PERSISTENT_VOLUME_CLAIMS:
       case KubernetesAPI.WatchTypes.PROJECTS:
         return false;
 
