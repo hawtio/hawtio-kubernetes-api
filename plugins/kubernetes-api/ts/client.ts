@@ -323,7 +323,7 @@ module KubernetesAPI {
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
-      this.log = log; 
+      this.log = Logger.get('hawtio-k8s-api-wshandler'); 
     }
 
     set list(_list:ObjectList) {
@@ -347,11 +347,14 @@ module KubernetesAPI {
     }
 
     private setHandlers(self:WSHandler, ws:WebSocket) {
-      _.forOwn(self, (value, key) => {
+      _.forIn(self, (value, key) => {
         if (_.startsWith(key, 'on')) {
-          ws[key] = (event) => {
+          var evt = key.replace('on', '');
+          this.log.debug("Adding event handler for '" + evt + "' using '" + key + "'");
+          ws.addEventListener(evt, (event) => {
+            this.log.debug("received websocket event: ", event);
             self[key](event);
-          }
+          });
         }
       });
     };
@@ -364,12 +367,12 @@ module KubernetesAPI {
     }
 
     shouldClose(event) {
-      if (this.destroyed && this.socket.readyState === WebSocket.OPEN) {
-        log.debug("Connection destroyed but still receiving messages, closing websocket");
+      if (this.destroyed  && this.socket && this.socket.readyState === WebSocket.OPEN) {
+        this.log.debug("Connection destroyed but still receiving messages, closing websocket");
         try {
-          log.debug("Closing websocket for kind: ", this.self.kind);
+          this.log.debug("Closing websocket for kind: ", this.self.kind);
           this.socket.close();
-          log.debug("Close called on websocket for kind: ", this.self.kind);
+          this.log.debug("Close called on websocket for kind: ", this.self.kind);
         } catch (err) {
           // nothing to do, assume it's already closed
         }
@@ -380,11 +383,11 @@ module KubernetesAPI {
 
     onmessage(event) {
       if (this.shouldClose(event)) {
+        this.log.debug("Should be closed!");
         return;
       }
       var data = JSON.parse(event.data);
       var eventType = data.type.toLowerCase();
-      // this.log.debug("event: ", eventType, " object: ", data.object);
       this._list[eventType](data.object);
     };
 
@@ -399,7 +402,8 @@ module KubernetesAPI {
 
     onclose(event) {
       if (this.destroyed) {
-        log.debug("websocket for kind: ", this.self.kind, " destroyed: ", event);
+        this.log.debug("websocket for kind: ", this.self.kind, " destroyed: ", event);
+        delete this.socket;
         return;
       }
       if (this.retries < 3 && this.connectTime && (new Date().getTime() - this.connectTime) > 5000) {
@@ -423,7 +427,7 @@ module KubernetesAPI {
     };
 
     onerror(event) {
-      log.debug("websocket for kind: ", this.self.kind, " received an error: ", event);
+      this.log.debug("websocket for kind: ", this.self.kind, " received an error: ", event);
       if (this.shouldClose(event)) {
         return;
       }
@@ -453,9 +457,9 @@ module KubernetesAPI {
           var doConnect = () => {
             var wsURL = this.self.wsURL;
             if (wsURL) {
-              log.debug("Connecting websocket for kind: ", this.self.kind);
-              var ws = this.socket = new WebSocket(wsURL);
-              this.setHandlers(this, ws);
+              this.log.debug("Connecting websocket for kind: ", this.self.kind);
+              this.socket = new WebSocket(wsURL);
+              this.setHandlers(this, this.socket);
             } else {
               log.info("No wsURL for kind: " + this.self.kind);
             }
@@ -465,15 +469,19 @@ module KubernetesAPI {
             processData: false,
             success: (data) => {
               this._list.objects = data.items || [];
-              doConnect();
+              setTimeout(() => {
+                doConnect();
+              }, 10);
             }, error: (jqXHR, text, status) => {
               var err = getErrorObject(jqXHR);
               if (jqXHR.status === 403) {
-                log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, ", user is not authorized");
+                this.log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, ", user is not authorized");
                 this._list.objects = [];
               } else {
-                log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, " error: ", err);
-                doConnect();
+                this.log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, " error: ", err);
+                setTimeout(() => {
+                  doConnect();
+                }, 10);
               }
             },
             beforeSend: beforeSend
@@ -486,9 +494,9 @@ module KubernetesAPI {
       this.destroyed = true;
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         try {
-          log.debug("Closing websocket for kind: ", this.self.kind);
+          this.log.debug("Closing websocket for kind: ", this.self.kind);
           this.socket.close();
-          log.debug("Close called on websocket for kind: ", this.self.kind);
+          this.log.debug("Close called on websocket for kind: ", this.self.kind);
         } catch (err) {
           // nothing to do, assume it's already closed
         }
@@ -526,7 +534,7 @@ module KubernetesAPI {
       this.handlers = new WSHandler(this);
       var list = this.list = new ObjectList(_options.kind, _options.namespace);
       this.handlers.list = list;
-      log.debug("creating new collection for", this.kind);
+      log.debug("creating new collection for", this.kind, " namespace: ", this.namespace);
     };
 
     public get options():K8SOptions {
