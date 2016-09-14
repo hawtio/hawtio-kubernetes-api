@@ -319,11 +319,13 @@ module KubernetesAPI {
     private self:CollectionImpl = undefined;
     private _list:ObjectList;
     private log:Logging.Logger = undefined;
+    private messageLog:Logging.Logger = undefined;
     private destroyed = false;
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
-      this.log = Logger.get('hawtio-k8s-api-wshandler'); 
+      this.log = Logger.get('KubernetesAPI.WSHandler'); 
+      this.messageLog = Logger.get('KubernetesAPI.WSHander.messages');
     }
 
     set list(_list:ObjectList) {
@@ -350,9 +352,9 @@ module KubernetesAPI {
       _.forIn(self, (value, key) => {
         if (_.startsWith(key, 'on')) {
           var evt = key.replace('on', '');
-          this.log.debug("Adding event handler for '" + evt + "' using '" + key + "'");
+          // this.log.debug("Adding event handler for '" + evt + "' using '" + key + "'");
           ws.addEventListener(evt, (event) => {
-            this.log.debug("received websocket event: ", event);
+            this.messageLog.debug("received websocket event: ", event);
             self[key](event);
           });
         }
@@ -368,11 +370,10 @@ module KubernetesAPI {
 
     shouldClose(event) {
       if (this.destroyed  && this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.log.debug("Connection destroyed but still receiving messages, closing websocket");
+        this.log.debug("Connection destroyed but still receiving messages, closing websocket, kind: ", this.self.kind, " namespace: ", this.self.namespace);
         try {
           this.log.debug("Closing websocket for kind: ", this.self.kind);
-          this.socket.close();
-          this.log.debug("Close called on websocket for kind: ", this.self.kind);
+          this.socket.close()
         } catch (err) {
           // nothing to do, assume it's already closed
         }
@@ -392,17 +393,18 @@ module KubernetesAPI {
     };
 
     onopen(event) {
+      this.log.debug("Received open event for kind: ", this.self.kind, " namespace: ", this.self.namespace);
       if (this.shouldClose(event)) {
         return;
       }
       this.retries = 0;
       this.connectTime = new Date().getTime();
-      this.log.debug("Connected: ", event);
     };
 
     onclose(event) {
+      this.log.debug("Received close event for kind: ", this.self.kind, " namespace: ", this.self.namespace);
       if (this.destroyed) {
-        this.log.debug("websocket for kind: ", this.self.kind, " destroyed: ", event);
+        this.log.debug("websocket destroyed for kind: ", this.self.kind, " namespace: ", this.self.namespace);
         delete this.socket;
         return;
       }
@@ -494,14 +496,15 @@ module KubernetesAPI {
       this.destroyed = true;
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         try {
-          this.log.debug("Closing websocket for kind: ", this.self.kind);
+          this.log.debug("Closing websocket for kind: ", this.self.kind, " namespace: ", this.self.namespace);
           this.socket.close();
-          this.log.debug("Close called on websocket for kind: ", this.self.kind);
+          this.log.debug("Close called on websocket for kind: ", this.self.kind, " namespace: ", this.self.namespace);
         } catch (err) {
           // nothing to do, assume it's already closed
         }
       }
       if (this.poller) {
+        this.log.debug("Destroying poller for kind: ", this.self.kind, " namespace: ", this.self.namespace);
         this.poller.destroy();
       }
     }
