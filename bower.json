@@ -22,7 +22,7 @@
     "hawtio-utilities": "~2.0.22"
   },
   "devDependencies": {
-    "hawtio-core-dts": "~2.0.0",
+    "hawtio-core-dts": "~2.0.29",
     "bootstrap": "~3.3.5"
   },
   "resolutions": {

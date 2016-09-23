@@ -17,7 +17,7 @@ declare module KubernetesAPI {
     function wsScheme(url: string): string;
     function toKindName(kind: any): any;
     function toCollectionName(kind: any): any;
-    function wsUrl(url: string): URI;
+    function wsUrl(url: string): uri.URI;
     function equals(left: any, right: any): boolean;
     function createList(...objects: any[]): {
         apiVersion: string;
