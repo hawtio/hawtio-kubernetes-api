@@ -29,6 +29,30 @@ module KubernetesAPI {
     }
   });
 
+  // Detect if we're running against openshift or not
+  hawtioPluginLoader.registerPreBootstrapTask({
+    name: 'KubernetesAPIProviderInit',
+    depends: ['hawtio-oauth', 'KubernetesApiInit'],
+    task: (next) => {
+      isOpenShift = false;
+      // probe /oapi/v1 as it's has all the openshift extensions
+      var testURL = new URI(KubernetesAPI.masterUrl).segment('oapi/v1').toString();
+      $.ajax(<any>{
+        url: testURL,
+        method: 'GET',
+        success: (data) => {
+          console.log("data: ", data);
+          log.info("Backend is an openshift instance");
+          isOpenShift = true;
+          next();
+        }, 
+        error: (jqXHR, textStatus, errorThrown) => {
+          log.info("Error probing " + testURL + " assuming backend is not an openshift instance.  Error details: status: ", textStatus, " errorThrown: ", errorThrown, " jqXHR instance: ", jqXHR);
+          next();
+        }
+      });
+    }
+  });
 
   hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesApiInit',
