@@ -90,20 +90,19 @@ module KubernetesAPI {
               }
             }
           }
+          // We'll just grab the URI for the document here in case we need it
+          var documentURI = new URI().path(HawtioCore.documentBase());
           if (!master || master === "/") {
             // lets default the master to the current protocol and host/port
             // in case the master url is "/" and we are
             // serving up static content from inside /api/v1/namespaces/default/services/fabric8 or something like that
             log.info("master_url unset or set to '/', assuming API server is at /");
-            var href = location.href;
-            if (href) {
-              master = new URI(href).query("").path("").toString();
-            }
+            master = documentURI.query("").toString();
           }
           if (master === "k8s") {
+            // We're using the built-in kuisp proxy to access the API server
             log.info("master_url set to 'k8s', assuming proxy is being used");
-            var href = location.href;
-            master = new URI(href).query("").path(master).toString();
+            master = documentURI.query("").segment(master).toString();
           }
           log.info("Using kubernetes API URL: ", master);
           KubernetesAPI.masterUrl = master;
