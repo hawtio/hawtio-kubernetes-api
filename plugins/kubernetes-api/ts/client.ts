@@ -674,7 +674,7 @@ module KubernetesAPI {
           var prefix = this.getPrefix();
           var kind = this._kind;
           if (!KubernetesAPI.isOpenShift && (kind === "buildconfigs" || kind === "BuildConfig")) {
-            prefix = UrlHelpers.join("/api/v1/proxy/namespaces/default/services/jenkinshift:80/", prefix);
+            prefix = UrlHelpers.join("/api/v1/proxy/namespaces", namespace, "/services/jenkinshift:80/", prefix);
             log.debug("Using buildconfigs URL override");
           }
           url = UrlHelpers.join(masterApiUrl(), prefix, 'namespaces', namespace, kind);
