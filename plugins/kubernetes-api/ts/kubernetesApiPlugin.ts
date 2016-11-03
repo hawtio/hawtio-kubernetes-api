@@ -54,66 +54,72 @@ module KubernetesAPI {
     }
   });
 
+	hawtioPluginLoader.registerPreBootstrapTask({
+		name: 'FetchConfig',
+		task: (next) => {
+      $.getScript('osconsole/config.js')
+        .always(() => {
+					log.debug("Fetched openshift config: ", window['OPENSHIFT_CONFIG']);
+					log.debug("Fetched keycloak config: ", window['KeycloakConfig']);
+					next();
+				})
+		}
+	}, true);
+
   hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesApiInit',
+		depends: ['FetchConfig'],
     task: (next) => {
-      $.getScript('osconsole/config.js')
-        .done((script, textStatus) => {
-          var config:KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
-          log.debug("Fetched OAuth config: ", config);
-          var master:string = config.master_uri;
-          if (!master && config.api && config.api.k8s) {
-            var masterUri = new URI().host(config.api.k8s.hostPort).path("").query("");
-            if (config.api.k8s.proto) {
-              masterUri.protocol(config.api.k8s.proto);
-            }
-            master = masterUri.toString();
-          }
+			var config:KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
+			log.debug("Fetched OAuth config: ", config);
+			var master:string = config.master_uri;
+			if (!master && config.api && config.api.k8s) {
+				var masterUri = new URI().host(config.api.k8s.hostPort).path("").query("");
+				if (config.api.k8s.proto) {
+					masterUri.protocol(config.api.k8s.proto);
+				}
+				master = masterUri.toString();
+			}
 
-          OSOAuthConfig = config.openshift;
-          GoogleOAuthConfig = config.google;
-          KeycloakConfig = config.keycloak;
+			OSOAuthConfig = config.openshift;
+			GoogleOAuthConfig = config.google;
+			//KeycloakConfig = config.keycloak || window['KeycloakConfig'];
 
-          if (OSOAuthConfig && !master) {
-            if (!master) {
-              var oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
-              if (oauth_authorize_uri) {
-                var text = oauth_authorize_uri;
-                var idx = text.indexOf("://");
-                if (idx > 0) {
-                  idx += 3;
-                  idx = text.indexOf("/", idx);
-                  if (idx > 0) {
-                    master = text.substring(0, ++idx);
-                  }
-                }
-              }
-            }
-          }
-          // We'll just grab the URI for the document here in case we need it
-          var documentURI = new URI().path(HawtioCore.documentBase());
-          if (!master || master === "/") {
-            // lets default the master to the current protocol and host/port
-            // in case the master url is "/" and we are
-            // serving up static content from inside /api/v1/namespaces/default/services/fabric8 or something like that
-            log.info("master_url unset or set to '/', assuming API server is at /");
-            master = documentURI.query("").toString();
-          }
-          if (master === "k8s") {
-            // We're using the built-in kuisp proxy to access the API server
-            log.info("master_url set to 'k8s', assuming proxy is being used");
-            master = documentURI.query("").segment(master).toString();
-          }
-          log.info("Using kubernetes API URL: ", master);
-          KubernetesAPI.masterUrl = master;
-          next();
-        })
-        .fail((response) => {
-          log.debug("Error fetching OAUTH config: ", response);
-          next();
-        });
+			if (OSOAuthConfig && !master) {
+				if (!master) {
+					var oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
+					if (oauth_authorize_uri) {
+						var text = oauth_authorize_uri;
+						var idx = text.indexOf("://");
+							if (idx > 0) {
+								idx += 3;
+								idx = text.indexOf("/", idx);
+								if (idx > 0) {
+									master = text.substring(0, ++idx);
+								}
+							}
+					}
+				}
+			}
+			// We'll just grab the URI for the document here in case we need it
+			var documentURI = new URI().path(HawtioCore.documentBase());
+			if (!master || master === "/") {
+				// lets default the master to the current protocol and host/port
+				// in case the master url is "/" and we are
+				// serving up static content from inside /api/v1/namespaces/default/services/fabric8 or something like that
+				log.info("master_url unset or set to '/', assuming API server is at /");
+				master = documentURI.query("").toString();
+			}
+			if (master === "k8s") {
+				// We're using the built-in kuisp proxy to access the API server
+				log.info("master_url set to 'k8s', assuming proxy is being used");
+				master = documentURI.query("").segment(master).toString();
+			}
+			log.info("Using kubernetes API URL: ", master);
+			KubernetesAPI.masterUrl = master;
+			next();
     }
-  }, true);
+  });
 
   hawtioPluginLoader.addModule('ngResource');
   hawtioPluginLoader.addModule(pluginName);
