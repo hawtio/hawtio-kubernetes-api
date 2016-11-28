@@ -61,6 +61,8 @@ module KubernetesAPI {
         .always(() => {
 					log.debug("Fetched openshift config: ", window['OPENSHIFT_CONFIG']);
 					log.debug("Fetched keycloak config: ", window['KeycloakConfig']);
+          OSOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.openshift');
+          GoogleOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.google');
 					next();
 				})
 		}
@@ -80,10 +82,6 @@ module KubernetesAPI {
 				}
 				master = masterUri.toString();
 			}
-
-			OSOAuthConfig = config.openshift;
-			GoogleOAuthConfig = config.google;
-			//KeycloakConfig = config.keycloak || window['KeycloakConfig'];
 
 			if (OSOAuthConfig && !master) {
 				if (!master) {
