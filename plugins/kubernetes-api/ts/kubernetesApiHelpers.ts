@@ -51,13 +51,13 @@ module KubernetesAPI {
     if (kind === WatchTypes.NAMESPACES) {
       return K8S_PREFIX;
     }
-    if (_.any(ExtensionTypes.extensions, (t) => t === kind)) {
+    if (_.some(ExtensionTypes.extensions, (t) => t === kind)) {
       return K8S_EXT_PREFIX;
     }
-    if (_.any(NamespacedTypes.k8sTypes, (t) => t === kind)) {
+    if (_.some(NamespacedTypes.k8sTypes, (t) => t === kind)) {
       return K8S_PREFIX;
     }
-    if (_.any(NamespacedTypes.osTypes, (t) => t === kind)) {
+    if (_.some(NamespacedTypes.osTypes, (t) => t === kind)) {
       return OS_PREFIX;
     }
     if (kind === WatchTypes.IMAGES) {

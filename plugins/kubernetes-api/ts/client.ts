@@ -95,7 +95,7 @@ module KubernetesAPI {
     }
 
     public hasNamedItem(item:any) {
-      return _.any(this._objects, (obj:any) => {
+      return _.some(this._objects, (obj:any) => {
         return getName(obj) === getName(item);
       });
     }
@@ -121,7 +121,7 @@ module KubernetesAPI {
       if (!object.kind) {
         object.kind = toKindName(this.kind);
       }
-      if (_.any(this._objects, (obj) => {
+      if (_.some(this._objects, (obj) => {
         return equals(obj, object);
       })) {
         this.modified(object);
@@ -139,7 +139,7 @@ module KubernetesAPI {
       if (!object.kind) {
         object.kind = toKindName(this.kind);
       }
-      if (!_.any(this._objects, (obj) => {
+      if (!_.some(this._objects, (obj) => {
         return equals(obj, object);
       })) {
         this.added(object);
@@ -451,7 +451,7 @@ module KubernetesAPI {
         return;
       }
       if (!this.socket && !this.poller) {
-        if (_.any(pollingOnly, (kind) => kind === this.self.kind)) {
+        if (_.some(pollingOnly, (kind) => kind === this.self.kind)) {
           this.log.info("Using polling for kind: ", this.self.kind);
           this.poller = new ObjectPoller(this.self.restURL, this);
           this.poller.start();
