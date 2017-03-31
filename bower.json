@@ -20,8 +20,7 @@
     "hawtio-utilities": "~2.0.22"
   },
   "devDependencies": {
-    "hawtio-core-dts": "~2.0.29",
-    "bootstrap": "~3.3.5"
+    "hawtio-core-dts": "~2.0.29"
   },
   "resolutions": {
     "angular": ">= 1.1.0 <= 1.6.0"
