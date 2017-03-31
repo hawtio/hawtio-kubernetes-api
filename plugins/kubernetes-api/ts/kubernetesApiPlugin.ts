@@ -119,6 +119,5 @@ module KubernetesAPI {
     }
   });
 
-  hawtioPluginLoader.addModule('ngResource');
   hawtioPluginLoader.addModule(pluginName);
 }
