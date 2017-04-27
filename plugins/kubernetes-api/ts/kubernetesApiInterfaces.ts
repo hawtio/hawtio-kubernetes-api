@@ -139,8 +139,9 @@ module KubernetesAPI {
     public static get extensions():Array<string> {
       return [
         WatchTypes.DAEMONSETS,
-        WatchTypes.REPLICA_SETS,
-        WatchTypes.DEPLOYMENTS
+        WatchTypes.DEPLOYMENTS,
+        WatchTypes.INGRESSES,
+        WatchTypes.REPLICA_SETS
       ];
     }
   }
@@ -151,7 +152,6 @@ module KubernetesAPI {
         WatchTypes.CONFIG_MAPS,
         WatchTypes.ENDPOINTS,
         WatchTypes.EVENTS,
-        WatchTypes.INGRESSES,
         WatchTypes.NODES,
         WatchTypes.PERSISTENT_VOLUMES,
         WatchTypes.PERSISTENT_VOLUME_CLAIMS,
