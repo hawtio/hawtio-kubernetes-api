@@ -21,8 +21,5 @@
   },
   "devDependencies": {
     "hawtio-core-dts": "~2.0.29"
-  },
-  "resolutions": {
-    "jquery": "~2.1.1"
   }
 }
