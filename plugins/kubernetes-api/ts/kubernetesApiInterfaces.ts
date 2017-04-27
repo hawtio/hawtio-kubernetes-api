@@ -139,8 +139,9 @@ module KubernetesAPI {
     public static get extensions():Array<string> {
       return [
         WatchTypes.DAEMONSETS,
-        WatchTypes.REPLICA_SETS,
-        WatchTypes.DEPLOYMENTS
+        WatchTypes.DEPLOYMENTS,
+        WatchTypes.INGRESSES,
+        WatchTypes.REPLICA_SETS
       ];
     }
   }
@@ -149,40 +150,36 @@ module KubernetesAPI {
     public static get k8sTypes():Array<string> {
       return [
         WatchTypes.CONFIG_MAPS,
+        WatchTypes.DEPLOYMENTS,
         WatchTypes.ENDPOINTS,
         WatchTypes.EVENTS,
-        WatchTypes.INGRESSES,
         WatchTypes.NODES,
         WatchTypes.PERSISTENT_VOLUMES,
         WatchTypes.PERSISTENT_VOLUME_CLAIMS,
         WatchTypes.PODS,
+        WatchTypes.REPLICA_SETS,
         WatchTypes.REPLICATION_CONTROLLERS,
         WatchTypes.RESOURCE_QUOTAS,
-        WatchTypes.PERSISTENT_VOLUMES,
         WatchTypes.SECRETS,
-        WatchTypes.SERVICES,
         WatchTypes.SERVICE_ACCOUNTS,
-        WatchTypes.REPLICA_SETS,
-        WatchTypes.DEPLOYMENTS
+        WatchTypes.SERVICES
       ];
     }
     public static get osTypes():Array<string> {
       return [
-        WatchTypes.TEMPLATES,
-        WatchTypes.BUILD_CONFIGS,
-        WatchTypes.ROUTES,
         WatchTypes.BUILDS,
         WatchTypes.BUILD_CONFIGS,
         WatchTypes.DEPLOYMENT_CONFIGS,
-        //WatchTypes.IMAGES,
         WatchTypes.IMAGE_STREAMS,
         WatchTypes.IMAGE_STREAM_TAGS,
         WatchTypes.OAUTH_CLIENTS,
         WatchTypes.POLICIES,
         WatchTypes.POLICY_BINDINGS,
         WatchTypes.PROJECTS,
+        WatchTypes.ROLES,
         WatchTypes.ROLE_BINDINGS,
-        WatchTypes.ROLES
+        WatchTypes.ROUTES,
+        WatchTypes.TEMPLATES
       ];
     }
   }
