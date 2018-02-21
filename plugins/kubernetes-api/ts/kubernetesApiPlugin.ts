@@ -41,7 +41,6 @@ module KubernetesAPI {
         url: testURL,
         method: 'GET',
         success: (data) => {
-          console.log("data: ", data);
           log.info("Backend is an openshift instance");
           isOpenShift = true;
           next();
