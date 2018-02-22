@@ -18,7 +18,7 @@ module KubernetesAPI {
   }
 
   // Allow clients to add other types to force polling under whatever circumstances
-  export var pollingOnly = [WatchTypes.PROJECTS, WatchTypes.IMAGE_STREAM_TAGS];
+  export var pollingOnly = [WatchTypes.IMAGE_STREAM_TAGS];
 
   /**
    *  Manages the array of k8s objects for a client instance
