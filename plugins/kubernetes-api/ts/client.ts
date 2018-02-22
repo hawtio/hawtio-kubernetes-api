@@ -470,7 +470,7 @@ module KubernetesAPI {
             method: 'GET',
             processData: false,
             success: (data) => {
-              this._list.objects = JSON.parse(data).items || [];
+              this._list.objects = data.items || [];
               setTimeout(() => {
                 doConnect();
               }, 10);
