@@ -19,7 +19,7 @@ var config = {
   ts: ['plugins/**/*.ts'],
   dist: argv.out || './dist/',
   js: 'hawtio-kubernetes-api.js',
-  dts: 'hawtio-online.d.ts',
+  dts: 'hawtio-kubernetes-api.d.ts',
 };
 
 const tsProject = plugins.typescript.createProject('tsconfig.json');
@@ -31,9 +31,7 @@ var normalSizeOptions = {
     gzip: true
 };
 
-gulp.task('clean-defs', function() {
-  return del('defs.d.ts');
-});
+gulp.task('clean-defs', () => del(config.dist + '*.d.ts'));
 
 gulp.task('tsc', ['clean-defs'], function() {
     const tsResult = tsProject.src()
