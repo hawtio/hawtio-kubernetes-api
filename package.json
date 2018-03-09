@@ -2,9 +2,8 @@
   "name": "@hawtio/kubernetes-api",
   "version": "3.0.0",
   "dependencies": {
-    "@hawtio/core": "~2.0.0",
-    "@hawtio/oauth": "~2.0.30",
-    "@hawtio/utilities": "~2.0.22"
+    "@hawtio/core": "^3.2.19",
+    "@hawtio/oauth": "^3.0.11"
   },
   "devDependencies": {
     "del": "^2.2.0",
@@ -38,8 +37,7 @@
   },
   "flat": true,
   "resolutions": {
-    "@hawtio/core": "3.0.17",
-    "@hawtio/utilities": "3.0.17",
+    "@hawtio/core": "3.2.19",
     "event-stream": "3.3.4",
     "gulp-concat": "2.6.1",
     "gulp-header": "1.8.2",
@@ -54,7 +52,6 @@
     "angular-sanitize": "1.6.9",
     "jquery": "3.3.1",
     "js-logger": "1.4.1",
-    "@hawtio/ui": "3.2.0",
     "@types/jasmine": "2.8.6",
     "@types/lodash": "4.14.104",
     "@types/marked": "0.3.0",
