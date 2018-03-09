@@ -31,10 +31,9 @@ var config = {
   css: pkg.name + '.css',
   tsProject: plugins.typescript.createProject({
     target: 'ES5',
-    module: 'commonjs',
-    declarationFiles: true,
-    noExternalResolve: false,
-    removeComments: true
+    outFile: 'compiled.js',
+    declaration: true,
+    noResolve: false,
   }),
   testTsProject: plugins.typescript.createProject({
     target: 'ES5',
@@ -107,7 +106,7 @@ gulp.task('tsc', ['clean-defs'], function() {
   var cwd = process.cwd();
   var tsResult = gulp.src(config.ts)
     .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.typescript(config.tsProject))
+    .pipe(config.tsProject())
     .on('error', plugins.notify.onError({
       onLast: true,
       message: '<%= error.message %>',
@@ -116,18 +115,11 @@ gulp.task('tsc', ['clean-defs'], function() {
 
     return eventStream.merge(
       tsResult.js
-        .pipe(plugins.concat('compiled.js'))
         .pipe(plugins.sourcemaps.write())
         .pipe(gulp.dest('.')),
       tsResult.dts
-        .pipe(gulp.dest('d.ts')))
-        .pipe(plugins.filter('**/*.d.ts'))
-        .pipe(plugins.concatFilenames('defs.d.ts', {
-          root: cwd,
-          prepend: '/// <reference path="',
-          append: '"/>'
-        }))
-        .pipe(gulp.dest('.'));
+        .pipe(plugins.rename('defs.d.ts'))
+        .pipe(gulp.dest('.')));
 });
 
 gulp.task('template', ['tsc'], function() {
