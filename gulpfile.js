@@ -24,6 +24,7 @@ var config = {
   templateModule: pkg.name + '-templates',
   dist: argv.out || './dist/',
   js: 'hawtio-kubernetes-api.js',
+  dts: 'hawtio-online.d.ts',
   css: pkg.name + '.css',
   tsProject: plugins.typescript.createProject({
     target: 'ES5',
@@ -73,8 +74,8 @@ gulp.task('tsc', ['clean-defs'], function() {
         .pipe(plugins.sourcemaps.write())
         .pipe(gulp.dest('.')),
       tsResult.dts
-        .pipe(plugins.rename('defs.d.ts'))
-        .pipe(gulp.dest('.')));
+        .pipe(plugins.rename(config.dts))
+        .pipe(gulp.dest(config.dist)));
 });
 
 gulp.task('template', ['tsc'], function() {
