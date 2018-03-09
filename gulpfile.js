@@ -26,7 +26,7 @@ var config = {
   templateModule: pkg.name + '-templates',
   testTemplateModule: pkg.name + '-test-templates',
   dist: argv.out || './dist/',
-  js: pkg.name + '.js',
+  js: 'hawtio-kubernetes-api.js',
   testJs: pkg.name + '-test.js',
   css: pkg.name + '.css',
   tsProject: plugins.typescript.createProject({
