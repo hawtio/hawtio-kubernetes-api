@@ -1,5 +1,4 @@
 var gulp = require('gulp'),
-    wiredep = require('wiredep').stream,
     eventStream = require('event-stream'),
     gulpLoadPlugins = require('gulp-load-plugins'),
     fs = require('fs'),
@@ -14,23 +13,25 @@ var gulp = require('gulp'),
     hawtio = require('hawtio-node-backend');
 
 var plugins = gulpLoadPlugins({});
-var pkg = require('./package.json');
 
 var config = {
   main: '.',
   ts: ['plugins/**/*.ts'],
   less: './less/**/*.less',
   templates: ['plugins/**/*.html'],
-  templateModule: pkg.name + '-templates',
+  templateModule: 'hawtio-kubernetes-api-templates',
   dist: argv.out || './dist/',
   js: 'hawtio-kubernetes-api.js',
   dts: 'hawtio-online.d.ts',
-  css: pkg.name + '.css',
   tsProject: plugins.typescript.createProject({
     target: 'ES5',
     outFile: 'compiled.js',
     declaration: true,
     noResolve: false,
+    typeRoots: [
+      "node_modules/@types",
+      "node_modules/@hawtio"
+    ]
   }),
 };
 
@@ -40,19 +41,6 @@ var normalSizeOptions = {
     showFiles: true,
     gzip: true
 };
-
-gulp.task('bower', function() {
-  return gulp.src('index.html')
-    .pipe(wiredep({}))
-    .pipe(gulp.dest('.'));
-});
-
-/** Adjust the reference path of any typescript-built plugin this project depends on */
-gulp.task('path-adjust', function() {
-  return gulp.src('libs/**/includes.d.ts')
-    .pipe(plugins.replace(/"\.\.\/libs/gm, '"../../../libs'))
-    .pipe(gulp.dest('libs'));
-});
 
 gulp.task('clean-defs', function() {
   return del('defs.d.ts');
@@ -104,14 +92,9 @@ gulp.task('clean', ['concat'], function() {
 });
 
 gulp.task('watch', ['build', 'build-example'], function() {
-  plugins.watch(['libs/**/*.js', 'libs/**/*.css', 'index.html', config.dist + '/' + config.js], function() {
-    gulp.start('reload');
-  });
-  plugins.watch(['libs/**/*.d.ts', config.ts, config.templates], function() {
-    gulp.start(['tsc', 'template', 'concat', 'clean']);
-  });
+  plugins.watch(['node_modules/**/*.js', 'index.html', config.dist + '/' + config.js], ['reload']);
+  plugins.watch(['node_modules/**/*.d.ts', config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
 });
-
 
 gulp.task('connect', ['watch'], function() {
   // lets disable unauthorised TLS issues with kube REST API
@@ -248,6 +231,6 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('build', ['bower', 'path-adjust', 'tsc', 'template', 'concat', 'clean']);
+gulp.task('build', ['tsc', 'template', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);
