@@ -17,9 +17,6 @@ var plugins = gulpLoadPlugins({});
 var config = {
   main: '.',
   ts: ['plugins/**/*.ts'],
-  less: './less/**/*.less',
-  templates: ['plugins/**/*.html'],
-  templateModule: 'hawtio-kubernetes-api-templates',
   dist: argv.out || './dist/',
   js: 'hawtio-kubernetes-api.js',
   dts: 'hawtio-online.d.ts',
@@ -57,21 +54,9 @@ gulp.task('tsc', ['clean-defs'], function() {
         .pipe(gulp.dest(config.dist)));
 });
 
-gulp.task('template', ['tsc'], function() {
-  return gulp.src(config.templates)
-    .pipe(plugins.angularTemplatecache({
-      filename: 'templates.js',
-      root: 'plugins/',
-      standalone: true,
-      module: config.templateModule,
-      templateFooter: '}]); hawtioPluginLoader.addModule("' + config.templateModule + '");'
-    }))
-    .pipe(gulp.dest('.'));
-});
-
-gulp.task('concat', ['template'], function() {
+gulp.task('concat', function() {
   var gZipSize = size(gZippedSizeOptions);
-  return gulp.src(['compiled.js', 'templates.js'])
+  return gulp.src(['compiled.js'])
     .pipe(plugins.concat(config.js))
     .pipe(size(normalSizeOptions))
     .pipe(gZipSize)
@@ -79,12 +64,12 @@ gulp.task('concat', ['template'], function() {
 });
 
 gulp.task('clean', ['concat'], function() {
-  return del(['templates.js', 'compiled.js']);
+  return del(['compiled.js']);
 });
 
 gulp.task('watch', ['build', 'build-example'], function() {
   plugins.watch(['node_modules/**/*.js', 'index.html', config.dist + '/' + config.js], ['reload']);
-  plugins.watch(['node_modules/**/*.d.ts', config.ts, config.templates], ['tsc', 'template', 'concat', 'clean']);
+  plugins.watch(['node_modules/**/*.d.ts', config.ts], ['tsc', 'template', 'concat', 'clean']);
 });
 
 gulp.task('connect', ['watch'], function() {
@@ -222,6 +207,6 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('build', ['tsc', 'template', 'concat', 'clean']);
+gulp.task('build', ['tsc', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);
