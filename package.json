@@ -1,6 +1,15 @@
 {
   "name": "@hawtio/kubernetes-api",
   "version": "3.0.0",
+  "main": "dist/hawtio-kubernetes-api.js",
+  "types": "dist/hawtio-kubernetes-api.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "gulp",
+    "build": "gulp build"
+  },
   "dependencies": {
     "@hawtio/core": "^3.2.19",
     "@hawtio/oauth": "^3.0.11"
