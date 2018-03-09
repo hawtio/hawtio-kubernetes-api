@@ -23,17 +23,9 @@ var config = {
   dist: argv.out || './dist/',
   js: 'hawtio-kubernetes-api.js',
   dts: 'hawtio-online.d.ts',
-  tsProject: plugins.typescript.createProject({
-    target: 'ES5',
-    outFile: 'compiled.js',
-    declaration: true,
-    noResolve: false,
-    typeRoots: [
-      "node_modules/@types",
-      "node_modules/@hawtio"
-    ]
-  }),
 };
+
+const tsProject = plugins.typescript.createProject('tsconfig.json');
 
 var normalSizeOptions = {
     showFiles: true
@@ -47,14 +39,13 @@ gulp.task('clean-defs', function() {
 });
 
 gulp.task('tsc', ['clean-defs'], function() {
-  var cwd = process.cwd();
-  var tsResult = gulp.src(config.ts)
+    const tsResult = tsProject.src()
     .pipe(plugins.sourcemaps.init())
-    .pipe(config.tsProject())
+    .pipe(tsProject())
     .on('error', plugins.notify.onError({
-      onLast: true,
+      onLast : true,
       message: '<%= error.message %>',
-      title: 'Typescript compilation error'
+      title  : 'Typescript compilation error'
     }));
 
     return eventStream.merge(
