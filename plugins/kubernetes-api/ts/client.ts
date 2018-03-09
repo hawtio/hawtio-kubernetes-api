@@ -151,7 +151,7 @@ module KubernetesAPI {
           this._ee.emit(WatchActions.MODIFIED, object);
           this.triggerChangedEvent();
         }
-      }, this);
+      });
     };
 
     public deleted(object) {
@@ -160,7 +160,7 @@ module KubernetesAPI {
       }
       var deleted = _.remove(this._objects, (obj) => {
         return equals(obj, object);
-      }, this);
+      });
       if (deleted) {
         this._ee.emit(WatchActions.DELETED, deleted[0]);
         this.triggerChangedEvent();

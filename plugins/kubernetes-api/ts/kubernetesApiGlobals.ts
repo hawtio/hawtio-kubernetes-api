@@ -1,5 +1,4 @@
 /// <reference path="kubernetesApiInterfaces.ts"/>
-/// <reference path="../../includes.ts"/>
 
 declare var smokesignals;
 

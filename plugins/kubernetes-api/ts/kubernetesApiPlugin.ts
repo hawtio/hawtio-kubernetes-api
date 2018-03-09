@@ -1,7 +1,4 @@
 /// <reference path="kubernetesApiHelpers.ts"/>
-declare var OSOAuthConfig:any;
-declare var GoogleOAuthConfig:any;
-declare var KeycloakConfig:any;
 
 module KubernetesAPI {
 
