@@ -46,6 +46,7 @@ gulp.task('tsc', function() {
 
     return eventStream.merge(
       tsResult.js
+        .pipe(plugins.ngAnnotate())
         .pipe(plugins.sourcemaps.write())
         .pipe(gulp.dest('.')),
       tsResult.dts

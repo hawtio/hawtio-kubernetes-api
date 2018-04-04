@@ -26,6 +26,7 @@
     "gulp-header": "1.2.2",
     "gulp-less": "3.0.1",
     "gulp-load-plugins": "^0.8.0",
+    "gulp-ng-annotate": "~2.0.0",
     "gulp-notify": "^2.1.0",
     "gulp-rename": "^1.0.0",
     "gulp-replace": "^0.5.4",
@@ -176,6 +177,8 @@
     "type-is": "1.6.16",
     "setprototypeof": "1.1.0",
     "statuses": "1.4.0",
-    "ee-first": "1.1.1"
+    "ee-first": "1.1.1",
+    "vinyl-sourcemaps-apply": "0.2.1",
+    "acorn": "4.0.13"
   }
 }
