@@ -4,6 +4,13 @@ module KubernetesAPI {
 
   export var _module = angular.module(pluginName, []);
 
+  function addProductInfo(aboutService: About.AboutService) {
+    'ngInject';
+    aboutService.addProductInfo('Hawtio Kubernetes API', 'PACKAGE_VERSION_PLACEHOLDER');
+  }
+
+  _module.run(addProductInfo);
+
   hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesApiConfig',
     depends: ['KubernetesApiInit'],

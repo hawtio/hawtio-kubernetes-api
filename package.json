@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "start": "gulp",
-    "build": "gulp build"
+    "build": "gulp build",
+    "version": "gulp version && git add -A dist"
   },
   "dependencies": {
     "@hawtio/core": "^3.2.25",
@@ -175,7 +176,6 @@
     "type-is": "1.6.16",
     "setprototypeof": "1.1.0",
     "statuses": "1.4.0",
-    "ee-first": "1.1.1",
-    "@hawtio/core": "3.2.25"
+    "ee-first": "1.1.1"
   }
 }
