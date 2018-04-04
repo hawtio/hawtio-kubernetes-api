@@ -11,7 +11,7 @@
     "build": "gulp build"
   },
   "dependencies": {
-    "@hawtio/core": "^3.2.19",
+    "@hawtio/core": "^3.2.25",
     "@hawtio/oauth": "^3.0.11"
   },
   "devDependencies": {
@@ -49,7 +49,6 @@
   },
   "flat": true,
   "resolutions": {
-    "@hawtio/core": "3.2.19",
     "event-stream": "3.3.4",
     "gulp-concat": "2.6.1",
     "gulp-header": "1.8.2",
@@ -176,6 +175,7 @@
     "type-is": "1.6.16",
     "setprototypeof": "1.1.0",
     "statuses": "1.4.0",
-    "ee-first": "1.1.1"
+    "ee-first": "1.1.1",
+    "@hawtio/core": "3.2.25"
   }
 }
