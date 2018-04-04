@@ -34,7 +34,7 @@ var normalSizeOptions = {
 
 gulp.task('clean-defs', () => del(config.dist + '*.d.ts'));
 
-gulp.task('tsc', ['clean-defs'], function() {
+gulp.task('tsc', function() {
     const tsResult = tsProject.src()
     .pipe(plugins.sourcemaps.init())
     .pipe(tsProject())
@@ -53,7 +53,7 @@ gulp.task('tsc', ['clean-defs'], function() {
         .pipe(gulp.dest(config.dist)));
 });
 
-gulp.task('concat', function() {
+gulp.task('concat', ['tsc'], function() {
   var gZipSize = size(gZippedSizeOptions);
   return gulp.src(['compiled.js'])
     .pipe(plugins.concat(config.js))
@@ -206,7 +206,7 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('version', function() {
+gulp.task('version', ['concat'], function() {
   return gulp.src(path.join(config.dist, config.js))
     .pipe(plugins.replace('PACKAGE_VERSION_PLACEHOLDER', package.version))
     .pipe(gulp.dest(config.dist));
