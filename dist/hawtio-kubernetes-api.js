@@ -896,7 +896,7 @@ var KubernetesAPI;
     KubernetesAPI._module = angular.module(KubernetesAPI.pluginName, []);
     function addProductInfo(aboutService) {
         'ngInject';
-        aboutService.addProductInfo('Hawtio Kubernetes API', '3.0.0');
+        aboutService.addProductInfo('Hawtio Kubernetes API', '3.1.0');
     }
     KubernetesAPI._module.run(addProductInfo);
     hawtioPluginLoader.registerPreBootstrapTask({
