@@ -1,6 +1,6 @@
 # hawtio-kubernetes-api
 
-hawtio plugin that provides an easy API for working with a kubernets/openshift API server.
+Hawtio plugin that provides an easy API for working with a Kubernetes or OpenShift API server.
 
 ### Usage
 
@@ -85,7 +85,7 @@ Typical usage would be to create a client, and watch that client for changes.  H
 
         // Here we're creating an object...  Since we're watching we'll just let 'watch' update our collection
         client.put(item, function(obj) {
-          console.log("Created: ", obj);         
+          console.log("Created: ", obj);
         });
       };
 
