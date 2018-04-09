@@ -21,6 +21,7 @@ var config = {
   dist: argv.out || './dist/',
   js: 'hawtio-kubernetes-api.js',
   dts: 'hawtio-kubernetes-api.d.ts',
+  sourceMap: argv.sourcemap
 };
 
 const tsProject = plugins.typescript.createProject('tsconfig.json');
@@ -36,7 +37,7 @@ gulp.task('clean-defs', () => del(config.dist + '*.d.ts'));
 
 gulp.task('tsc', function() {
     const tsResult = tsProject.src()
-    .pipe(plugins.sourcemaps.init())
+    .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
     .pipe(tsProject())
     .on('error', plugins.notify.onError({
       onLast : true,
@@ -47,7 +48,7 @@ gulp.task('tsc', function() {
     return eventStream.merge(
       tsResult.js
         .pipe(plugins.ngAnnotate())
-        .pipe(plugins.sourcemaps.write())
+        .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
         .pipe(gulp.dest('.')),
       tsResult.dts
         .pipe(plugins.rename(config.dts))
