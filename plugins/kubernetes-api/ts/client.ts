@@ -4,7 +4,7 @@
 
 module KubernetesAPI {
 
-  var log = Logger.get('k8s-objects');
+  var log = Logger.get('hawtio-k8s-objects');
 
   function getKey(kind:string, namespace?: string) {
     return namespace ? namespace + '-' + kind : kind;
@@ -324,8 +324,8 @@ module KubernetesAPI {
 
     constructor(private _self:CollectionImpl) {
       this.self = _self;
-      this.log = Logger.get('KubernetesAPI.WSHandler'); 
-      this.messageLog = Logger.get('KubernetesAPI.WSHander.messages');
+      this.log = Logger.get('hawtio-k8s-api-wshandler'); 
+      this.messageLog = Logger.get('hawtio-k8s-api-wshandler-messages');
     }
 
     set list(_list:ObjectList) {
@@ -847,7 +847,7 @@ module KubernetesAPI {
    * Factory implementation that's available as an angular service
    */
   class K8SClientFactoryImpl {
-    private log:Logging.Logger = Logger.get('k8s-client-factory');
+    private log:Logging.Logger = Logger.get('hawtio-k8s-client-factory');
     private _clients = <ClientMap> {};
     public create(options: any, namespace?: any):Collection {
       var kind = options;
