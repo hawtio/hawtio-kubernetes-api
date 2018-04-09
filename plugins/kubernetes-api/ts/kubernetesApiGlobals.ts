@@ -4,10 +4,10 @@ declare var smokesignals;
 
 module KubernetesAPI {
 
-  export var pluginName = 'hawtio-k8s-api';
+  export var pluginName = 'KubernetesAPI';
   export var pluginPath = 'plugins/kubernetes-api/';
   export var templatePath = pluginPath + 'html/';
-  export var log:Logging.Logger = Logger.get(pluginName);
+  export var log:Logging.Logger = Logger.get('hawtio-k8s-api');
 
   export var keepPollingModel = true;
 
