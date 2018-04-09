@@ -454,10 +454,10 @@ var KubernetesAPI;
 /// <reference path="kubernetesApiInterfaces.ts"/>
 var KubernetesAPI;
 (function (KubernetesAPI) {
-    KubernetesAPI.pluginName = 'hawtio-k8s-api';
+    KubernetesAPI.pluginName = 'KubernetesAPI';
     KubernetesAPI.pluginPath = 'plugins/kubernetes-api/';
     KubernetesAPI.templatePath = KubernetesAPI.pluginPath + 'html/';
-    KubernetesAPI.log = Logger.get(KubernetesAPI.pluginName);
+    KubernetesAPI.log = Logger.get('hawtio-k8s-api');
     KubernetesAPI.keepPollingModel = true;
     KubernetesAPI.defaultIconUrl = Core.url("/img/kubernetes.svg");
     KubernetesAPI.hostIconUrl = Core.url("/img/host.svg");
