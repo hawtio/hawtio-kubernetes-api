@@ -33,8 +33,6 @@ var normalSizeOptions = {
     gzip: true
 };
 
-gulp.task('clean-defs', () => del(config.dist + '*.d.ts'));
-
 gulp.task('tsc', function() {
     const tsResult = tsProject.src()
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
