@@ -948,11 +948,25 @@ var KubernetesAPI;
         task: function (next) {
             $.getScript('osconsole/config.js')
                 .always(function () {
-                KubernetesAPI.log.debug("Fetched openshift config: ", window['OPENSHIFT_CONFIG']);
-                KubernetesAPI.log.debug("Fetched keycloak config: ", window['KeycloakConfig']);
+                KubernetesAPI.log.debug('Fetched openshift config:', window['OPENSHIFT_CONFIG']);
+                KubernetesAPI.log.debug('Fetched keycloak config:', window['KeycloakConfig']);
                 OSOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.openshift');
                 GoogleOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.google');
-                next();
+                if (OSOAuthConfig.oauth_authorize_uri) {
+                    next();
+                }
+                else if (OSOAuthConfig.oauth_metadata_uri) {
+                    KubernetesAPI.log.info('Fetching OAuth server metadata from:', OSOAuthConfig.oauth_metadata_uri);
+                    $.getJSON(OSOAuthConfig.oauth_metadata_uri)
+                        .done(function (metadata) {
+                        OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
+                        OSOAuthConfig.master_uri = metadata.issuer;
+                    })
+                        .always(function () { return next(); });
+                }
+                else {
+                    next();
+                }
             });
         }
     }, true);

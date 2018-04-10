@@ -62,11 +62,23 @@ module KubernetesAPI {
 		task: (next) => {
       $.getScript('osconsole/config.js')
         .always(() => {
-					log.debug("Fetched openshift config: ", window['OPENSHIFT_CONFIG']);
-					log.debug("Fetched keycloak config: ", window['KeycloakConfig']);
+					log.debug('Fetched openshift config:', window['OPENSHIFT_CONFIG']);
+					log.debug('Fetched keycloak config:', window['KeycloakConfig']);
           OSOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.openshift');
           GoogleOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.google');
-					next();
+          if (OSOAuthConfig.oauth_authorize_uri) {
+            next();
+          } else if (OSOAuthConfig.oauth_metadata_uri) {
+            log.info('Fetching OAuth server metadata from:', OSOAuthConfig.oauth_metadata_uri);
+            $.getJSON(OSOAuthConfig.oauth_metadata_uri)
+            .done(metadata => {
+              OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
+              OSOAuthConfig.master_uri = metadata.issuer;
+            })
+            .always(() => next());
+          } else {
+            next();
+          }
 				})
 		}
 	}, true);
