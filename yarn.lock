@@ -15,9 +15,9 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@^3.2.25", "@hawtio/core@~3.2.0":
-  version "3.2.25"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.25.tgz#4f1cece51fe8a209be4972bf84faa6498393de41"
+"@hawtio/core@^3.2.25", "@hawtio/core@~3.2.25":
+  version "3.2.26"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-3.2.26.tgz#0efc45bec40f21bfc37e045c556e5dbea70b4e6d"
   dependencies:
     "@hawtio/core-dts" "3.0.18"
     "@types/angular" "~1.6.0"
@@ -28,6 +28,7 @@
     "@types/marked" "0.3.0"
     "@types/urijs" "1.15.34"
     angular "~1.6.0"
+    angular-animate "~1.6.0"
     angular-patternfly "^4.0.0"
     angular-route "~1.6.0"
     angular-sanitize "~1.6.0"
@@ -38,10 +39,10 @@
     urijs "1.19.0"
 
 "@hawtio/oauth@^3.0.11":
-  version "3.0.11"
-  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-3.0.11.tgz#bc396904efea83b5869082e72e43a3dc34c7c237"
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-3.1.0.tgz#03e5f37d717da6cd051752894c870a22fd6469ef"
   dependencies:
-    "@hawtio/core" "~3.2.0"
+    "@hawtio/core" "~3.2.25"
     ng-idle "^1.3.2"
 
 "@types/angular-route@1.3.4":
@@ -135,17 +136,17 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
-angular-animate@1.5.*:
-  version "1.5.11"
-  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.5.11.tgz#1baa43c303d1b93c4e6aa89453b39114b7a1c669"
+angular-animate@1.5.*, angular-animate@~1.6.0:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.6.9.tgz#a0f926c1ba3190bd8929ef966a7fa79760682622"
 
 angular-drag-and-drop-lists@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/angular-drag-and-drop-lists/-/angular-drag-and-drop-lists-2.0.0.tgz#a01d44b94cf233c9c2d45a31842cb35a9d0882ca"
 
 angular-patternfly@^4.0.0:
-  version "4.15.0"
-  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.15.0.tgz#17fd980f7ce84217e4bbbe7d773fcf655b7e912c"
+  version "4.16.1"
+  resolved "https://registry.yarnpkg.com/angular-patternfly/-/angular-patternfly-4.16.1.tgz#43a74fcdc6fdc880ba0f683b571cd14867b8e187"
   dependencies:
     angular "1.5.*"
     angular-animate "1.5.*"
@@ -443,8 +444,8 @@ bytes@1, bytes@1.0.0, bytes@3.0.0:
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
 
 c3@~0.4.11:
-  version "0.4.21"
-  resolved "https://registry.yarnpkg.com/c3/-/c3-0.4.21.tgz#61a2dc5a31c6a64e011d15b136c160c44fbb9631"
+  version "0.4.22"
+  resolved "https://registry.yarnpkg.com/c3/-/c3-0.4.22.tgz#88b895f06fb6b44314e94b2d7331c3dc98b64d2d"
   dependencies:
     d3 "~3.5.0"
 

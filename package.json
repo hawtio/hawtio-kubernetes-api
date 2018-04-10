@@ -180,6 +180,7 @@
     "statuses": "1.4.0",
     "ee-first": "1.1.1",
     "vinyl-sourcemaps-apply": "0.2.1",
-    "acorn": "4.0.13"
+    "acorn": "4.0.13",
+    "angular-animate": "1.6.9"
   }
 }
