@@ -66,7 +66,7 @@ gulp.task('clean', ['concat'], function() {
   return del(['compiled.js']);
 });
 
-gulp.task('watch', ['build', 'build-example'], function() {
+gulp.task('watch', ['build'], function() {
   plugins.watch(['node_modules/**/*.js', 'index.html', config.dist + '/' + config.js], ['reload']);
   plugins.watch(['node_modules/**/*.d.ts', config.ts], ['tsc', 'template', 'concat', 'clean']);
 });
