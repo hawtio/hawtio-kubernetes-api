@@ -956,7 +956,7 @@ var KubernetesAPI;
                     next();
                 }
                 else if (OSOAuthConfig.oauth_metadata_uri) {
-                    KubernetesAPI.log.info('Fetching OAuth server metadata from:', OSOAuthConfig.oauth_metadata_uri);
+                    KubernetesAPI.log.debug('Fetching OAuth server metadata from:', OSOAuthConfig.oauth_metadata_uri);
                     $.getJSON(OSOAuthConfig.oauth_metadata_uri)
                         .done(function (metadata) {
                         OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
