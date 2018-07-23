@@ -15,7 +15,7 @@
   dependencies:
     "@types/jquery" "~2.0.46"
 
-"@hawtio/core@^4.0.0", "@hawtio/core@~3.2.25":
+"@hawtio/core@^4.0.0":
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.0.4.tgz#03083bf002026e26fba33d4d5003e9d19618ff33"
   dependencies:
@@ -39,20 +39,20 @@
     marked "0.3.9"
     urijs "1.19.0"
 
-"@hawtio/oauth@^3.0.11":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-3.1.0.tgz#03e5f37d717da6cd051752894c870a22fd6469ef"
+"@hawtio/oauth@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.0.0.tgz#debc940fe04b79de2278db472d5b6e5d24f212fd"
   dependencies:
-    "@hawtio/core" "~3.2.25"
+    "@hawtio/core" "^4.0.0"
     ng-idle "^1.3.2"
 
-"@types/angular-route@*", "@types/angular-route@1.3.4":
+"@types/angular-route@*":
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/@types/angular-route/-/angular-route-1.3.5.tgz#78b8e0b069d5efe55ec7072461f4e2f6ae20767b"
   dependencies:
     "@types/angular" "*"
 
-"@types/angular@*", "@types/angular@1.6.43", "@types/angular@~1.6.0":
+"@types/angular@*", "@types/angular@1.6.43":
   version "1.6.43"
   resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.6.43.tgz#6235ef416053a86302970717510a936d889cbb9a"
 
@@ -137,9 +137,9 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
-angular-animate@1.5.*, angular-animate@1.6.9, angular-animate@~1.6.0, angular-animate@~1.7.0:
-  version "1.6.9"
-  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.6.9.tgz#a0f926c1ba3190bd8929ef966a7fa79760682622"
+angular-animate@1.5.*, angular-animate@~1.7.0:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/angular-animate/-/angular-animate-1.7.2.tgz#48d1d22caf0057b57b50f882b68d51c297aa7747"
 
 angular-drag-and-drop-lists@2.0.0:
   version "2.0.0"
@@ -169,11 +169,11 @@ angular-patternfly@^4.0.0:
     jquery-ui-dist "~1.12.1"
     moment "~2.19.3"
 
-angular-route@1.6.9, angular-route@~1.6.0, angular-route@~1.7.0:
+angular-route@1.6.9, angular-route@~1.7.0:
   version "1.6.9"
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.6.9.tgz#73c63cec6a8a6b924698aec635eac32aa41f5e2b"
 
-angular-sanitize@1.5.*, angular-sanitize@1.6.9, angular-sanitize@~1.6.0, angular-sanitize@~1.7.0:
+angular-sanitize@1.5.*, angular-sanitize@1.6.9, angular-sanitize@~1.7.0:
   version "1.6.9"
   resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.9.tgz#1adba33f6f513e5f93e3aca8071bef53666739ea"
 
@@ -185,7 +185,7 @@ angular-ui-bootstrap@2.3.x, angular-ui-bootstrap@2.5.6:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
 
-angular@1.5.*, angular@1.6.9, angular@>=1.3.0, angular@^1.2.0, angular@~1.6.0, angular@~1.7.0:
+angular@1.5.*, angular@1.6.9, angular@>=1.3.0, angular@^1.2.0, angular@~1.7.0:
   version "1.6.9"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.6.9.tgz#bc812932e18909038412d594a5990f4bb66c0619"
 
