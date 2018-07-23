@@ -85,19 +85,6 @@ gulp.task('connect', ['watch'], function() {
       dir: '.'
   }];
 
-  var dirs = fs.readdirSync('./libs');
-  dirs.forEach(function(dir) {
-    var dir = './libs/' + dir;
-    console.log("dir: ", dir);
-    if (fs.statSync(dir).isDirectory()) {
-      console.log("Adding directory to search path: ", dir);
-      staticAssets.push({
-        path: '/',
-        dir: dir
-      });
-    }
-  });
-
   var localProxies = [];
   var defaultProxies = [{
     proto: kube.protocol(),
