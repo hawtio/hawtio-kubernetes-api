@@ -185,12 +185,12 @@
       }
 
       var _module = angular.module('Test', []);
-      _module.controller('TestWatcherController', function($scope, $element, K8SClientFactory) {
+      _module.controller('TestWatcherController', [$scope, '$element', 'K8SClientFactory', function($scope, $element, K8SClientFactory) {
         $scope.init = function(kind, namespace) {
           initWatcherScope(K8SClientFactory, $scope, $element, kind, namespace);
         }
-      });
-      _module.controller('TestStaticController', function($scope, $element) {
+      }]);
+      _module.controller('TestStaticController', ['$scope', '$element', function($scope, $element) {
         $scope.init = function(kind, namespace) {
           initStaticScope($scope, $element, kind, namespace);
         }
@@ -246,7 +246,7 @@
             }
           });
         }, 5000);
-      });
+      }]);
       hawtioPluginLoader.addModule('Test');
     </script>
 
