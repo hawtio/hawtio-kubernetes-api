@@ -194,12 +194,12 @@ gulp.task('reload', function() {
     .pipe(hawtio.reload());
 });
 
-gulp.task('version', ['concat'], function() {
+gulp.task('version', function() {
   return gulp.src(path.join(config.dist, config.js))
     .pipe(plugins.replace('PACKAGE_VERSION_PLACEHOLDER', package.version))
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('build', ['tsc', 'concat', 'version', 'clean']);
+gulp.task('build', ['tsc', 'concat', 'clean']);
 
 gulp.task('default', ['connect']);
