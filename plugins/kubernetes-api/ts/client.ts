@@ -23,36 +23,35 @@ module KubernetesAPI {
   /**
    *  Manages the array of k8s objects for a client instance
    **/
-  class ObjectList {
+  class ObjectList extends EventEmitter {
     public triggerChangedEvent = _.debounce(() => {
-      this._ee.emit(WatchActions.ANY, this._objects);
+      this.emit(WatchActions.ANY, this._objects);
     }, 75, { trailing: true });
 
-    private _ee:EventEnabled = undefined;
     private _initialized = false;
     private _objects:Array<any> = [];
     private log:Logging.Logger = log;
 
     constructor(private _kind:string, private namespace?:string) {
-      this._ee = smokesignals.convert(this);
+      super();
       if (this.log.enabledFor(Logger.DEBUG)) {
-        this._ee.on(WatchActions.ADDED, (object) => {
+        this.on(WatchActions.ADDED, (object) => {
           this.log.debug("added", this.kind, ":", object);
         });
-        this._ee.on(WatchActions.MODIFIED, (object) => {
+        this.on(WatchActions.MODIFIED, (object) => {
           this.log.debug("modified", this.kind, ":", object);
         });
-        this._ee.on(WatchActions.DELETED, (object) => {
+        this.on(WatchActions.DELETED, (object) => {
           this.log.debug("deleted", this.kind, ":", object);
         });
-        this._ee.on(WatchActions.ANY, (objects) => {
+        this.on(WatchActions.ANY, (objects) => {
           this.log.debug(this.kind, "changed:", objects);
         });
-        this._ee.on(WatchActions.INIT, (objects) => {
+        this.on(WatchActions.INIT, (objects) => {
           this.log.debug(this.kind, "initialized");
         });
       }
-      this._ee.on(WatchActions.ANY, (objects) => {
+      this.on(WatchActions.ANY, (objects) => {
         this.initialize();
       });
     };
@@ -66,7 +65,7 @@ module KubernetesAPI {
         return;
       }
       this._initialized = true;
-      this._ee.emit(WatchActions.INIT, this._objects);
+      this.emit(WatchActions.INIT, this._objects);
       this.triggerChangedEvent();
     }
 
@@ -74,10 +73,6 @@ module KubernetesAPI {
       return this._initialized;
     }
 
-    public get events() {
-      return this._ee;
-    }
-    
     public get objects() {
       return this._objects;
     }
@@ -128,7 +123,7 @@ module KubernetesAPI {
         return;
       }
       this._objects.push(object);
-      this._ee.emit(WatchActions.ADDED, object);
+      this.emit(WatchActions.ADDED, object);
       this.triggerChangedEvent();
     };
 
@@ -148,7 +143,7 @@ module KubernetesAPI {
       _.forEach(this._objects, (obj) => {
         if (equals(obj, object)) {
           angular.copy(object, obj);
-          this._ee.emit(WatchActions.MODIFIED, object);
+          this.emit(WatchActions.MODIFIED, object);
           this.triggerChangedEvent();
         }
       });
@@ -162,7 +157,7 @@ module KubernetesAPI {
         return equals(obj, object);
       });
       if (deleted) {
-        this._ee.emit(WatchActions.DELETED, deleted[0]);
+        this.emit(WatchActions.DELETED, deleted[0]);
         this.triggerChangedEvent();
       }
     };
@@ -639,7 +634,7 @@ module KubernetesAPI {
         cb = this.addLabelFilter(cb, labelSelector);
       }
       if (!this.list.initialized) {
-        this.list.events.once(WatchActions.INIT, cb);
+        this.list.once(WatchActions.INIT, cb);
       } else {
         setTimeout(() => {
           cb(this.list.objects);
@@ -698,7 +693,7 @@ module KubernetesAPI {
         }, 10);
       }
       log.debug(this.kind, "adding watch callback:", cb);
-      this.list.events.on(WatchActions.ANY, (data) => {
+      this.list.on(WatchActions.ANY, (data) => {
         log.debug(this.kind, "got data:", data);
         cb(data);
       });
@@ -707,7 +702,7 @@ module KubernetesAPI {
 
     public unwatch(cb:(data:any[]) => void) {
       log.debug(this.kind, "removing watch callback:", cb);
-      this.list.events.off(WatchActions.ANY, cb);
+      this.list.off(WatchActions.ANY, cb);
     }
 
     public put(item:any, cb:(data:any) => void, error?:(err:any) => void) {
@@ -1094,7 +1089,4 @@ module KubernetesAPI {
     client.connect();
     return self;
   }
-
 }
-
-

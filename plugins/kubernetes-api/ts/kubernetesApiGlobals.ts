@@ -1,7 +1,5 @@
 /// <reference path="kubernetesApiInterfaces.ts"/>
 
-declare var smokesignals;
-
 module KubernetesAPI {
 
   export var pluginName = 'KubernetesAPI';

@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@hawtio/core": "^4.0.0",
-    "@hawtio/oauth": "^4.0.0"
+    "@hawtio/oauth": "^4.0.0",
+    "eventemitter3": "~3.1.0"
   },
   "devDependencies": {
     "del": "^2.2.0",
@@ -183,6 +184,7 @@
     "acorn": "4.0.13",
     "angular-animate": "1.7.2",
     "http-errors": "1.6.3",
-    "bootstrap-select": "1.12.4"
+    "bootstrap-select": "1.12.4",
+    "eventemitter3": "3.1.0"
   }
 }
