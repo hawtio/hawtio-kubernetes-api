@@ -188,7 +188,7 @@
       }
 
       var _module = angular.module('Test', []);
-      _module.controller('TestWatcherController', [$scope, '$element', 'K8SClientFactory', function($scope, $element, K8SClientFactory) {
+      _module.controller('TestWatcherController', ['$scope', '$element', 'K8SClientFactory', function($scope, $element, K8SClientFactory) {
         $scope.init = function(kind, namespace) {
           initWatcherScope(K8SClientFactory, $scope, $element, kind, namespace);
         }
