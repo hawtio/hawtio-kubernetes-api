@@ -10,7 +10,7 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp build",
-    "version": "gulp version"
+    "prepack": "gulp version"
   },
   "dependencies": {
     "@hawtio/core": "^4.0.0",
