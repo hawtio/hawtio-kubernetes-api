@@ -1,6 +1,6 @@
 {
   "name": "@hawtio/kubernetes-api",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "license": "Apache-2.0",
   "main": "dist/hawtio-kubernetes-api.js",
   "types": "dist/hawtio-kubernetes-api.d.ts",
