@@ -36,7 +36,7 @@
     "gulp-size": "^1.2.0",
     "gulp-sourcemaps": "^1.5.0",
     "gulp-tslint": "^1.4.2",
-    "gulp-typescript": "^3.0.0",
+    "gulp-typescript": "^4.0.0",
     "gulp-watch": "^3.0.0",
     "hawtio-node-backend": "^2.0.5",
     "stringify-object": "^2.3.0",
@@ -185,6 +185,12 @@
     "angular-animate": "1.7.2",
     "http-errors": "1.6.3",
     "bootstrap-select": "1.12.4",
-    "eventemitter3": "3.1.0"
+    "eventemitter3": "3.1.0",
+    "safe-buffer": "5.1.2",
+    "arr-union": "3.1.0",
+    "array-slice": "1.1.0",
+    "duplexify": "3.6.0",
+    "is-valid-glob": "1.0.0",
+    "to-absolute-glob": "2.0.2"
   }
 }
