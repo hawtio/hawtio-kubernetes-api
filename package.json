@@ -10,7 +10,8 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp build",
-    "prepack": "gulp version"
+    "prepack": "gulp version",
+    "test": "gulp build"
   },
   "dependencies": {
     "@hawtio/core": "^4.0.0",
@@ -191,6 +192,8 @@
     "is-valid-glob": "1.0.0",
     "to-absolute-glob": "2.0.2",
     "@types/jquery": "2.0.49",
-    "jquery": "2.2.4"
+    "jquery": "2.2.4",
+    "typescript": "3.0.3",
+    "bootstrap": "3.3.7"
   }
 }
