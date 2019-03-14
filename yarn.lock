@@ -17,10 +17,10 @@
   dependencies:
     "@types/jquery" "2.0.53"
 
-"@hawtio/core@^4.0.0", "@hawtio/core@~4.4.0":
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.4.4.tgz#078d35341e3a950c958ba595c62bfd8349918bde"
-  integrity sha512-HWL/s4y6ZNdpGijrhcycTLMxU56lp8IcYgjYGx7EH4JEl/Fb91s2agb5TaFA4jbht2zBLzDQpmQ1uPjh90EKiQ==
+"@hawtio/core@~4.5.0":
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/@hawtio/core/-/core-4.5.1.tgz#7076fcc18fcbd911eaf7481d7a0a839d5d3ed105"
+  integrity sha512-6bc9K7COc3vAHBtTMXPq2M6CiD+EpNKgTc51aLhlnYoipVVagxAfGtgdqWV3S7674RPl1viPzNICNUrgqWMYzg==
   dependencies:
     "@hawtio/core-dts" "~3.3.0"
     "@patternfly/patternfly" "~1.0.192"
@@ -43,12 +43,12 @@
     typescript "^3.0.3"
     urijs "1.19.0"
 
-"@hawtio/oauth@^4.0.0":
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.4.4.tgz#c68c119a204bdae34c5e04d73f6223420b813a90"
-  integrity sha512-LkLxZSuMNFGe740rqWtF6YvvSWtZC4pLndcxbc1PZ/hC2HyOxAx4H+2h+Vw5RncxnLulecSJAn/F1kiRhF/zHA==
+"@hawtio/oauth@~4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.5.0.tgz#e2b6b838bc5ccc465e1c3c9a0119fc13d445d7d6"
+  integrity sha512-6GUdJhfoA35wzfD8JXjYLxrMEsItHdRgvKlWP0qsL/3GKdEVWoRyd+FahTMuDFYAu+R+RZlRm2AqCWAthSdE4A==
   dependencies:
-    "@hawtio/core" "~4.4.0"
+    "@hawtio/core" "~4.5.0"
     ng-idle "^1.3.2"
 
 "@patternfly/patternfly@~1.0.192":
@@ -4255,10 +4255,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@3.0.3, typescript@^3.0.0, typescript@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.3.tgz#4853b3e275ecdaa27f78fda46dc273a7eb7fc1c8"
-  integrity sha512-kk80vLW9iGtjMnIv11qyxLqZm20UklzuR2tL0QAnDIygIUIemcZMxlMWudl9OOt76H3ntVzcTiddQ1/pAAJMYg==
+typescript@^3.0.3, typescript@^3.3.0:
+  version "3.3.3333"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.3.3333.tgz#171b2c5af66c59e9431199117a3bcadc66fdcfd6"
+  integrity sha512-JjSKsAfuHBE/fB2oZ8NxtRTk5iGcg6hkYXMnZ3Wc+b2RSqejEqTaem11mHASMnFilHrax3sLK0GDzcJrekZYLw==
 
 uglify-js@2.x:
   version "2.8.29"
