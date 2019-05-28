@@ -4,18 +4,6 @@ module KubernetesAPI {
 
   declare var K8SClientFactory: K8SClientFactory;
 
-  export function apiPrefix() {
-    return K8S_PREFIX;
-  }
-
-  export function osApiPrefix() {
-    return OS_PREFIX;
-  }
-
-  export function extPrefix() {
-    return K8S_EXT_PREFIX;
-  }
-
   export function masterApiUrl() {
     return masterUrl || "";
   }
@@ -35,7 +23,7 @@ module KubernetesAPI {
   }
 
   export function kubernetesApiPrefix() {
-    return UrlHelpers.join(apiPrefix(), K8S_API_VERSION);
+    return UrlHelpers.join(K8S_PREFIX, K8S_API_VERSION);
   }
 
   export function kubernetesApiExtensionPrefix() {
@@ -43,7 +31,7 @@ module KubernetesAPI {
   }
 
   export function openshiftApiPrefix(kind: string) {
-    return UrlHelpers.join(osApiPrefix(), apiGroupForKind(kind), OS_API_VERSION);
+    return UrlHelpers.join(OS_PREFIX, apiGroupForKind(kind), OS_API_VERSION);
   }
 
   export function apiForKind(kind: string) {
@@ -288,18 +276,6 @@ module KubernetesAPI {
     return _.filter(objects, (object) => {
       return matches(getLabels(object));
     });
-  }
-
-  /**
-   * Apply the given namespace to an object if it isn't already set
-   */
-  export function applyNamespace(obj: any, namespace: string) {
-    if (!obj.kind || !namespace) {
-      return;
-    }
-    if (namespaced(toCollectionName(obj.kind)) && !obj.metadata.namespace) {
-      obj.metadata.namespace = namespace;
-    }
   }
 
   /**
