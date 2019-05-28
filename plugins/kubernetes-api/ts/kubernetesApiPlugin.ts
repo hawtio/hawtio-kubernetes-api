@@ -16,7 +16,6 @@ module KubernetesAPI {
     depends: ['KubernetesApiInit'],
     task: (next) => {
       K8S_PREFIX = Core.trimLeading(Core.pathGet(osConfig, ['api', 'k8s', 'prefix']) || K8S_PREFIX, '/');
-      OS_PREFIX = Core.trimLeading(Core.pathGet(osConfig, ['api', 'openshift', 'prefix']) || OS_PREFIX, '/');
       next();
     }
   });
@@ -39,8 +38,7 @@ module KubernetesAPI {
     depends: ['hawtio-oauth', 'KubernetesApiInit'],
     task: (next) => {
       isOpenShift = false;
-      // probe /oapi/v1 as it's has all the openshift extensions
-      var testURL = new URI(KubernetesAPI.masterUrl).segment('oapi/v1').toString();
+      var testURL = new URI(KubernetesAPI.masterUrl).segment('apis/apps.openshift.io/v1').toString();
       $.ajax(<any>{
         url: testURL,
         method: 'GET',

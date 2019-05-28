@@ -39,11 +39,11 @@ module KubernetesAPI {
   }
 
   export function kubernetesApiExtensionPrefix() {
-    return UrlHelpers.join(K8S_EXT_PREFIX, K8S_EXTENSIONS, K8S_EXT_VERSION);
+    return UrlHelpers.join(K8S_EXT_PREFIX, K8S_EXT_VERSION);
   }
 
-  export function openshiftApiPrefix() {
-    return UrlHelpers.join(osApiPrefix(), OS_API_VERSION);
+  export function openshiftApiPrefix(kind: string) {
+    return UrlHelpers.join(osApiPrefix(), apiGroupForKind(kind), OS_API_VERSION);
   }
 
   export function apiForKind(kind: string) {
@@ -65,15 +65,28 @@ module KubernetesAPI {
     return null;
   }
 
-  export function apiVersionForKind(kind: string) {
-    var api = apiForKind(kind);
-    switch (api) {
-      case K8S_EXT_PREFIX:
-        return kubernetesApiExtensionPrefix();
-      case K8S_API_VERSION:
-        return kubernetesApiPrefix();
-      case OS_API_VERSION:
-        return openshiftApiPrefix();
+  export function apiGroupForKind(kind: string) {
+    switch (kind) {
+      case WatchTypes.OAUTH_CLIENTS:
+        return 'oauth.openshift.io';
+      case WatchTypes.BUILDS,
+        WatchTypes.BUILD_CONFIGS:
+        return 'build.openshift.io';
+      case WatchTypes.DEPLOYMENT_CONFIGS:
+        return 'apps.openshift.io';
+      case WatchTypes.IMAGES,
+        WatchTypes.IMAGE_STREAMS,
+        WatchTypes.IMAGE_STREAM_TAGS:
+        return 'image.openshift.io';
+      case WatchTypes.PROJECTS:
+        return 'project.openshift.io';
+      case WatchTypes.ROLES,
+        WatchTypes.ROLE_BINDINGS:
+        return 'authorization.openshift.io';
+      case WatchTypes.ROUTES:
+        return 'route.openshift.io';
+      case WatchTypes.TEMPLATES:
+        return 'template.openshift.io';
       default:
         return null;
     }
@@ -87,18 +100,10 @@ module KubernetesAPI {
       case K8S_PREFIX:
         return kubernetesApiPrefix();
       case OS_PREFIX:
-        return openshiftApiPrefix();
+        return openshiftApiPrefix(kind);
       default:
         return null;
     }
-  }
-
-  export function kubernetesApiUrl() {
-    return UrlHelpers.join(masterApiUrl(), kubernetesApiPrefix());
-  }
-
-  export function openshiftApiUrl() {
-    return UrlHelpers.join(masterApiUrl(), openshiftApiPrefix());
   }
 
   /*

@@ -643,6 +643,7 @@ module KubernetesAPI {
     };
 
     private getPrefix() {
+      // TODO: support retrieving endpoint URL based on API group
       var pref = prefixForKind(this._kind);
       if (!pref) {
         if (this._apiVersion && _.startsWith(this._apiVersion, 'extensions')) {
