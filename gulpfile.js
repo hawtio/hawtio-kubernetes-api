@@ -1,7 +1,6 @@
 const gulp = require('gulp'),
       eventStream = require('event-stream'),
       gulpLoadPlugins = require('gulp-load-plugins'),
-      fs = require('fs'),
       del = require('del'),
       path = require('path'),
       size = require('gulp-size'),
@@ -75,9 +74,8 @@ gulp.task('connect', ['watch'], function() {
   // lets disable unauthorised TLS issues with kube REST API
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-  var kubeBase = process.env.KUBERNETES_MASTER || 'https://localhost:8443';
-  var kube = uri(urljoin(kubeBase, 'api'));
-  var oapi = uri(urljoin(kubeBase, 'oapi'));
+  const kubeBase = process.env.KUBERNETES_MASTER || 'https://localhost:8443';
+  const kube = uri(kubeBase);
   console.log("Connecting to Kubernetes on: " + kube);
 
   var staticAssets = [{
@@ -90,14 +88,8 @@ gulp.task('connect', ['watch'], function() {
     proto: kube.protocol(),
     port: kube.port(),
     hostname: kube.hostname(),
-    path: '/kubernetes/api',
-    targetPath: kube.path()
-  }, {
-    proto: oapi.protocol(),
-    port: oapi.port(),
-    hostname: oapi.hostname(),
-    path: '/kubernetes/oapi',
-    targetPath: oapi.path()
+    path: '/kubernetes',
+    targetPath: '/',
   }, {
     proto: kube.protocol(),
     hostname: kube.hostname(),
@@ -120,7 +112,7 @@ gulp.task('connect', ['watch'], function() {
     staticAssets: staticAssets,
     fallback: 'index.html',
     liveReload: {
-      enabled: true
+      enabled: true,
     }
   });
   var debugLoggingOfProxy = process.env.DEBUG_PROXY === "true";
@@ -133,14 +125,12 @@ gulp.task('connect', ['watch'], function() {
     var config = {
       api: {
         openshift: {
-          proto: oapi.protocol(),
-          hostPort: oapi.host(),
-          prefix: oapi.path()
+          proto: kube.protocol(),
+          hostPort: kube.host(),
         },
         k8s: {
           proto: kube.protocol(),
           hostPort: kube.host(),
-          prefix: kube.path()
         }
       }
     };
