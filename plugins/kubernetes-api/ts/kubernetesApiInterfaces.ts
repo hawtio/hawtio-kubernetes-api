@@ -1,17 +1,17 @@
 module KubernetesAPI {
 
   export class consts {
-    get NAMESPACE_STORAGE_KEY():string { return "k8sSelectedNamespace"; }
+    get NAMESPACE_STORAGE_KEY(): string { return "k8sSelectedNamespace"; }
   }
 
   export var Constants = new consts();
-  
+
   export interface ApiLocation {
-    proto?:string;
-    hostPort:string;
-    prefix:string;
+    proto?: string;
+    hostPort: string;
+    prefix: string;
   }
-  
+
   export interface ApiLocations {
     openshift?: ApiLocation;
     k8s?: ApiLocation;
@@ -26,23 +26,23 @@ module KubernetesAPI {
   }
 
   export interface OpenShiftOAuthConfig {
-    oauth_authorize_uri:string;
-    oauth_client_id:string;
+    oauth_authorize_uri: string;
+    oauth_client_id: string;
   }
 
   export interface GoogleOAuthConfig {
-    authenticationURI:string;
-    authorizationURI:string;
-    clientId:string;
-    clientSecret:string;
-    redirectURI:string;
-    scope:string;
-    tokenURI?:string;
+    authenticationURI: string;
+    authorizationURI: string;
+    clientId: string;
+    clientSecret: string;
+    redirectURI: string;
+    scope: string;
+    tokenURI?: string;
   }
 
   export interface KeyCloakAuthConfig {
-    oauth_authorize_uri:string;
-    oauth_client_id:string;
+    oauth_authorize_uri: string;
+    oauth_client_id: string;
   }
 
   export interface KubernetesState {
@@ -51,90 +51,88 @@ module KubernetesAPI {
   }
 
   export class KindTypes {
-    public static get LIST():string { return "List"; }
-    public static get ENDPOINTS():string { return "Endpoint"; }
-    public static get EVENTS():string { return "Event"; }
-    public static get NAMESPACES():string { return "Namespace"; }
-    public static get NODES():string { return "Node"; }
-    public static get PERSISTENT_VOLUMES():string { return "PersistentVolume"; }
-    public static get PERSISTENT_VOLUME_CLAIMS():string { return "PersistentVolumeClaim"; }
-    public static get PODS():string { return "Pod"; }
-    public static get REPLICATION_CONTROLLERS():string { return "ReplicationController"; }
-    public static get REPLICA_SETS():string { return "ReplicaSet"; }
-    public static get RESOURCE_QUOTAS():string { return "ResourceQuota"; }
-    public static get OAUTH_CLIENTS():string { return "OAuthClient"; }
-    public static get SECRETS():string { return "Secret"; }
-    public static get SERVICES():string { return "Service"; }
-    public static get SERVICE_ACCOUNTS():string { return "ServiceAccount"; }
-    public static get CONFIG_MAPS():string { return "ConfigMap"; }
-    public static get INGRESSES():string { return "Ingress"; }
-
-    public static get TEMPLATES():string { return "Template"; }
-    public static get ROUTES():string { return "Route"; }
-    public static get BUILD_CONFIGS():string { return "BuildConfig"; }
-    public static get BUILDS():string { return "Build"; }
-    public static get DEPLOYMENT_CONFIGS():string { return "DeploymentConfig"; }
-    public static get DEPLOYMENTS():string { return "Deployment"; }
-    public static get IMAGES():string { return "Image"; }
-    public static get IMAGE_STREAMS():string { return "ImageStream"; }
-    public static get IMAGE_STREAM_TAGS():string { return "ImageStreamTag"; }
-    public static get POLICIES():string { return "Policy"; }
-    public static get POLICY_BINDINGS():string { return "PolicyBinding"; }
-    public static get PROJECTS():string { return "Project"; }
-    public static get ROLE_BINDINGS():string { return "RoleBinding"; }
-    public static get ROLES():string { return "Role"; }
-    public static get DAEMONSETS():string { return "DaemonSet"; }
+    public static get LIST(): string { return "List"; }
+    public static get ENDPOINTS(): string { return "Endpoint"; }
+    public static get EVENTS(): string { return "Event"; }
+    public static get NAMESPACES(): string { return "Namespace"; }
+    public static get NODES(): string { return "Node"; }
+    public static get PERSISTENT_VOLUMES(): string { return "PersistentVolume"; }
+    public static get PERSISTENT_VOLUME_CLAIMS(): string { return "PersistentVolumeClaim"; }
+    public static get PODS(): string { return "Pod"; }
+    public static get REPLICATION_CONTROLLERS(): string { return "ReplicationController"; }
+    public static get REPLICA_SETS(): string { return "ReplicaSet"; }
+    public static get RESOURCE_QUOTAS(): string { return "ResourceQuota"; }
+    public static get OAUTH_CLIENTS(): string { return "OAuthClient"; }
+    public static get SECRETS(): string { return "Secret"; }
+    public static get SERVICES(): string { return "Service"; }
+    public static get SERVICE_ACCOUNTS(): string { return "ServiceAccount"; }
+    public static get CONFIG_MAPS(): string { return "ConfigMap"; }
+    public static get INGRESSES(): string { return "Ingress"; }
+    public static get TEMPLATES(): string { return "Template"; }
+    public static get ROUTES(): string { return "Route"; }
+    public static get BUILD_CONFIGS(): string { return "BuildConfig"; }
+    public static get BUILDS(): string { return "Build"; }
+    public static get DEPLOYMENT_CONFIGS(): string { return "DeploymentConfig"; }
+    public static get DEPLOYMENTS(): string { return "Deployment"; }
+    public static get IMAGES(): string { return "Image"; }
+    public static get IMAGE_STREAMS(): string { return "ImageStream"; }
+    public static get IMAGE_STREAM_TAGS(): string { return "ImageStreamTag"; }
+    public static get POLICIES(): string { return "Policy"; }
+    public static get POLICY_BINDINGS(): string { return "PolicyBinding"; }
+    public static get PROJECTS(): string { return "Project"; }
+    public static get ROLE_BINDINGS(): string { return "RoleBinding"; }
+    public static get ROLES(): string { return "Role"; }
+    public static get DAEMONSETS(): string { return "DaemonSet"; }
   }
 
   export class WatchTypes {
-    public static get LIST():string { return "list"; }
-    public static get ENDPOINTS():string { return "endpoints"; }
-    public static get EVENTS():string { return "events"; }
-    public static get NAMESPACES():string { return "namespaces"; }
-    public static get NODES():string { return "nodes"; }
-    public static get PERSISTENT_VOLUMES():string { return "persistentvolumes"; }
-    public static get PERSISTENT_VOLUME_CLAIMS():string { return "persistentvolumeclaims"; }
-    public static get PODS():string { return "pods"; }
-    public static get REPLICATION_CONTROLLERS():string { return "replicationcontrollers"; }
-    public static get REPLICA_SETS():string { return "replicasets"; }
-    public static get RESOURCE_QUOTAS():string { return "resourcequotas"; }
-    public static get OAUTH_CLIENTS():string { return "oauthclients"; }
-    public static get SECRETS():string { return "secrets"; }
-    public static get SERVICES():string { return "services"; }
-    public static get SERVICE_ACCOUNTS():string { return "serviceaccounts"; }
-    public static get CONFIG_MAPS():string { return "configmaps"; }
-    public static get INGRESSES():string { return "ingresses"; }
-
-    public static get TEMPLATES():string { return "templates"; }
-    public static get ROUTES():string { return "routes"; }
-    public static get BUILD_CONFIGS():string { return "buildconfigs"; }
-    public static get BUILDS():string { return "builds"; }
-    public static get DEPLOYMENT_CONFIGS():string { return "deploymentconfigs"; }
-    public static get DEPLOYMENTS():string { return "deployments"; }
-    public static get IMAGES():string { return "images"; }
-    public static get IMAGE_STREAMS():string { return "imagestreams"; }
-    public static get IMAGE_STREAM_TAGS():string { return "imagestreamtags"; }
-    public static get POLICIES():string { return "policies"; }
-    public static get POLICY_BINDINGS():string { return "policybindings"; }
-    public static get PROJECTS():string { return "projects"; }
-    public static get ROLE_BINDINGS():string { return "rolebindings"; }
-    public static get ROLES():string { return "roles"; }
-    public static get DAEMONSETS():string { return "daemonsets"; }
+    public static get LIST(): string { return "list"; }
+    public static get ENDPOINTS(): string { return "endpoints"; }
+    public static get EVENTS(): string { return "events"; }
+    public static get NAMESPACES(): string { return "namespaces"; }
+    public static get NODES(): string { return "nodes"; }
+    public static get PERSISTENT_VOLUMES(): string { return "persistentvolumes"; }
+    public static get PERSISTENT_VOLUME_CLAIMS(): string { return "persistentvolumeclaims"; }
+    public static get PODS(): string { return "pods"; }
+    public static get REPLICATION_CONTROLLERS(): string { return "replicationcontrollers"; }
+    public static get REPLICA_SETS(): string { return "replicasets"; }
+    public static get RESOURCE_QUOTAS(): string { return "resourcequotas"; }
+    public static get OAUTH_CLIENTS(): string { return "oauthclients"; }
+    public static get SECRETS(): string { return "secrets"; }
+    public static get SERVICES(): string { return "services"; }
+    public static get SERVICE_ACCOUNTS(): string { return "serviceaccounts"; }
+    public static get CONFIG_MAPS(): string { return "configmaps"; }
+    public static get INGRESSES(): string { return "ingresses"; }
+    public static get TEMPLATES(): string { return "templates"; }
+    public static get ROUTES(): string { return "routes"; }
+    public static get BUILD_CONFIGS(): string { return "buildconfigs"; }
+    public static get BUILDS(): string { return "builds"; }
+    public static get DEPLOYMENT_CONFIGS(): string { return "deploymentconfigs"; }
+    public static get DEPLOYMENTS(): string { return "deployments"; }
+    public static get IMAGES(): string { return "images"; }
+    public static get IMAGE_STREAMS(): string { return "imagestreams"; }
+    public static get IMAGE_STREAM_TAGS(): string { return "imagestreamtags"; }
+    public static get POLICIES(): string { return "policies"; }
+    public static get POLICY_BINDINGS(): string { return "policybindings"; }
+    public static get PROJECTS(): string { return "projects"; }
+    public static get ROLE_BINDINGS(): string { return "rolebindings"; }
+    public static get ROLES(): string { return "roles"; }
+    public static get DAEMONSETS(): string { return "daemonsets"; }
   }
 
   export class ExtensionTypes {
-    public static get extensions():Array<string> {
+    public static get extensions(): Array<string> {
       return [
         WatchTypes.DAEMONSETS,
         WatchTypes.DEPLOYMENTS,
         WatchTypes.INGRESSES,
-        WatchTypes.REPLICA_SETS
+        WatchTypes.REPLICA_SETS,
       ];
     }
   }
 
   export class NamespacedTypes {
-    public static get k8sTypes():Array<string> {
+    public static get k8sTypes(): Array<string> {
       return [
         WatchTypes.CONFIG_MAPS,
         WatchTypes.DEPLOYMENTS,
@@ -149,10 +147,10 @@ module KubernetesAPI {
         WatchTypes.RESOURCE_QUOTAS,
         WatchTypes.SECRETS,
         WatchTypes.SERVICE_ACCOUNTS,
-        WatchTypes.SERVICES
+        WatchTypes.SERVICES,
       ];
     }
-    public static get osTypes():Array<string> {
+    public static get osTypes(): Array<string> {
       return [
         WatchTypes.BUILDS,
         WatchTypes.BUILD_CONFIGS,
@@ -166,7 +164,7 @@ module KubernetesAPI {
         WatchTypes.ROLES,
         WatchTypes.ROLE_BINDINGS,
         WatchTypes.ROUTES,
-        WatchTypes.TEMPLATES
+        WatchTypes.TEMPLATES,
       ];
     }
   }
@@ -177,44 +175,44 @@ module KubernetesAPI {
     apiVersion?: string;
     labelSelector?: LabelMap;
     object?: any;
-    success?: (objs:any[]) => void;
-    error?: (err:any) => void;
-    urlFunction?: (options:K8SOptions) => string;
+    success?: (objs: any[]) => void;
+    error?: (err: any) => void;
+    urlFunction?: (options: K8SOptions) => string;
   }
-  
+
   export class WatchActions {
-    public static get INIT():string { return "INIT"; };
-    public static get ANY():string { return "*"; };
-    public static get ADDED():string { return "ADDED"; };
-    public static get MODIFIED():string { return "MODIFIED"; };
-    public static get DELETED():string { return "DELETED"; };
+    public static get INIT(): string { return "INIT"; };
+    public static get ANY(): string { return "*"; };
+    public static get ADDED(): string { return "ADDED"; };
+    public static get MODIFIED(): string { return "MODIFIED"; };
+    public static get DELETED(): string { return "DELETED"; };
   }
-  
+
   export interface ObjectMap {
-    [uid:string]: any;    
+    [uid: string]: any;
   }
 
   export interface LabelMap {
-    [name:string]: string;
+    [name: string]: string;
   }
-  
+
   export interface Collection {
-    wsURL:string;
-    restURL:string;
+    wsURL: string;
+    restURL: string;
     namespace: string;
     kind: string;
     connected: boolean;
     connect();
-    get(cb:(data:any[]) => void, labelSelector?:LabelMap):void;
-    watch(cb:(data:any[]) => void, labelSelector?:LabelMap):(data:any[]) => void;
-    unwatch(cb:(data:any[]) => void):void;
-    put(item:any, cb:(data:any) => void, error?:(err:any) => void):void;
-    delete(item:any, cb:(data:any) => void, error?:(err:any) => void):void;
-    getKey():string;
+    get(cb: (data: any[]) => void, labelSelector?: LabelMap): void;
+    watch(cb: (data: any[]) => void, labelSelector?: LabelMap): (data: any[]) => void;
+    unwatch(cb: (data: any[]) => void): void;
+    put(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
+    delete(item: any, cb: (data: any) => void, error?: (err: any) => void): void;
+    getKey(): string;
   }
 
   export interface K8SClientFactory {
-    create(kind:any, namespace?: string):Collection;
-    destroy(client:Collection, ...handles:Array<(data:any[]) => void>):void;
+    create(kind: any, namespace?: string): Collection;
+    destroy(client: Collection, ...handles: Array<(data: any[]) => void>): void;
   }
 }

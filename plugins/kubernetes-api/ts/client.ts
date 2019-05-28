@@ -6,7 +6,7 @@ module KubernetesAPI {
 
   var log = Logger.get('hawtio-k8s-objects');
 
-  function getKey(kind:string, namespace?: string) {
+  function getKey(kind: string, namespace?: string) {
     return namespace ? namespace + '-' + kind : kind;
   }
 
@@ -29,10 +29,10 @@ module KubernetesAPI {
     }, 75, { trailing: true });
 
     private _initialized = false;
-    private _objects:Array<any> = [];
-    private log:Logging.Logger = log;
+    private _objects: Array<any> = [];
+    private log: Logging.Logger = log;
 
-    constructor(private _kind:string, private namespace?:string) {
+    constructor(private _kind: string, private namespace?: string) {
       super();
       if (this.log.enabledFor(Logger.DEBUG)) {
         this.on(WatchActions.ADDED, (object) => {
@@ -77,7 +77,7 @@ module KubernetesAPI {
       return this._objects;
     }
 
-    public set objects(objs:any[]) {
+    public set objects(objs: any[]) {
       this._objects.length = 0;
       _.forEach(objs, (obj) => {
         if (!obj.kind) {
@@ -89,14 +89,14 @@ module KubernetesAPI {
       this.triggerChangedEvent();
     }
 
-    public hasNamedItem(item:any) {
-      return _.some(this._objects, (obj:any) => {
+    public hasNamedItem(item: any) {
+      return _.some(this._objects, (obj: any) => {
         return getName(obj) === getName(item);
       });
     }
 
-    public getNamedItem(name:string) {
-      return _.find(this._objects, (obj:any) => {
+    public getNamedItem(name: string) {
+      return _.find(this._objects, (obj: any) => {
         return getName(obj) === name;
       });
     }
@@ -164,13 +164,13 @@ module KubernetesAPI {
   };
 
   interface CompareResult {
-    added:Array<any>;
-    modified:Array<any>;
-    deleted:Array<any>;
+    added: Array<any>;
+    modified: Array<any>;
+    deleted: Array<any>;
   }
 
-  function compare(old:Array<any>, _new:Array<any>):CompareResult {
-    var answer = <CompareResult> {
+  function compare(old: Array<any>, _new: Array<any>): CompareResult {
+    var answer = <CompareResult>{
       added: [],
       modified: [],
       deleted: []
@@ -199,26 +199,26 @@ module KubernetesAPI {
    */
   class ObjectPoller {
 
-    private _lastFetch = <Array<any>> [];
-    private log:Logging.Logger = undefined;
+    private _lastFetch = <Array<any>>[];
+    private log: Logging.Logger = undefined;
     private _connected = false;
     private _interval = 5000;
-    private retries:number = 0;
-    private tCancel:any = undefined;
+    private retries: number = 0;
+    private tCancel: any = undefined;
 
-    constructor(private restURL:string, private handler:WSHandler) {
-      this.log = log; 
+    constructor(private restURL: string, private handler: WSHandler) {
+      this.log = log;
       this._lastFetch = this.handler.list.objects;
     };
 
-    public get connected () {
+    public get connected() {
       return this._connected;
     };
 
     private doGet() {
       if (!this._connected) {
         return;
-      } 
+      }
       $.ajax(this.restURL, <any>{
         method: 'GET',
         success: (data) => {
@@ -226,17 +226,17 @@ module KubernetesAPI {
             return;
           }
           log.debug(this.handler.kind, "fetched data:", data);
-          var items  = (data && data.items) ? data.items : [];
+          var items = (data && data.items) ? data.items : [];
           var result = compare(this._lastFetch, items);
           this._lastFetch = items;
-          _.forIn(result, (items:any[], action:string) => {
-            _.forEach(items, (item:any) => {
+          _.forIn(result, (items: any[], action: string) => {
+            _.forEach(items, (item: any) => {
               var event = {
                 data: angular.toJson({
                   type: action.toUpperCase(),
                   object: _.clone(item)
-                  }, true)
-                };
+                }, true)
+              };
               this.handler.onmessage(event);
             });
           });
@@ -307,28 +307,28 @@ module KubernetesAPI {
    * Manages the websocket connection to the backend and passes events to the ObjectList
    */
   class WSHandler {
-    private retries:number = 0;
-    private connectTime:number = 0;
-    private socket:WebSocket;
-    private poller:ObjectPoller;
-    private self:CollectionImpl = undefined;
-    private _list:ObjectList;
-    private log:Logging.Logger = undefined;
-    private messageLog:Logging.Logger = undefined;
+    private retries: number = 0;
+    private connectTime: number = 0;
+    private socket: WebSocket;
+    private poller: ObjectPoller;
+    private self: CollectionImpl = undefined;
+    private _list: ObjectList;
+    private log: Logging.Logger = undefined;
+    private messageLog: Logging.Logger = undefined;
     private destroyed = false;
 
-    constructor(private _self:CollectionImpl) {
+    constructor(private _self: CollectionImpl) {
       this.self = _self;
-      this.log = Logger.get('hawtio-k8s-api-wshandler'); 
+      this.log = Logger.get('hawtio-k8s-api-wshandler');
       this.messageLog = Logger.get('hawtio-k8s-api-wshandler-messages');
     }
 
-    set list(_list:ObjectList) {
+    set list(_list: ObjectList) {
       this._list = _list;
     }
 
     get list() {
-      return this._list || <ObjectList> { objects: [] };
+      return this._list || <ObjectList>{ objects: [] };
     }
 
     get collection() {
@@ -343,7 +343,7 @@ module KubernetesAPI {
       return this._self.kind;
     }
 
-    private setHandlers(self:WSHandler, ws:WebSocket) {
+    private setHandlers(self: WSHandler, ws: WebSocket) {
       _.forIn(self, (value, key) => {
         if (_.startsWith(key, 'on')) {
           var evt = key.replace('on', '');
@@ -356,7 +356,7 @@ module KubernetesAPI {
       });
     };
 
-    public send(data:any) {
+    public send(data: any) {
       if (!_.isString(data)) {
         data = angular.toJson(data);
       }
@@ -364,7 +364,7 @@ module KubernetesAPI {
     }
 
     shouldClose(event) {
-      if (this.destroyed  && this.socket && this.socket.readyState === WebSocket.OPEN) {
+      if (this.destroyed && this.socket && this.socket.readyState === WebSocket.OPEN) {
         this.log.debug("Connection destroyed but still receiving messages, closing websocket, kind: ", this.self.kind, " namespace: ", this.self.namespace);
         try {
           this.log.debug("Closing websocket for kind: ", this.self.kind);
@@ -430,7 +430,7 @@ module KubernetesAPI {
       }
     }
 
-    get connected():boolean {
+    get connected(): boolean {
       return (this.socket && this.socket.readyState === WebSocket.OPEN) || (this.poller && this.poller.connected);
     };
 
@@ -461,7 +461,7 @@ module KubernetesAPI {
               log.info("No wsURL for kind: " + this.self.kind);
             }
           };
-          $.ajax(this.self.restURL, <any> {
+          $.ajax(this.self.restURL, <any>{
             method: 'GET',
             processData: false,
             success: (data) => {
@@ -510,14 +510,14 @@ module KubernetesAPI {
    */
   export class CollectionImpl implements Collection {
 
-    private _kind:string;
-    private _namespace:string;
-    private _path:string;
-    private _apiVersion:string;
-    private handlers:WSHandler = undefined;
-    private list:ObjectList = undefined;
+    private _kind: string;
+    private _namespace: string;
+    private _path: string;
+    private _apiVersion: string;
+    private handlers: WSHandler = undefined;
+    private list: ObjectList = undefined;
 
-    constructor(private _options:K8SOptions) {
+    constructor(private _options: K8SOptions) {
       this._kind = _options.kind;
       this._apiVersion = _options.apiVersion;
       this._namespace = _options.namespace || null;
@@ -535,7 +535,7 @@ module KubernetesAPI {
       log.debug("creating new collection for", this.kind, " namespace: ", this.namespace);
     };
 
-    public get options():K8SOptions {
+    public get options(): K8SOptions {
       return this._options;
     }
 
@@ -557,7 +557,7 @@ module KubernetesAPI {
         if (answer === null || !answer) {
           return null;
         }
-        return wsUrl(answer).query(<any> {
+        return wsUrl(answer).query(<any>{
           watch: true,
           access_token: HawtioOAuth.getOAuthToken()
         });
@@ -574,7 +574,7 @@ module KubernetesAPI {
             url = UrlHelpers.join(hostname, masterApiUrl(), this._path);
           }
         }
-        return wsUrl(url).query(<any> {
+        return wsUrl(url).query(<any>{
           watch: true,
           access_token: HawtioOAuth.getOAuthToken()
         });
@@ -601,7 +601,7 @@ module KubernetesAPI {
       return this._kind;
     };
 
-    get connected():boolean {
+    get connected(): boolean {
       return this.handlers.connected;
     };
 
@@ -619,17 +619,17 @@ module KubernetesAPI {
       */
     }
 
-    private addLabelFilter(cb:(data:any[]) => void, labelSelector:LabelMap) {
+    private addLabelFilter(cb: (data: any[]) => void, labelSelector: LabelMap) {
       log.debug("Adding label filter: ", labelSelector);
       var cbOld = cb;
-      return (data:any[]) => {
+      return (data: any[]) => {
         data = filterByLabel(data, labelSelector);
         cbOld(data);
       };
     }
 
     // one time fetch of the data...
-    public get(cb:(data:any[]) => void, labelSelector?:LabelMap) {
+    public get(cb: (data: any[]) => void, labelSelector?: LabelMap) {
       if (labelSelector) {
         cb = this.addLabelFilter(cb, labelSelector);
       }
@@ -654,7 +654,7 @@ module KubernetesAPI {
       return pref;
     }
 
-    private restUrlFor(item:any, useName:boolean = true) {
+    private restUrlFor(item: any, useName: boolean = true) {
       var name = getName(item);
       if (useName && !name) {
         log.debug("Name missing from item: ", item);
@@ -682,7 +682,7 @@ module KubernetesAPI {
     }
 
     // continually get updates
-    public watch(cb:(data:any[]) => void, labelSelector?:LabelMap):(data:any[]) => void {
+    public watch(cb: (data: any[]) => void, labelSelector?: LabelMap): (data: any[]) => void {
       if (labelSelector) {
         cb = this.addLabelFilter(cb, labelSelector);
       }
@@ -700,12 +700,12 @@ module KubernetesAPI {
       return cb;
     };
 
-    public unwatch(cb:(data:any[]) => void) {
+    public unwatch(cb: (data: any[]) => void) {
       log.debug(this.kind, "removing watch callback:", cb);
       this.list.off(WatchActions.ANY, cb);
     }
 
-    public put(item:any, cb:(data:any) => void, error?:(err:any) => void) {
+    public put(item: any, cb: (data: any) => void, error?: (err: any) => void) {
       var method = 'PUT';
       var url = this.restUrlFor(item);
       if (!this.list.hasNamedItem(item)) {
@@ -735,7 +735,7 @@ module KubernetesAPI {
 
       }
       try {
-        $.ajax(url, <any> {
+        $.ajax(url, <any>{
           method: method,
           contentType: 'application/json',
           data: angular.toJson(item),
@@ -747,7 +747,7 @@ module KubernetesAPI {
             } catch (err) {
               cb({});
             }
-          }, 
+          },
           error: (jqXHR, text, status) => {
             var err = getErrorObject(jqXHR);
             log.debug("Failed to create or update, error: ", err);
@@ -762,7 +762,7 @@ module KubernetesAPI {
       }
     };
 
-    public delete(item:any, cb:(data:any) => void, error?:(err:any) => void) {
+    public delete(item: any, cb: (data: any) => void, error?: (err: any) => void) {
       var url = this.restUrlFor(item);
       if (!url) {
         return;
@@ -802,9 +802,9 @@ module KubernetesAPI {
    */
   class ClientInstance {
     private _refCount = 0;
-    private _collection:CollectionImpl = undefined;
+    private _collection: CollectionImpl = undefined;
 
-    constructor(_collection:CollectionImpl) {
+    constructor(_collection: CollectionImpl) {
       this._collection = _collection;
     };
 
@@ -835,16 +835,16 @@ module KubernetesAPI {
   };
 
   interface ClientMap {
-    [name:string]:ClientInstance;
+    [name: string]: ClientInstance;
   }
 
   /*
    * Factory implementation that's available as an angular service
    */
   class K8SClientFactoryImpl {
-    private log:Logging.Logger = Logger.get('hawtio-k8s-client-factory');
-    private _clients = <ClientMap> {};
-    public create(options: any, namespace?: any):Collection {
+    private log: Logging.Logger = Logger.get('hawtio-k8s-client-factory');
+    private _clients = <ClientMap>{};
+    public create(options: any, namespace?: any): Collection {
       var kind = options;
       var namespace = namespace;
       var _options = options;
@@ -872,7 +872,7 @@ module KubernetesAPI {
       }
     }
 
-    public destroy(client:Collection, ...handles:Array<(data:any[]) => void>) {
+    public destroy(client: Collection, ...handles: Array<(data: any[]) => void>) {
       _.forEach(handles, (handle) => {
         client.unwatch(handle);
       });
@@ -890,7 +890,7 @@ module KubernetesAPI {
     }
   }
 
-  export var K8SClientFactory:K8SClientFactory = new K8SClientFactoryImpl();
+  export var K8SClientFactory: K8SClientFactory = new K8SClientFactoryImpl();
 
   _module.factory('K8SClientFactory', () => {
     return K8SClientFactory;
@@ -907,12 +907,12 @@ module KubernetesAPI {
   /*
    * Get a collection
    */
-  export function get(options:K8SOptions) {
+  export function get(options: K8SOptions) {
     if (!options.kind) {
       throw NO_KIND;
     }
     var client = K8SClientFactory.create(options);
-    var success = (data:any[]) => {
+    var success = (data: any[]) => {
       if (options.success) {
         try {
           options.success(data);
@@ -926,7 +926,7 @@ module KubernetesAPI {
     client.connect();
   }
 
-  function handleListAction(options:any, action:(object:any, success:(data:any) => void, error:(err:any) => void) => void) {
+  function handleListAction(options: any, action: (object: any, success: (data: any) => void, error: (err: any) => void) => void) {
     if (!options.object.objects) {
       throw NO_OBJECTS;
     }
@@ -951,17 +951,17 @@ module KubernetesAPI {
       var object = objects.shift();
       log.debug("Processing object: ", getName(object));
       var success = (data) => {
-      addResult(fullName(object), data);
+        addResult(fullName(object), data);
       };
       var error = (data) => {
-      addResult(fullName(object), data);
+        addResult(fullName(object), data);
       };
       action(object, success, error);
     }
     next();
   }
 
-  function normalizeOptions(options:any) {
+  function normalizeOptions(options: any) {
     log.debug("Normalizing supplied options: ", options);
     // let's try and support also just supplying k8s objects directly
     if (options.metadata || getKind(options) === toKindName(WatchTypes.LIST)) {
@@ -987,11 +987,11 @@ module KubernetesAPI {
     return options;
   }
 
-  export function del(options:any) {
+  export function del(options: any) {
     options = normalizeOptions(options);
     // support deleting a list of objects
     if (options.object.kind === toKindName(WatchTypes.LIST)) {
-      handleListAction(options, (object:any, success, error) => {
+      handleListAction(options, (object: any, success, error) => {
         del({
           object: object,
           success: success,
@@ -1030,11 +1030,11 @@ module KubernetesAPI {
   /*
    * Add/replace an object, or a list of objects
    */
-  export function put(options:any) {
+  export function put(options: any) {
     options = normalizeOptions(options);
     // support putting a list of objects
     if (options.object.kind === toKindName(WatchTypes.LIST)) {
-      handleListAction(options, (object:any, success, error) => {
+      handleListAction(options, (object: any, success, error) => {
         put({
           object: object,
           success: success,
@@ -1073,11 +1073,11 @@ module KubernetesAPI {
     client.connect();
   }
 
-  export function watch(options:K8SOptions) {
+  export function watch(options: K8SOptions) {
     if (!options.kind) {
       throw NO_KIND;
     }
-    var client = <Collection> K8SClientFactory.create(options);
+    var client = <Collection>K8SClientFactory.create(options);
     var handle = client.watch(options.success, options.labelSelector);
     var self = {
       client: client,

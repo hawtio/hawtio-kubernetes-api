@@ -48,7 +48,7 @@ module KubernetesAPI {
           log.info("Backend is an openshift instance");
           isOpenShift = true;
           next();
-        }, 
+        },
         error: (jqXHR, textStatus, errorThrown) => {
           log.info("Error probing " + testURL + " assuming backend is not an openshift instance.  Error details: status: ", textStatus, " errorThrown: ", errorThrown, " jqXHR instance: ", jqXHR);
           next();
@@ -71,11 +71,11 @@ module KubernetesAPI {
           } else if (OSOAuthConfig.oauth_metadata_uri) {
             log.debug('Fetching OAuth server metadata from:', OSOAuthConfig.oauth_metadata_uri);
             $.getJSON(OSOAuthConfig.oauth_metadata_uri)
-            .done(metadata => {
-              OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
-              OSOAuthConfig.master_uri = metadata.issuer;
-            })
-            .always(() => next());
+              .done(metadata => {
+                OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
+                OSOAuthConfig.master_uri = metadata.issuer;
+              })
+              .always(() => next());
           } else {
             next();
           }
@@ -87,9 +87,9 @@ module KubernetesAPI {
     name: 'KubernetesApiInit',
     depends: ['FetchConfig'],
     task: (next) => {
-      var config:KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
+      var config: KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
       log.debug("Fetched OAuth config: ", config);
-      var master:string = config.master_uri;
+      var master: string = config.master_uri;
       if (!master && config.api && config.api.k8s) {
         var masterUri = new URI().host(config.api.k8s.hostPort).path("").query("");
         if (config.api.k8s.proto) {
@@ -104,13 +104,13 @@ module KubernetesAPI {
           if (oauth_authorize_uri) {
             var text = oauth_authorize_uri;
             var idx = text.indexOf("://");
+            if (idx > 0) {
+              idx += 3;
+              idx = text.indexOf("/", idx);
               if (idx > 0) {
-                idx += 3;
-                idx = text.indexOf("/", idx);
-                if (idx > 0) {
-                  master = text.substring(0, ++idx);
-                }
+                master = text.substring(0, ++idx);
               }
+            }
           }
         }
       }

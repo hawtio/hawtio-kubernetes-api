@@ -5,7 +5,7 @@ module KubernetesAPI {
   export var pluginName = 'KubernetesAPI';
   export var pluginPath = 'plugins/kubernetes-api/';
   export var templatePath = pluginPath + 'html/';
-  export var log:Logging.Logger = Logger.get('hawtio-k8s-api');
+  export var log: Logging.Logger = Logger.get('hawtio-k8s-api');
 
   export var keepPollingModel = true;
 
@@ -13,7 +13,7 @@ module KubernetesAPI {
   export var hostIconUrl = Core.url("/img/host.svg");
 
   // this gets set as a pre-bootstrap task
-  export var osConfig:KubernetesConfig = undefined;
+  export var osConfig: KubernetesConfig = undefined;
   export var masterUrl = "";
   export var isOpenShift = false;
 
