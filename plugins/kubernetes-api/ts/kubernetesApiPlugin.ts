@@ -71,7 +71,7 @@ module KubernetesAPI {
             $.getJSON(OSOAuthConfig.oauth_metadata_uri)
               .done(metadata => {
                 OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
-                OSOAuthConfig.master_uri = metadata.issuer;
+                OSOAuthConfig.issuer = metadata.issuer;
               })
               .always(() => next());
           } else {
