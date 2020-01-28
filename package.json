@@ -14,8 +14,8 @@
     "test": "gulp build"
   },
   "dependencies": {
-    "@hawtio/core": "~4.7.0",
-    "@hawtio/oauth": "~4.7.1",
+    "@hawtio/core": "^4.0.0",
+    "@hawtio/oauth": "^4.0.0",
     "eventemitter3": "~3.1.0"
   },
   "devDependencies": {
@@ -184,7 +184,6 @@
     "angular-animate": "1.7.2",
     "http-errors": "1.6.3",
     "bootstrap-select": "1.12.4",
-    "eventemitter3": "3.1.0",
     "safe-buffer": "5.1.2",
     "arr-union": "3.1.0",
     "array-slice": "1.1.0",
@@ -211,6 +210,7 @@
     "uuid": "3.3.2",
     "fast-deep-equal": "2.0.1",
     "json-schema-traverse": "0.4.1",
-    "punycode": "2.1.1"
+    "punycode": "2.1.1",
+    "eventemitter3": "3.1.2"
   }
 }
