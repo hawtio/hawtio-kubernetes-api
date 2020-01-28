@@ -1379,7 +1379,7 @@ event-stream@*, event-stream@3.3.2, event-stream@3.3.4, event-stream@^3.2.1:
     stream-combiner "~0.0.4"
     through "~2.3.1"
 
-eventemitter3@1.x.x, eventemitter3@~3.1.0:
+eventemitter3@1.x.x, eventemitter3@3.1.2, eventemitter3@~3.1.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-3.1.2.tgz#2d3d48f9c346698fce83a85d7d664e98535df6e7"
   integrity sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==
@@ -2956,9 +2956,9 @@ merge-stream@^1.0.0:
     readable-stream "^2.0.1"
 
 merge@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/merge/-/merge-1.2.0.tgz#7531e39d4949c281a66b8c5a6e0265e8b05894da"
-  integrity sha1-dTHjnUlJwoGma4xabgJl6LBYlNo=
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/merge/-/merge-1.2.1.tgz#38bebf80c3220a8a487b6fcfb3941bb11720c145"
+  integrity sha512-VjFo4P5Whtj4vsLzsYBu5ayHhoHJ0UqNm7ibvShmbmoz7tGi0vXaoJbGdB+GmDMLUdg8DpQXEIeVDAe8MaABvQ==
 
 methods@~1.1.2:
   version "1.1.2"
