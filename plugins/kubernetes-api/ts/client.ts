@@ -409,7 +409,10 @@ module KubernetesAPI {
           this.log.debug("Retrying after connection closed: ", event);
           this.retries = this.retries + 1;
           this.log.debug("watch ", this.self.kind, " disconnected, retry #", this.retries);
-          var ws = this.socket = new WebSocket(this.self.wsURL);
+          // Pass the bearer token via WebSocket sub-protocol
+          // An extra sub-protocol is required along with the authentication one, that gets removed
+          // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
+          var ws = this.socket = new WebSocket(this.self.wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).slice(0, -2)}`]);
           this.setHandlers(self, ws);
         }, 5000);
       } else {
@@ -455,7 +458,10 @@ module KubernetesAPI {
             var wsURL = this.self.wsURL;
             if (wsURL) {
               this.log.debug("Connecting websocket for kind: ", this.self.kind);
-              this.socket = new WebSocket(wsURL);
+              // Pass the bearer token via WebSocket sub-protocol
+              // An extra sub-protocol is required along with the authentication one, that gets removed
+              // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
+              this.socket = new WebSocket(wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).slice(0, -2)}`]);
               this.setHandlers(this, this.socket);
             } else {
               log.info("No wsURL for kind: " + this.self.kind);
@@ -557,10 +563,7 @@ module KubernetesAPI {
         if (answer === null || !answer) {
           return null;
         }
-        return wsUrl(answer).query(<any>{
-          watch: true,
-          access_token: HawtioOAuth.getOAuthToken()
-        });
+        return wsUrl(answer).query(<any>{ watch: true });
       } else {
         var url = UrlHelpers.join(masterApiUrl(), this._path);
         var location = Core.windowLocation();
@@ -574,10 +577,7 @@ module KubernetesAPI {
             url = UrlHelpers.join(hostname, masterApiUrl(), this._path);
           }
         }
-        return wsUrl(url).query(<any>{
-          watch: true,
-          access_token: HawtioOAuth.getOAuthToken()
-        });
+        return wsUrl(url).query(<any>{ watch: true });
       }
     }
 
