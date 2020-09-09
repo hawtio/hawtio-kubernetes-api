@@ -18,5 +18,4 @@ module KubernetesAPI {
   export var OS_API_VERSION = 'v1';
   export var K8S_EXT_VERSION = 'v1beta1';
 
-  export var labelFilterTextSeparator = ",";
 }

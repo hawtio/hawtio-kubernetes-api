@@ -326,18 +326,6 @@ module KubernetesAPI {
   };
 
   /**
-   * Returns the labels text string using the <code>key1=value1,key2=value2,....</code> format
-   */
-  export function labelsToString(labels, seperatorText = labelFilterTextSeparator) {
-    var answer = "";
-    angular.forEach(labels, (value, key) => {
-      var separator = answer ? seperatorText : "";
-      answer += separator + key + "=" + value;
-    });
-    return answer;
-  }
-
-  /**
    * Returns true if the current status of the pod is running
    */
   export function isRunning(podCurrentState) {
@@ -345,25 +333,6 @@ module KubernetesAPI {
     if (status) {
       var lower = status.toLowerCase();
       return lower.startsWith("run");
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Returns true if the labels object has all of the key/value pairs from the selector
-   */
-  export function selectorMatches(selector, labels) {
-    if (angular.isObject(labels)) {
-      var answer = true;
-      var count = 0;
-      angular.forEach(selector, (value, key) => {
-        count++;
-        if (answer && labels[key] !== value) {
-          answer = false;
-        }
-      });
-      return answer && count > 0;
     } else {
       return false;
     }
