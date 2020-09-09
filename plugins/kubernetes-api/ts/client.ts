@@ -546,39 +546,56 @@ module KubernetesAPI {
     }
 
     private get _restUrl() {
+      var url = new URI();
+
       if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
-        var answer = this.options.urlFunction(this.options);
+        let answer = this.options.urlFunction(this.options);
         if (answer === null || !answer) {
           return null;
         }
-        return new URI(answer);
+        url = new URI(answer);
       } else {
-        return new URI(UrlHelpers.join(masterApiUrl(), this._path));
+        url = new URI(UrlHelpers.join(masterApiUrl(), this._path))
       }
+
+      if (this.options.labelSelector !== null) {
+        url = url.addQuery({labelSelector: this.options.labelSelector});
+      }
+
+      return url;
     }
 
     private get _wsUrl() {
+      var url = new URI();
+
       if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
-        var answer = this.options.urlFunction(this.options);
+        let answer = this.options.urlFunction(this.options);
         if (answer === null || !answer) {
           return null;
         }
-        return wsUrl(answer).query(<any>{ watch: true });
+        url = wsUrl(answer);
       } else {
-        var url = UrlHelpers.join(masterApiUrl(), this._path);
-        var location = Core.windowLocation();
-        if (location && url.indexOf("://") < 0) {
-          var hostname = location.hostname;
+        let urlStr = UrlHelpers.join(masterApiUrl(), this._path);
+        let location = Core.windowLocation();
+        if (location && urlStr.indexOf("://") < 0) {
+          let hostname = location.hostname;
           if (hostname) {
-            var port = location.port;
+            let port = location.port;
             if (port) {
               hostname += ":" + port;
             }
-            url = UrlHelpers.join(hostname, masterApiUrl(), this._path);
+            urlStr = UrlHelpers.join(hostname, masterApiUrl(), this._path);
           }
         }
-        return wsUrl(url).query(<any>{ watch: true });
+        url = wsUrl(urlStr);
       }
+
+      url = url.query(<any>{ watch: true });
+
+      if (this.options.labelSelector !== null) {
+        url = url.addQuery({labelSelector: this.options.labelSelector});
+      }
+      return url;
     }
 
     public getKey() {
@@ -619,20 +636,8 @@ module KubernetesAPI {
       */
     }
 
-    private addLabelFilter(cb: (data: any[]) => void, labelSelector: LabelMap) {
-      log.debug("Adding label filter: ", labelSelector);
-      var cbOld = cb;
-      return (data: any[]) => {
-        data = filterByLabel(data, labelSelector);
-        cbOld(data);
-      };
-    }
-
     // one time fetch of the data...
-    public get(cb: (data: any[]) => void, labelSelector?: LabelMap) {
-      if (labelSelector) {
-        cb = this.addLabelFilter(cb, labelSelector);
-      }
+    public get(cb: (data: any[]) => void) {
       if (!this.list.initialized) {
         this.list.once(WatchActions.INIT, cb);
       } else {
@@ -683,10 +688,7 @@ module KubernetesAPI {
     }
 
     // continually get updates
-    public watch(cb: (data: any[]) => void, labelSelector?: LabelMap): (data: any[]) => void {
-      if (labelSelector) {
-        cb = this.addLabelFilter(cb, labelSelector);
-      }
+    public watch(cb: (data: any[]) => void): (data: any[]) => void {
       if (this.list.initialized) {
         setTimeout(() => {
           log.debug(this.kind, "passing existing objects:", this.list.objects);
@@ -923,7 +925,7 @@ module KubernetesAPI {
       }
       K8SClientFactory.destroy(client);
     }
-    client.get(success, options.labelSelector);
+    client.get(success);
     client.connect();
   }
 
@@ -1079,7 +1081,7 @@ module KubernetesAPI {
       throw NO_KIND;
     }
     var client = <Collection>K8SClientFactory.create(options);
-    var handle = client.watch(options.success, options.labelSelector);
+    var handle = client.watch(options.success);
     var self = {
       client: client,
       handle: handle,

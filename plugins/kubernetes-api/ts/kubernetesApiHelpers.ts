@@ -269,16 +269,6 @@ module KubernetesAPI {
   }
 
   /**
-   * Filter a collection by label
-   **/
-  export function filterByLabel(objects: Array<any>, labelSelector: LabelMap) {
-    var matches = (<any>_).matches(labelSelector);
-    return _.filter(objects, (object) => {
-      return matches(getLabels(object));
-    });
-  }
-
-  /**
    * Returns a fully scoped name with the namespace/kind, suitable to use as a key in maps
    **/
   export function fullName(entity) {
