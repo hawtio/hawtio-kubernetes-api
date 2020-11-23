@@ -412,7 +412,7 @@ module KubernetesAPI {
           // Pass the bearer token via WebSocket sub-protocol
           // An extra sub-protocol is required along with the authentication one, that gets removed
           // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
-          var ws = this.socket = new WebSocket(this.self.wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).slice(0, -2)}`]);
+          var ws = this.socket = new WebSocket(this.self.wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).replace(/=/g, '')}`]);
           this.setHandlers(self, ws);
         }, 5000);
       } else {
@@ -461,7 +461,7 @@ module KubernetesAPI {
               // Pass the bearer token via WebSocket sub-protocol
               // An extra sub-protocol is required along with the authentication one, that gets removed
               // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
-              this.socket = new WebSocket(wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).slice(0, -2)}`]);
+              this.socket = new WebSocket(wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).replace(/=/g, '')}`]);
               this.setHandlers(this, this.socket);
             } else {
               log.info("No wsURL for kind: " + this.self.kind);
