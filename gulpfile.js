@@ -146,10 +146,13 @@ gulp.task('connect', ['watch'], function() {
       };
 
     } else if (useAuthentication) {
+      const namespace = process.env.NAMESPACE || 'hawtio';
+      const clientId = process.env.CLIENT_ID || 'hawtio-online-dev';
+
       config.master_uri = kubeBase;
       config.openshift = {
         oauth_authorize_uri: urljoin(kubeBase, '/oauth/authorize'),
-        oauth_client_id    : 'system:serviceaccount:hawtio:hawtio-online-dev',
+        oauth_client_id    : `system:serviceaccount:${namespace}:${clientId}`,
         scope              : 'user:info user:check-access role:edit:hawtio',
       };
     }

@@ -2,7 +2,7 @@
 /// <reference path="kubernetes-api.helpers.ts"/>
 /// <reference path="kubernetes-api.module.ts"/>
 
-module KubernetesAPI {
+namespace KubernetesAPI {
 
   var log = Logger.get('hawtio-k8s-objects');
 

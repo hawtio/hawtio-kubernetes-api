@@ -1,4 +1,4 @@
-module KubernetesAPI {
+namespace KubernetesAPI {
 
   export class consts {
     get NAMESPACE_STORAGE_KEY(): string { return "k8sSelectedNamespace"; }

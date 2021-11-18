@@ -1,6 +1,6 @@
 /// <reference path="kubernetes-api.globals.ts"/>
 
-module KubernetesAPI {
+namespace KubernetesAPI {
 
   declare var K8SClientFactory: K8SClientFactory;
 

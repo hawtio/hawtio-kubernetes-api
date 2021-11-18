@@ -1,6 +1,6 @@
 /// <reference path="kubernetes-api.helpers.ts"/>
 
-module KubernetesAPI {
+namespace KubernetesAPI {
 
   export var _module = angular.module(pluginName, []);
 
