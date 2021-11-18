@@ -1,5 +1,7 @@
 # hawtio-kubernetes-api
 
+[![Build](https://github.com/hawtio/hawtio-kubernetes-api/actions/workflows/build.yml/badge.svg)](https://github.com/hawtio/hawtio-kubernetes-api/actions/workflows/build.yml)
+
 Hawtio plugin that provides an easy API for working with a Kubernetes or OpenShift API server.
 
 ### Usage
