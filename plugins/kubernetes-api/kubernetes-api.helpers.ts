@@ -1,4 +1,4 @@
-/// <reference path="kubernetesApiGlobals.ts"/>
+/// <reference path="kubernetes-api.globals.ts"/>
 
 module KubernetesAPI {
 

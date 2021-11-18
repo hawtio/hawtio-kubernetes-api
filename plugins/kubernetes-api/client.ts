@@ -1,6 +1,6 @@
-/// <reference path="kubernetesApiGlobals.ts"/>
-/// <reference path="kubernetesApiHelpers.ts"/>
-/// <reference path="kubernetesApiPlugin.ts"/>
+/// <reference path="kubernetes-api.globals.ts"/>
+/// <reference path="kubernetes-api.helpers.ts"/>
+/// <reference path="kubernetes-api.module.ts"/>
 
 module KubernetesAPI {
 

@@ -1,4 +1,4 @@
-/// <reference path="kubernetesApiInterfaces.ts"/>
+/// <reference path="kubernetes-api.model.ts"/>
 
 module KubernetesAPI {
 
