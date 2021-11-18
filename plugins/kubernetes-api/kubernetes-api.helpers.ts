@@ -2,7 +2,7 @@
 
 namespace KubernetesAPI {
 
-  declare var K8SClientFactory: K8SClientFactory;
+  declare let K8SClientFactory: K8SClientFactory;
 
   export function masterApiUrl() {
     return masterUrl || "";
@@ -81,7 +81,7 @@ namespace KubernetesAPI {
   }
 
   export function prefixForKind(kind: string) {
-    var api = apiForKind(kind);
+    const api = apiForKind(kind);
     switch (api) {
       case K8S_EXT_PREFIX:
         return kubernetesApiExtensionPrefix();
@@ -98,7 +98,7 @@ namespace KubernetesAPI {
    * Extracts the k8s/openshift error response if present
    */
   export function getErrorObject(jqXHR) {
-    var answer: any = jqXHR.responseText;
+    let answer: any = jqXHR.responseText;
     try {
       answer = angular.fromJson(answer);
     } catch (err) {
@@ -111,7 +111,7 @@ namespace KubernetesAPI {
    * Returns either secure/insecure websocket protocol based on the master URI protocol
    */
   export function wsScheme(url: string) {
-    var protocol = new URI(url).protocol() || 'http';
+    const protocol = new URI(url).protocol() || 'http';
     if (_.startsWith(protocol, 'https')) {
       return 'wss';
     } else {
@@ -211,7 +211,7 @@ namespace KubernetesAPI {
    * Returns the websocket URL for the supplied URL
    */
   export function wsUrl(url: string) {
-    var protocol = wsScheme(url);
+    const protocol = wsScheme(url);
     return new URI(url).scheme(protocol);
   }
 
@@ -219,8 +219,8 @@ namespace KubernetesAPI {
    * Compare two k8s objects based on their UID
    */
   export function equals(left, right): boolean {
-    var leftUID = getUID(left);
-    var rightUID = getUID(right);
+    const leftUID = getUID(left);
+    const rightUID = getUID(right);
     if (!leftUID && !rightUID) {
       return angular.toJson(left) === angular.toJson(right);
     }
@@ -237,7 +237,7 @@ namespace KubernetesAPI {
    * Create a list of kubernetes objects suitable for posting a bunch of objects
    */
   export function createList(...objects: any[]) {
-    var answer = {
+    const answer = {
       apiVersion: K8S_API_VERSION,
       kind: toKindName(WatchTypes.LIST),
       objects: []
@@ -272,9 +272,9 @@ namespace KubernetesAPI {
    * Returns a fully scoped name with the namespace/kind, suitable to use as a key in maps
    **/
   export function fullName(entity) {
-    var namespace = getNamespace(entity);
-    var kind = getKind(entity);
-    var name = getName(entity);
+    const namespace = getNamespace(entity);
+    const kind = getKind(entity);
+    const name = getName(entity);
     return UrlHelpers.join((namespace ? namespace : ""), kind, name);
   }
 
@@ -283,7 +283,7 @@ namespace KubernetesAPI {
   }
 
   export function getNamespace(entity) {
-    var answer = Core.pathGet(entity, ["metadata", "namespace"]);
+    const answer = Core.pathGet(entity, ["metadata", "namespace"]);
     // some objects aren't namespaced, so this can return null;
     return answer;
   }
@@ -293,7 +293,7 @@ namespace KubernetesAPI {
   }
 
   export function getLabels(entity) {
-    var answer = Core.pathGet(entity, ["metadata", "labels"]);
+    const answer = Core.pathGet(entity, ["metadata", "labels"]);
     return answer ? answer : {};
   }
 
@@ -329,9 +329,9 @@ namespace KubernetesAPI {
    * Returns true if the current status of the pod is running
    */
   export function isRunning(podCurrentState) {
-    var status = (podCurrentState || {}).phase;
+    const status = (podCurrentState || {}).phase;
     if (status) {
-      var lower = status.toLowerCase();
+      const lower = status.toLowerCase();
       return lower.startsWith("run");
     } else {
       return false;

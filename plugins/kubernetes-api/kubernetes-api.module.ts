@@ -2,7 +2,7 @@
 
 namespace KubernetesAPI {
 
-  export var _module = angular.module(pluginName, []);
+  export const _module = angular.module(pluginName, []);
 
   function addProductInfo(aboutService: About.AboutService) {
     'ngInject';
@@ -38,7 +38,7 @@ namespace KubernetesAPI {
     depends: ['hawtio-oauth', 'KubernetesApiInit'],
     task: (next) => {
       isOpenShift = false;
-      var testURL = new URI(KubernetesAPI.masterUrl).segment('apis/apps.openshift.io/v1').toString();
+      const testURL = new URI(KubernetesAPI.masterUrl).segment('apis/apps.openshift.io/v1').toString();
       $.ajax(<any>{
         url: testURL,
         method: 'GET',
@@ -85,11 +85,11 @@ namespace KubernetesAPI {
     name: 'KubernetesApiInit',
     depends: ['FetchConfig'],
     task: (next) => {
-      var config: KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
+      const config: KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
       log.debug("Fetched OAuth config: ", config);
-      var master: string = config.master_uri;
+      let master: string = config.master_uri;
       if (!master && config.api && config.api.k8s) {
-        var masterUri = new URI().host(config.api.k8s.hostPort).path("").query("");
+        const masterUri = new URI().host(config.api.k8s.hostPort).path("").query("");
         if (config.api.k8s.proto) {
           masterUri.protocol(config.api.k8s.proto);
         }
@@ -98,10 +98,10 @@ namespace KubernetesAPI {
 
       if (OSOAuthConfig && !master) {
         if (!master) {
-          var oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
+          const oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
           if (oauth_authorize_uri) {
-            var text = oauth_authorize_uri;
-            var idx = text.indexOf("://");
+            const text = oauth_authorize_uri;
+            let idx = text.indexOf("://");
             if (idx > 0) {
               idx += 3;
               idx = text.indexOf("/", idx);
@@ -113,7 +113,7 @@ namespace KubernetesAPI {
         }
       }
       // We'll just grab the URI for the document here in case we need it
-      var documentURI = new URI().path(HawtioCore.documentBase());
+      const documentURI = new URI().path(HawtioCore.documentBase());
       if (!master || master === "/") {
         // lets default the master to the current protocol and host/port
         // in case the master url is "/" and we are

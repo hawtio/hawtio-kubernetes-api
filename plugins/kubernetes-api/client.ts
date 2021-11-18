@@ -4,21 +4,21 @@
 
 namespace KubernetesAPI {
 
-  var log = Logger.get('hawtio-k8s-objects');
+  const log = Logger.get('hawtio-k8s-objects');
 
   function getKey(kind: string, namespace?: string) {
     return namespace ? namespace + '-' + kind : kind;
   }
 
   function beforeSend(request) {
-    var token = HawtioOAuth.getOAuthToken();
+    const token = HawtioOAuth.getOAuthToken();
     if (token) {
       request.setRequestHeader('Authorization', 'Bearer ' + token);
     }
   }
 
   // Allow clients to add other types to force polling under whatever circumstances
-  export var pollingOnly = [WatchTypes.IMAGE_STREAM_TAGS];
+  export const pollingOnly = [WatchTypes.IMAGE_STREAM_TAGS];
 
   /**
    *  Manages the array of k8s objects for a client instance
@@ -153,7 +153,7 @@ namespace KubernetesAPI {
       if (!this.belongs(object)) {
         return;
       }
-      var deleted = _.remove(this._objects, (obj) => {
+      const deleted = _.remove(this._objects, (obj) => {
         return equals(obj, object);
       });
       if (deleted) {
@@ -170,13 +170,13 @@ namespace KubernetesAPI {
   }
 
   function compare(old: Array<any>, _new: Array<any>): CompareResult {
-    var answer = <CompareResult>{
+    const answer = <CompareResult>{
       added: [],
       modified: [],
       deleted: []
     };
     _.forEach(_new, (newObj) => {
-      var oldObj = _.find(old, (o) => equals(o, newObj));
+      const oldObj = _.find(old, (o) => equals(o, newObj));
       if (!oldObj) {
         answer.added.push(newObj);
         return;
@@ -186,7 +186,7 @@ namespace KubernetesAPI {
       }
     });
     _.forEach(old, (oldObj) => {
-      var newObj = _.find(_new, (o) => equals(o, oldObj));
+      const newObj = _.find(_new, (o) => equals(o, oldObj));
       if (!newObj) {
         answer.deleted.push(oldObj);
       }
@@ -226,12 +226,12 @@ namespace KubernetesAPI {
             return;
           }
           log.debug(this.handler.kind, "fetched data:", data);
-          var items = (data && data.items) ? data.items : [];
-          var result = compare(this._lastFetch, items);
+          const items = (data && data.items) ? data.items : [];
+          const result = compare(this._lastFetch, items);
           this._lastFetch = items;
           _.forIn(result, (items: any[], action: string) => {
             _.forEach(items, (item: any) => {
-              var event = {
+              const event = {
                 data: angular.toJson({
                   type: action.toUpperCase(),
                   object: _.clone(item)
@@ -253,7 +253,7 @@ namespace KubernetesAPI {
           if (!this._connected) {
             return;
           }
-          var error = getErrorObject(jqXHR);
+          const error = getErrorObject(jqXHR);
           if (jqXHR.status === 403) {
             this.log.info(this.handler.kind, "- Failed to poll objects, user is not authorized");
             return;
@@ -346,7 +346,7 @@ namespace KubernetesAPI {
     private setHandlers(self: WSHandler, ws: WebSocket) {
       _.forIn(self, (value, key) => {
         if (_.startsWith(key, 'on')) {
-          var evt = key.replace('on', '');
+          const evt = key.replace('on', '');
           // this.log.debug("Adding event handler for '" + evt + "' using '" + key + "'");
           ws.addEventListener(evt, (event) => {
             this.messageLog.debug("received websocket event: ", event);
@@ -382,8 +382,8 @@ namespace KubernetesAPI {
         this.log.debug("Should be closed!");
         return;
       }
-      var data = JSON.parse(event.data);
-      var eventType = data.type.toLowerCase();
+      const data = JSON.parse(event.data);
+      const eventType = data.type.toLowerCase();
       this._list[eventType](data.object);
     };
 
@@ -404,7 +404,7 @@ namespace KubernetesAPI {
         return;
       }
       if (this.retries < 3 && this.connectTime && (new Date().getTime() - this.connectTime) > 5000) {
-        var self = this;
+        const self = this;
         setTimeout(() => {
           this.log.debug("Retrying after connection closed: ", event);
           this.retries = this.retries + 1;
@@ -412,7 +412,7 @@ namespace KubernetesAPI {
           // Pass the bearer token via WebSocket sub-protocol
           // An extra sub-protocol is required along with the authentication one, that gets removed
           // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
-          var ws = this.socket = new WebSocket(this.self.wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).replace(/=/g, '')}`]);
+          const ws = this.socket = new WebSocket(this.self.wsURL, [undefined, `base64url.bearer.authorization.k8s.io.${btoa(HawtioOAuth.getOAuthToken()).replace(/=/g, '')}`]);
           this.setHandlers(self, ws);
         }, 5000);
       } else {
@@ -454,8 +454,8 @@ namespace KubernetesAPI {
           this.poller = new ObjectPoller(this.self.restURL, this);
           this.poller.start();
         } else {
-          var doConnect = () => {
-            var wsURL = this.self.wsURL;
+          const doConnect = () => {
+            const wsURL = this.self.wsURL;
             if (wsURL) {
               this.log.debug("Connecting websocket for kind: ", this.self.kind);
               // Pass the bearer token via WebSocket sub-protocol
@@ -476,7 +476,7 @@ namespace KubernetesAPI {
                 doConnect();
               }, 10);
             }, error: (jqXHR, text, status) => {
-              var err = getErrorObject(jqXHR);
+              const err = getErrorObject(jqXHR);
               if (jqXHR.status === 403) {
                 this.log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, ", user is not authorized");
                 this._list.objects = [];
@@ -528,7 +528,7 @@ namespace KubernetesAPI {
       this._apiVersion = _options.apiVersion;
       this._namespace = _options.namespace || null;
 
-      var pref = this.getPrefix();
+      const pref = this.getPrefix();
 
       if (this._namespace) {
         this._path = UrlHelpers.join(pref, 'namespaces', this._namespace, this._kind);
@@ -536,7 +536,7 @@ namespace KubernetesAPI {
         this._path = UrlHelpers.join(pref, this._kind);
       }
       this.handlers = new WSHandler(this);
-      var list = this.list = new ObjectList(_options.kind, _options.namespace);
+      const list = this.list = new ObjectList(_options.kind, _options.namespace);
       this.handlers.list = list;
       log.debug("creating new collection for", this.kind, " namespace: ", this.namespace);
     };
@@ -546,7 +546,7 @@ namespace KubernetesAPI {
     }
 
     private get _restUrl() {
-      var url = new URI();
+      let url = new URI();
 
       if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
         let answer = this.options.urlFunction(this.options);
@@ -566,7 +566,7 @@ namespace KubernetesAPI {
     }
 
     private get _wsUrl() {
-      var url = new URI();
+      let url = new URI();
 
       if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
         let answer = this.options.urlFunction(this.options);
@@ -649,7 +649,7 @@ namespace KubernetesAPI {
 
     private getPrefix() {
       // TODO: support retrieving endpoint URL based on API group
-      var pref = prefixForKind(this._kind);
+      let pref = prefixForKind(this._kind);
       if (!pref) {
         if (this._apiVersion && _.startsWith(this._apiVersion, 'extensions')) {
           pref = UrlHelpers.join(K8S_EXT_PREFIX, this._apiVersion);
@@ -661,19 +661,19 @@ namespace KubernetesAPI {
     }
 
     private restUrlFor(item: any, useName: boolean = true) {
-      var name = getName(item);
+      const name = getName(item);
       if (useName && !name) {
         log.debug("Name missing from item: ", item);
         return undefined;
       }
-      var url = UrlHelpers.join(this._restUrl.toString());
+      let url = UrlHelpers.join(this._restUrl.toString());
       if (this.options.urlFunction && angular.isFunction(this.options.urlFunction)) {
         // lets trust the url to be correct
       } else {
         if (namespaced(toCollectionName(item.kind))) {
-          var namespace = getNamespace(item) || this._namespace;
-          var prefix = this.getPrefix();
-          var kind = this._kind;
+          const namespace = getNamespace(item) || this._namespace;
+          let prefix = this.getPrefix();
+          const kind = this._kind;
           if (!KubernetesAPI.isOpenShift && (kind === "buildconfigs" || kind === "BuildConfig")) {
             prefix = UrlHelpers.join("/api/v1/proxy/namespaces", namespace, "/services/jenkinshift:80/", prefix);
             log.debug("Using buildconfigs URL override");
@@ -709,17 +709,17 @@ namespace KubernetesAPI {
     }
 
     public put(item: any, cb: (data: any) => void, error?: (err: any) => void) {
-      var method = 'PUT';
-      var url = this.restUrlFor(item);
+      let method = 'PUT';
+      let url = this.restUrlFor(item);
       if (!this.list.hasNamedItem(item)) {
         // creating a new object
         method = 'POST';
         url = this.restUrlFor(item, false);
       } else {
         // updating an existing object
-        var resourceVersion = item.metadata.resourceVersion;
+        let resourceVersion = item.metadata.resourceVersion;
         if (!resourceVersion) {
-          var current = this.list.getNamedItem(getName(item));
+          const current = this.list.getNamedItem(getName(item));
           resourceVersion = current.metadata.resourceVersion;
           item.metadata.resourceVersion = resourceVersion;
         }
@@ -745,14 +745,14 @@ namespace KubernetesAPI {
           processData: false,
           success: (data) => {
             try {
-              var response = angular.fromJson(data);
+              const response = angular.fromJson(data);
               cb(response);
             } catch (err) {
               cb({});
             }
           },
           error: (jqXHR, text, status) => {
-            var err = getErrorObject(jqXHR);
+            const err = getErrorObject(jqXHR);
             log.debug("Failed to create or update, error: ", err);
             if (error) {
               error(err);
@@ -766,7 +766,7 @@ namespace KubernetesAPI {
     };
 
     public delete(item: any, cb: (data: any) => void, error?: (err: any) => void) {
-      var url = this.restUrlFor(item);
+      const url = this.restUrlFor(item);
       if (!url) {
         return;
       }
@@ -777,14 +777,14 @@ namespace KubernetesAPI {
           method: 'DELETE',
           success: (data) => {
             try {
-              var response = angular.fromJson(data);
+              const response = angular.fromJson(data);
               cb(response);
             } catch (err) {
               cb({});
             }
           },
           error: (jqXHR, text, status) => {
-            var err = getErrorObject(jqXHR);
+            const err = getErrorObject(jqXHR);
             log.debug("Failed to delete, error: ", err);
             this.list.added(item);
             this.list.triggerChangedEvent();
@@ -848,9 +848,8 @@ namespace KubernetesAPI {
     private log: Logging.Logger = Logger.get('hawtio-k8s-client-factory');
     private _clients = <ClientMap>{};
     public create(options: any, namespace?: any): Collection {
-      var kind = options;
-      var namespace = namespace;
-      var _options = options;
+      let kind = options;
+      let _options = options;
       if (angular.isObject(options)) {
         kind = options.kind;
         namespace = options.namespace || namespace;
@@ -860,14 +859,14 @@ namespace KubernetesAPI {
           namespace: namespace
         };
       }
-      var key = getKey(kind, namespace);
+      const key = getKey(kind, namespace);
       if (this._clients[key]) {
-        var client = this._clients[key];
+        const client = this._clients[key];
         client.addRef();
         this.log.debug("Returning existing client for key: ", key, " refcount is: ", client.refCount);
         return client.collection;
       } else {
-        var client = new ClientInstance(new CollectionImpl(_options));
+        const client = new ClientInstance(new CollectionImpl(_options));
         client.addRef();
         this.log.debug("Creating new client for key: ", key, " refcount is: ", client.refCount);
         this._clients[key] = client;
@@ -879,9 +878,9 @@ namespace KubernetesAPI {
       _.forEach(handles, (handle) => {
         client.unwatch(handle);
       });
-      var key = client.getKey();
+      const key = client.getKey();
       if (this._clients[key]) {
-        var c = this._clients[key];
+        const c = this._clients[key];
         c.removeRef();
         this.log.debug("Removed reference to client with key: ", key, " refcount is: ", c.refCount);
         if (c.disposable()) {
@@ -893,15 +892,15 @@ namespace KubernetesAPI {
     }
   }
 
-  export var K8SClientFactory: K8SClientFactory = new K8SClientFactoryImpl();
+  export const K8SClientFactory: K8SClientFactory = new K8SClientFactoryImpl();
 
   _module.factory('K8SClientFactory', () => {
     return K8SClientFactory;
   });
 
-  var NO_KIND = "No kind in supplied options";
-  var NO_OBJECT = "No object in supplied options";
-  var NO_OBJECTS = "No objects in list object";
+  const NO_KIND = "No kind in supplied options";
+  const NO_OBJECT = "No object in supplied options";
+  const NO_OBJECTS = "No objects in list object";
 
   /*
    * Static functions for manipulating k8s obj3cts
@@ -914,8 +913,8 @@ namespace KubernetesAPI {
     if (!options.kind) {
       throw NO_KIND;
     }
-    var client = K8SClientFactory.create(options);
-    var success = (data: any[]) => {
+    const client = K8SClientFactory.create(options);
+    const success = (data: any[]) => {
       if (options.success) {
         try {
           options.success(data);
@@ -933,8 +932,8 @@ namespace KubernetesAPI {
     if (!options.object.objects) {
       throw NO_OBJECTS;
     }
-    var answer = {};
-    var objects = _.cloneDeep(options.object.objects);
+    const answer = {};
+    const objects = _.cloneDeep(options.object.objects);
     function addResult(id, data) {
       answer[id] = data;
       next();
@@ -951,12 +950,12 @@ namespace KubernetesAPI {
         }
         return;
       }
-      var object = objects.shift();
+      const object = objects.shift();
       log.debug("Processing object: ", getName(object));
-      var success = (data) => {
+      const success = (data) => {
         addResult(fullName(object), data);
       };
-      var error = (data) => {
+      const error = (data) => {
         addResult(fullName(object), data);
       };
       action(object, success, error);
@@ -968,7 +967,7 @@ namespace KubernetesAPI {
     log.debug("Normalizing supplied options: ", options);
     // let's try and support also just supplying k8s objects directly
     if (options.metadata || getKind(options) === toKindName(WatchTypes.LIST)) {
-      var object = options;
+      const object = options;
       options = {
         object: object
       };
@@ -1006,8 +1005,8 @@ namespace KubernetesAPI {
     options.kind = options.kind || toCollectionName(options.object);
     options.namespace = namespaced(options.kind) ? options.namespace || getNamespace(options.object) : null;
     options.apiVersion = options.apiVersion || getApiVersion(options.object);
-    var client = K8SClientFactory.create(options);
-    var success = (data) => {
+    const client = K8SClientFactory.create(options);
+    const success = (data) => {
       if (options.success) {
         try {
           options.success(data);
@@ -1017,7 +1016,7 @@ namespace KubernetesAPI {
       }
       K8SClientFactory.destroy(client);
     };
-    var error = (err) => {
+    const error = (err) => {
       if (options.error) {
         try {
           options.error(err);
@@ -1049,9 +1048,9 @@ namespace KubernetesAPI {
     options.kind = options.kind || toCollectionName(options.object);
     options.namespace = namespaced(options.kind) ? options.namespace || getNamespace(options.object) : null;
     options.apiVersion = options.apiVersion || getApiVersion(options.object);
-    var client = K8SClientFactory.create(options);
+    const client = K8SClientFactory.create(options);
     client.get((objects) => {
-      var success = (data) => {
+      const success = (data) => {
         if (options.success) {
           try {
             options.success(data);
@@ -1061,7 +1060,7 @@ namespace KubernetesAPI {
         }
         K8SClientFactory.destroy(client);
       };
-      var error = (err) => {
+      const error = (err) => {
         if (options.error) {
           try {
             options.error(err);
@@ -1080,9 +1079,9 @@ namespace KubernetesAPI {
     if (!options.kind) {
       throw NO_KIND;
     }
-    var client = <Collection>K8SClientFactory.create(options);
-    var handle = client.watch(options.success);
-    var self = {
+    const client = <Collection>K8SClientFactory.create(options);
+    const handle = client.watch(options.success);
+    const self = {
       client: client,
       handle: handle,
       disconnect: () => {
