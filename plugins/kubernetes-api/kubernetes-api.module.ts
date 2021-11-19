@@ -69,7 +69,7 @@ namespace KubernetesAPI {
           } else if (OSOAuthConfig.oauth_metadata_uri) {
             log.debug('Fetching OAuth server metadata from:', OSOAuthConfig.oauth_metadata_uri);
             $.getJSON(OSOAuthConfig.oauth_metadata_uri)
-              .done(metadata => {
+              .done((metadata) => {
                 OSOAuthConfig.oauth_authorize_uri = metadata.authorization_endpoint;
                 OSOAuthConfig.issuer = metadata.issuer;
               })
@@ -77,7 +77,7 @@ namespace KubernetesAPI {
           } else {
             next();
           }
-        })
+        });
     }
   }, true);
 
@@ -86,8 +86,8 @@ namespace KubernetesAPI {
     depends: ['FetchConfig'],
     task: (next) => {
       const config: KubernetesConfig = KubernetesAPI.osConfig = window['OPENSHIFT_CONFIG'];
-      log.debug("Fetched OAuth config: ", config);
-      let master: string = config.master_uri;
+      log.debug("Fetched OAuth config:", config);
+      let master = config.master_uri;
       if (!master && config.api && config.api.k8s) {
         const masterUri = new URI().host(config.api.k8s.hostPort).path("").query("");
         if (config.api.k8s.proto) {
@@ -97,17 +97,15 @@ namespace KubernetesAPI {
       }
 
       if (OSOAuthConfig && !master) {
-        if (!master) {
-          const oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
-          if (oauth_authorize_uri) {
-            const text = oauth_authorize_uri;
-            let idx = text.indexOf("://");
+        const oauth_authorize_uri = OSOAuthConfig.oauth_authorize_uri;
+        if (oauth_authorize_uri) {
+          const text = oauth_authorize_uri;
+          let idx = text.indexOf("://");
+          if (idx > 0) {
+            idx += 3;
+            idx = text.indexOf("/", idx);
             if (idx > 0) {
-              idx += 3;
-              idx = text.indexOf("/", idx);
-              if (idx > 0) {
-                master = text.substring(0, ++idx);
-              }
+              master = text.substring(0, ++idx);
             }
           }
         }
@@ -126,7 +124,7 @@ namespace KubernetesAPI {
         log.info("master_url set to 'k8s', assuming proxy is being used");
         master = documentURI.query("").segment(master).toString();
       }
-      log.info("Using kubernetes API URL: ", master);
+      log.info("Using kubernetes API URL:", master);
       KubernetesAPI.masterUrl = master;
       next();
     }

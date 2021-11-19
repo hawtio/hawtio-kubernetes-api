@@ -1,20 +1,21 @@
-const gulp = require('gulp'),
-      eventStream = require('event-stream'),
-      gulpLoadPlugins = require('gulp-load-plugins'),
-      del = require('del'),
-      path = require('path'),
-      size = require('gulp-size'),
-      uri = require('urijs'),
-      urljoin = require('url-join'),
-      s = require('underscore.string'),
-      stringifyObject = require('stringify-object'),
-      argv = require('yargs').argv,
-      hawtio = require('hawtio-node-backend');
+const
+  gulp = require('gulp'),
+  eventStream = require('event-stream'),
+  gulpLoadPlugins = require('gulp-load-plugins'),
+  del = require('del'),
+  path = require('path'),
+  size = require('gulp-size'),
+  uri = require('urijs'),
+  urljoin = require('url-join'),
+  s = require('underscore.string'),
+  stringifyObject = require('stringify-object'),
+  argv = require('yargs').argv,
+  hawtio = require('hawtio-node-backend');
 
 const package = require('./package.json');
 const plugins = gulpLoadPlugins({});
 
-var config = {
+const config = {
   main: '.',
   ts: ['plugins/**/*.ts'],
   dist: argv.out || './dist/',
@@ -25,35 +26,36 @@ var config = {
 
 const tsProject = plugins.typescript.createProject('tsconfig.json');
 
-var normalSizeOptions = {
-    showFiles: true
-}, gZippedSizeOptions  = {
-    showFiles: true,
-    gzip: true
+const normalSizeOptions = {
+  showFiles: true
+};
+const gZippedSizeOptions = {
+  showFiles: true,
+  gzip: true
 };
 
-gulp.task('tsc', function() {
-    const tsResult = tsProject.src()
+gulp.task('tsc', function () {
+  const tsResult = tsProject.src()
     .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.init()))
     .pipe(tsProject())
     .on('error', plugins.notify.onError({
-      onLast : true,
+      onLast: true,
       message: '<%= error.message %>',
-      title  : 'Typescript compilation error'
+      title: 'Typescript compilation error'
     }));
 
-    return eventStream.merge(
-      tsResult.js
-        .pipe(plugins.ngAnnotate())
-        .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
-        .pipe(gulp.dest('.')),
-      tsResult.dts
-        .pipe(plugins.rename(config.dts))
-        .pipe(gulp.dest(config.dist)));
+  return eventStream.merge(
+    tsResult.js
+      .pipe(plugins.ngAnnotate())
+      .pipe(plugins.if(config.sourceMap, plugins.sourcemaps.write()))
+      .pipe(gulp.dest('.')),
+    tsResult.dts
+      .pipe(plugins.rename(config.dts))
+      .pipe(gulp.dest(config.dist)));
 });
 
-gulp.task('concat', ['tsc'], function() {
-  var gZipSize = size(gZippedSizeOptions);
+gulp.task('concat', ['tsc'], function () {
+  const gZipSize = size(gZippedSizeOptions);
   return gulp.src(['compiled.js'])
     .pipe(plugins.concat(config.js))
     .pipe(size(normalSizeOptions))
@@ -61,16 +63,16 @@ gulp.task('concat', ['tsc'], function() {
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('clean', ['concat'], function() {
+gulp.task('clean', ['concat'], function () {
   return del(['compiled.js']);
 });
 
-gulp.task('watch', ['build'], function() {
+gulp.task('watch', ['build'], function () {
   plugins.watch(['node_modules/**/*.js', 'index.html', config.dist + '/' + config.js], ['reload']);
   plugins.watch(['node_modules/**/*.d.ts', config.ts], ['tsc', 'template', 'concat', 'clean']);
 });
 
-gulp.task('connect', ['watch'], function() {
+gulp.task('connect', ['watch'], function () {
   // lets disable unauthorised TLS issues with kube REST API
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -78,33 +80,35 @@ gulp.task('connect', ['watch'], function() {
   const kube = uri(kubeBase);
   console.log("Connecting to Kubernetes on: " + kube);
 
-  var staticAssets = [{
-      path: '/',
-      dir: '.'
+  const staticAssets = [{
+    path: '/',
+    dir: '.'
   }];
 
-  var localProxies = [];
-  var defaultProxies = [{
-    proto: kube.protocol(),
-    port: kube.port(),
-    hostname: kube.hostname(),
-    path: '/kubernetes',
-    targetPath: '/',
-  }, {
-    proto: kube.protocol(),
-    hostname: kube.hostname(),
-    port: kube.port(),
-    path: '/jolokia',
-    targetPath: '/hawtio/jolokia'
-  }, {
-    proto: kube.protocol(),
-    hostname: kube.hostname(),
-    port: kube.port(),
-    path: '/git',
-    targetPath: '/hawtio/git'
-  }];
+  const localProxies = [];
+  const defaultProxies = [
+    {
+      proto: kube.protocol(),
+      port: kube.port(),
+      hostname: kube.hostname(),
+      path: '/kubernetes',
+      targetPath: '/',
+    }, {
+      proto: kube.protocol(),
+      hostname: kube.hostname(),
+      port: kube.port(),
+      path: '/jolokia',
+      targetPath: '/hawtio/jolokia'
+    }, {
+      proto: kube.protocol(),
+      hostname: kube.hostname(),
+      port: kube.port(),
+      path: '/git',
+      targetPath: '/hawtio/git'
+    }
+  ];
 
-  var staticProxies = localProxies.concat(defaultProxies);
+  const staticProxies = localProxies.concat(defaultProxies);
 
   hawtio.setConfig({
     port: process.env.DEV_PORT || 2772,
@@ -115,14 +119,14 @@ gulp.task('connect', ['watch'], function() {
       enabled: true,
     }
   });
-  var debugLoggingOfProxy = process.env.DEBUG_PROXY === "true";
-  var useAuthentication = process.env.DISABLE_OAUTH !== "true";
+  const debugLoggingOfProxy = process.env.DEBUG_PROXY === "true";
+  const useAuthentication = process.env.DISABLE_OAUTH !== "true";
 
-  var googleClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
-  var googleClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  const googleClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const googleClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
 
-  hawtio.use('/osconsole/config.js', function(req, res, next) {
-    var config = {
+  hawtio.use('/osconsole/config.js', function (req, res, next) {
+    const config = {
       api: {
         openshift: {
           proto: kube.protocol(),
@@ -137,12 +141,12 @@ gulp.task('connect', ['watch'], function() {
     if (googleClientId && googleClientSecret) {
       config.master_uri = kubeBase;
       config.google = {
-         clientId: googleClientId,
-         clientSecret: googleClientSecret,
-         authenticationURI: "https://accounts.google.com/o/oauth2/auth",
-         authorizationURI: "https://accounts.google.com/o/oauth2/auth",
-         scope: "profile",
-         redirectURI: "http://localhost:9000"
+        clientId: googleClientId,
+        clientSecret: googleClientSecret,
+        authenticationURI: "https://accounts.google.com/o/oauth2/auth",
+        authorizationURI: "https://accounts.google.com/o/oauth2/auth",
+        scope: "profile",
+        redirectURI: "http://localhost:9000"
       };
 
     } else if (useAuthentication) {
@@ -152,42 +156,49 @@ gulp.task('connect', ['watch'], function() {
       config.master_uri = kubeBase;
       config.openshift = {
         oauth_authorize_uri: urljoin(kubeBase, '/oauth/authorize'),
-        oauth_client_id    : `system:serviceaccount:${namespace}:${clientId}`,
-        scope              : 'user:info user:check-access role:edit:hawtio',
+        oauth_client_id: `system:serviceaccount:${namespace}:${clientId}`,
+        scope: 'user:info user:check-access role:edit:hawtio',
       };
     }
-    var answer = "window.OPENSHIFT_CONFIG = window.HAWTIO_OAUTH_CONFIG = " + stringifyObject(config);
+    const answer = "window.OPENSHIFT_CONFIG = window.HAWTIO_OAUTH_CONFIG = " + stringifyObject(config);
     res.set('Content-Type', 'application/javascript');
     res.send(answer);
   });
 
-  hawtio.use('/', function(req, res, next) {
-          var path = req.originalUrl;
-          // avoid returning these files, they should get pulled from js
-          if (s.startsWith(path, '/plugins/') && s.endsWith(path, 'html')) {
-            console.log("returning 404 for: ", path);
-            res.statusCode = 404;
-            res.end();
-          } else {
-            if (debugLoggingOfProxy) {
-              console.log("allowing: ", path);
-            }
-            next();
-          }
-        });
-  hawtio.listen(function(server) {
-    var host = server.address().address;
-    var port = server.address().port;
+  // Accessed from hawtio-oauth bootstrap
+  hawtio.use('/oauth/config.js', function (req, res, next) {
+    res.set('Content-Type', 'application/javascript');
+    res.send('');
+  });
+
+  hawtio.use('/', function (req, res, next) {
+    const path = req.originalUrl;
+    // avoid returning these files, they should get pulled from js
+    if (s.startsWith(path, '/plugins/') && s.endsWith(path, 'html')) {
+      console.log("returning 404 for: ", path);
+      res.statusCode = 404;
+      res.end();
+    } else {
+      if (debugLoggingOfProxy) {
+        console.log("allowing: ", path);
+      }
+      next();
+    }
+  });
+
+  hawtio.listen(function (server) {
+    const host = server.address().address;
+    const port = server.address().port;
     console.log("started from gulp file at ", host, ":", port);
   });
 });
 
-gulp.task('reload', function() {
+gulp.task('reload', function () {
   gulp.src('.')
     .pipe(hawtio.reload());
 });
 
-gulp.task('version', function() {
+gulp.task('version', function () {
   return gulp.src(path.join(config.dist, config.js))
     .pipe(plugins.replace('PACKAGE_VERSION_PLACEHOLDER', package.version))
     .pipe(gulp.dest(config.dist));
