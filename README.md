@@ -4,7 +4,7 @@
 
 Hawtio plugin that provides an easy API for working with a Kubernetes or OpenShift API server.
 
-### Usage
+## Usage
 
 To use the API, inject it into a service or controller:
 
@@ -106,7 +106,9 @@ Typical usage would be to create a client, and watch that client for changes.  H
 
 ```
 
-#### Output build to a different directory
+## Developing
+
+### Output build to a different directory
 
 When developing this plugin in a dependent console you can change the output directory where the compiled .js and .css go.  Just use the 'out' flag to set a different output directory, for example:
 
@@ -114,7 +116,7 @@ When developing this plugin in a dependent console you can change the output dir
 
 Whenever the build completes the compiled .js file will be put into the target directory.  Don't forget to first do a `gulp build` without this flag before committing changes!
 
-#### Turn on source maps generation for debugging TypeScript
+### Turn on source maps generation for debugging TypeScript
 
 If you want to debug `.ts` using a browser developer tool such as Chrome DevTools, pass the `--sourcemap` flag:
 
@@ -123,3 +125,11 @@ yarn start --sourcemap
 ```
 
 Do not use this flag when you are committing the compiled `.js` file, as it embeds source maps to the output file. Use this flag only during development.
+
+### Minikube
+
+To make the example work, you would need to configure CORS Allowed Origins for the API server so that the Kubernetes endpoints can be invoked from JavaScript.
+
+```
+minikube start --extra-config apiserver.cors-allowed-origins=["http://*"]
+```

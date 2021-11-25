@@ -125,6 +125,8 @@ gulp.task('connect', ['watch'], function () {
   const googleClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const googleClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
 
+  const token = process.env.TOKEN;
+
   hawtio.use('/osconsole/config.js', function (req, res, next) {
     const config = {
       api: {
@@ -148,7 +150,6 @@ gulp.task('connect', ['watch'], function () {
         scope: "profile",
         redirectURI: "http://localhost:9000"
       };
-
     } else if (useAuthentication) {
       const namespace = process.env.NAMESPACE || 'hawtio';
       const clientId = process.env.CLIENT_ID || 'hawtio-online-dev';
@@ -160,6 +161,9 @@ gulp.task('connect', ['watch'], function () {
         scope: 'user:info user:check-access role:edit:hawtio',
       };
     }
+    if (token) {
+      config.token = token;
+    }
     const answer = "window.OPENSHIFT_CONFIG = window.HAWTIO_OAUTH_CONFIG = " + stringifyObject(config);
     res.set('Content-Type', 'application/javascript');
     res.send(answer);
@@ -168,7 +172,7 @@ gulp.task('connect', ['watch'], function () {
   // Accessed from hawtio-oauth bootstrap
   hawtio.use('/oauth/config.js', function (req, res, next) {
     res.set('Content-Type', 'application/javascript');
-    res.send('');
+    res.send('// No data');
   });
 
   hawtio.use('/', function (req, res, next) {
