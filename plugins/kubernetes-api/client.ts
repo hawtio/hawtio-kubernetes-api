@@ -241,7 +241,7 @@ namespace KubernetesAPI {
             });
           });
           this.handler.list.initialize();
-          //log.debug("Result: ", result);
+          //log.debug("Result:", result);
           if (this._connected) {
             this.tCancel = setTimeout(() => {
               log.debug(this.handler.kind, "polling");
@@ -259,14 +259,14 @@ namespace KubernetesAPI {
             return;
           }
           if (this.retries >= 3) {
-            this.log.debug(this.handler.kind, "- Out of retries, stopping polling, error: ", error);
+            this.log.debug(this.handler.kind, "- Out of retries, stopping polling, error:", error);
             this.stop();
             if (this.handler.error) {
               this.handler.error(error);
             }
           } else {
             this.retries = this.retries + 1;
-            this.log.debug(this.handler.kind, "- Error polling, retry #", this.retries + 1, " error: ", error);
+            this.log.debug(this.handler.kind, "- Error polling, retry #", this.retries + 1, "error:", error);
             this.tCancel = setTimeout(() => {
               this.doGet();
             }, this._interval);
@@ -288,9 +288,9 @@ namespace KubernetesAPI {
 
     public stop() {
       this._connected = false;
-      this.log.debug(this.handler.kind, " - disconnecting");
+      this.log.debug(this.handler.kind, "- disconnecting");
       if (this.tCancel) {
-        this.log.debug(this.handler.kind, " - cancelling polling");
+        this.log.debug(this.handler.kind, "- cancelling polling");
         clearTimeout(this.tCancel);
         this.tCancel = undefined;
       }
@@ -298,7 +298,7 @@ namespace KubernetesAPI {
 
     public destroy() {
       this.stop();
-      this.log.debug(this.handler.kind, " - destroyed");
+      this.log.debug(this.handler.kind, "- destroyed");
     }
 
   }
@@ -349,7 +349,7 @@ namespace KubernetesAPI {
           const evt = key.replace('on', '');
           // this.log.debug("Adding event handler for '" + evt + "' using '" + key + "'");
           ws.addEventListener(evt, (event) => {
-            this.messageLog.debug("received websocket event: ", event);
+            this.messageLog.debug("received websocket event:", event);
             self[key](event);
           });
         }
@@ -365,9 +365,9 @@ namespace KubernetesAPI {
 
     shouldClose(event) {
       if (this.destroyed && this.socket && this.socket.readyState === WebSocket.OPEN) {
-        this.log.debug("Connection destroyed but still receiving messages, closing websocket, kind: ", this.self.kind, " namespace: ", this.self.namespace);
+        this.log.debug("Connection destroyed but still receiving messages, closing websocket, kind:", this.self.kind, "namespace:", this.self.namespace);
         try {
-          this.log.debug("Closing websocket for kind: ", this.self.kind);
+          this.log.debug("Closing websocket for kind:", this.self.kind);
           this.socket.close();
         } catch (err) {
           // nothing to do, assume it's already closed
@@ -388,7 +388,7 @@ namespace KubernetesAPI {
     };
 
     onopen(event) {
-      this.log.debug("Received open event for kind: ", this.self.kind, " namespace: ", this.self.namespace);
+      this.log.debug("Received open event for kind:", this.self.kind, "namespace:", this.self.namespace);
       if (this.shouldClose(event)) {
         return;
       }
@@ -397,18 +397,18 @@ namespace KubernetesAPI {
     };
 
     onclose(event) {
-      this.log.debug("Received close event for kind: ", this.self.kind, " namespace: ", this.self.namespace);
+      this.log.debug("Received close event for kind:", this.self.kind, "namespace:", this.self.namespace);
       if (this.destroyed) {
-        this.log.debug("websocket destroyed for kind: ", this.self.kind, " namespace: ", this.self.namespace);
+        this.log.debug("websocket destroyed for kind:", this.self.kind, "namespace:", this.self.namespace);
         delete this.socket;
         return;
       }
       if (this.retries < 3 && this.connectTime && (new Date().getTime() - this.connectTime) > 5000) {
         const self = this;
         setTimeout(() => {
-          this.log.debug("Retrying after connection closed: ", event);
+          this.log.debug("Retrying after connection closed:", event);
           this.retries = this.retries + 1;
-          this.log.debug("watch ", this.self.kind, " disconnected, retry #", this.retries);
+          this.log.debug("watch ", this.self.kind, "disconnected, retry #", this.retries);
           // Pass the bearer token via WebSocket sub-protocol
           // An extra sub-protocol is required along with the authentication one, that gets removed
           // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
@@ -416,7 +416,7 @@ namespace KubernetesAPI {
           this.setHandlers(self, ws);
         }, 5000);
       } else {
-        this.log.debug("websocket for ", this.self.kind, " closed, event: ", event);
+        this.log.debug("websocket for ", this.self.kind, "closed, event:", event);
         if (!event.wasClean) {
           this.log.debug("Switching to polling mode");
           delete this.socket;
@@ -427,7 +427,7 @@ namespace KubernetesAPI {
     };
 
     onerror(event) {
-      this.log.debug("websocket for kind: ", this.self.kind, " received an error: ", event);
+      this.log.debug("websocket for kind:", this.self.kind, "received an error:", event);
       if (this.shouldClose(event)) {
         return;
       }
@@ -450,14 +450,14 @@ namespace KubernetesAPI {
       }
       if (!this.socket && !this.poller) {
         if (_.some(pollingOnly, (kind) => kind === this.self.kind)) {
-          this.log.info("Using polling for kind: ", this.self.kind);
+          this.log.info("Using polling for kind:", this.self.kind);
           this.poller = new ObjectPoller(this.self.restURL, this);
           this.poller.start();
         } else {
           const doConnect = () => {
             const wsURL = this.self.wsURL;
             if (wsURL) {
-              this.log.debug("Connecting websocket for kind: ", this.self.kind);
+              this.log.debug("Connecting websocket for kind:", this.self.kind);
               // Pass the bearer token via WebSocket sub-protocol
               // An extra sub-protocol is required along with the authentication one, that gets removed
               // See https://github.com/kubernetes/kubernetes/commit/714f97d7baf4975ad3aa47735a868a81a984d1f0
@@ -478,10 +478,10 @@ namespace KubernetesAPI {
             }, error: (jqXHR, text, status) => {
               const err = getErrorObject(jqXHR);
               if (jqXHR.status === 403) {
-                this.log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, ", user is not authorized");
+                this.log.info("Failed to fetch data while connecting to backend for type:", this.self.kind, ", user is not authorized");
                 this._list.objects = [];
               } else {
-                this.log.info("Failed to fetch data while connecting to backend for type: ", this.self.kind, " error: ", err);
+                this.log.info("Failed to fetch data while connecting to backend for type:", this.self.kind, "error:", err);
                 setTimeout(() => {
                   doConnect();
                 }, 10);
@@ -497,15 +497,15 @@ namespace KubernetesAPI {
       this.destroyed = true;
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         try {
-          this.log.debug("Closing websocket for kind: ", this.self.kind, " namespace: ", this.self.namespace);
+          this.log.debug("Closing websocket for kind:", this.self.kind, "namespace:", this.self.namespace);
           this.socket.close();
-          this.log.debug("Close called on websocket for kind: ", this.self.kind, " namespace: ", this.self.namespace);
+          this.log.debug("Close called on websocket for kind:", this.self.kind, "namespace:", this.self.namespace);
         } catch (err) {
           // nothing to do, assume it's already closed
         }
       }
       if (this.poller) {
-        this.log.debug("Destroying poller for kind: ", this.self.kind, " namespace: ", this.self.namespace);
+        this.log.debug("Destroying poller for kind:", this.self.kind, "namespace:", this.self.namespace);
         this.poller.destroy();
       }
     }
@@ -538,7 +538,7 @@ namespace KubernetesAPI {
       this.handlers = new WSHandler(this);
       const list = this.list = new ObjectList(_options.kind, _options.namespace);
       this.handlers.list = list;
-      log.debug("creating new collection for", this.kind, " namespace: ", this.namespace);
+      log.debug("creating new collection for", this.kind, "namespace:", this.namespace);
     };
 
     public get options(): K8SOptions {
@@ -663,7 +663,7 @@ namespace KubernetesAPI {
     private restUrlFor(item: any, useName: boolean = true) {
       const name = getName(item);
       if (useName && !name) {
-        log.debug("Name missing from item: ", item);
+        log.debug("Name missing from item:", item);
         return undefined;
       }
       let url = UrlHelpers.join(this._restUrl.toString());
@@ -753,7 +753,7 @@ namespace KubernetesAPI {
           },
           error: (jqXHR, text, status) => {
             const err = getErrorObject(jqXHR);
-            log.debug("Failed to create or update, error: ", err);
+            log.debug("Failed to create or update, error:", err);
             if (error) {
               error(err);
             }
@@ -785,7 +785,7 @@ namespace KubernetesAPI {
           },
           error: (jqXHR, text, status) => {
             const err = getErrorObject(jqXHR);
-            log.debug("Failed to delete, error: ", err);
+            log.debug("Failed to delete, error:", err);
             this.list.added(item);
             this.list.triggerChangedEvent();
             if (error) {
@@ -863,12 +863,12 @@ namespace KubernetesAPI {
       if (this._clients[key]) {
         const client = this._clients[key];
         client.addRef();
-        this.log.debug("Returning existing client for key: ", key, " refcount is: ", client.refCount);
+        this.log.debug("Returning existing client for key:", key, "refcount is:", client.refCount);
         return client.collection;
       } else {
         const client = new ClientInstance(new CollectionImpl(_options));
         client.addRef();
-        this.log.debug("Creating new client for key: ", key, " refcount is: ", client.refCount);
+        this.log.debug("Creating new client for key:", key, "refcount is:", client.refCount);
         this._clients[key] = client;
         return client.collection;
       }
@@ -882,11 +882,11 @@ namespace KubernetesAPI {
       if (this._clients[key]) {
         const c = this._clients[key];
         c.removeRef();
-        this.log.debug("Removed reference to client with key: ", key, " refcount is: ", c.refCount);
+        this.log.debug("Removed reference to client with key:", key, "refcount is:", c.refCount);
         if (c.disposable()) {
           this._clients[key] = undefined;
           c.destroy();
-          this.log.debug("Destroyed client for key: ", key);
+          this.log.debug("Destroyed client for key:", key);
         }
       }
     }
@@ -919,7 +919,7 @@ namespace KubernetesAPI {
         try {
           options.success(data);
         } catch (err) {
-          log.debug("Supplied success callback threw error: ", err);
+          log.debug("Supplied success callback threw error:", err);
         }
       }
       K8SClientFactory.destroy(client);
@@ -946,12 +946,12 @@ namespace KubernetesAPI {
             options.success(answer);
           }
         } catch (err) {
-          log.debug("Supplied success callback threw error: ", err);
+          log.debug("Supplied success callback threw error:", err);
         }
         return;
       }
       const object = objects.shift();
-      log.debug("Processing object: ", getName(object));
+      log.debug("Processing object:", getName(object));
       const success = (data) => {
         addResult(fullName(object), data);
       };
@@ -964,7 +964,7 @@ namespace KubernetesAPI {
   }
 
   function normalizeOptions(options: any) {
-    log.debug("Normalizing supplied options: ", options);
+    log.debug("Normalizing supplied options:", options);
     // let's try and support also just supplying k8s objects directly
     if (options.metadata || getKind(options) === toKindName(WatchTypes.LIST)) {
       const object = options;
@@ -985,7 +985,7 @@ namespace KubernetesAPI {
         throw NO_KIND;
       }
     }
-    log.debug("Options object normalized: ", options);
+    log.debug("Options object normalized:", options);
     return options;
   }
 
@@ -1011,7 +1011,7 @@ namespace KubernetesAPI {
         try {
           options.success(data);
         } catch (err) {
-          log.debug("Supplied success callback threw error: ", err);
+          log.debug("Supplied success callback threw error:", err);
         }
       }
       K8SClientFactory.destroy(client);
@@ -1021,7 +1021,7 @@ namespace KubernetesAPI {
         try {
           options.error(err);
         } catch (err) {
-          log.debug("Supplied error callback threw error: ", err);
+          log.debug("Supplied error callback threw error:", err);
         }
       }
       K8SClientFactory.destroy(client);
@@ -1055,7 +1055,7 @@ namespace KubernetesAPI {
           try {
             options.success(data);
           } catch (err) {
-            log.debug("Supplied success callback threw error: ", err);
+            log.debug("Supplied success callback threw error:", err);
           }
         }
         K8SClientFactory.destroy(client);
@@ -1065,7 +1065,7 @@ namespace KubernetesAPI {
           try {
             options.error(err);
           } catch (err) {
-            log.debug("Supplied error callback threw error: ", err);
+            log.debug("Supplied error callback threw error:", err);
           }
         }
         K8SClientFactory.destroy(client);
