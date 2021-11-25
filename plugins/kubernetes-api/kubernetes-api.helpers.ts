@@ -4,11 +4,11 @@ namespace KubernetesAPI {
 
   declare let K8SClientFactory: K8SClientFactory;
 
-  export function masterApiUrl() {
+  export function masterApiUrl(): string {
     return masterUrl || "";
   }
 
-  export function namespaced(kind: string) {
+  export function namespaced(kind: string): boolean {
     switch (kind) {
       case KubernetesAPI.WatchTypes.POLICIES:
       case KubernetesAPI.WatchTypes.OAUTH_CLIENTS:
@@ -22,11 +22,11 @@ namespace KubernetesAPI {
     }
   }
 
-  export function kubernetesApiPrefix() {
+  export function kubernetesApiPrefix(): string {
     return UrlHelpers.join(K8S_PREFIX, K8S_API_VERSION);
   }
 
-  export function kubernetesApiExtensionPrefix() {
+  export function kubernetesApiExtensionPrefix(): string {
     return UrlHelpers.join(K8S_EXT_PREFIX, K8S_EXT_VERSION);
   }
 
@@ -34,7 +34,7 @@ namespace KubernetesAPI {
     return UrlHelpers.join(OS_PREFIX, apiGroupForKind(kind), OS_API_VERSION);
   }
 
-  export function apiForKind(kind: string) {
+  export function apiForKind(kind: string): string {
     if (kind === WatchTypes.NAMESPACES) {
       return K8S_PREFIX;
     }
@@ -53,7 +53,7 @@ namespace KubernetesAPI {
     return null;
   }
 
-  export function apiGroupForKind(kind: string) {
+  export function apiGroupForKind(kind: string): string {
     switch (kind) {
       case WatchTypes.OAUTH_CLIENTS:
         return 'oauth.openshift.io';
@@ -80,7 +80,7 @@ namespace KubernetesAPI {
     }
   }
 
-  export function prefixForKind(kind: string) {
+  export function prefixForKind(kind: string): string {
     const api = apiForKind(kind);
     switch (api) {
       case K8S_EXT_PREFIX:
@@ -97,8 +97,8 @@ namespace KubernetesAPI {
   /*
    * Extracts the k8s/openshift error response if present
    */
-  export function getErrorObject(jqXHR) {
-    let answer: any = jqXHR.responseText;
+  export function getErrorObject(jqXHR: JQueryXHR): string {
+    let answer = jqXHR.responseText;
     try {
       answer = angular.fromJson(answer);
     } catch (err) {
@@ -110,7 +110,7 @@ namespace KubernetesAPI {
   /*
    * Returns either secure/insecure websocket protocol based on the master URI protocol
    */
-  export function wsScheme(url: string) {
+  export function wsScheme(url: string): string {
     const protocol = new URI(url).protocol() || 'http';
     if (_.startsWith(protocol, 'https')) {
       return 'wss';
@@ -122,7 +122,7 @@ namespace KubernetesAPI {
   /*
    * Returns the single 'kind' of an object from the collection kind
    */
-  export function toKindName(kind: any) {
+  export function toKindName(kind: any): any {
     if (angular.isObject(kind)) {
       return getKind(kind);
     }
@@ -166,7 +166,7 @@ namespace KubernetesAPI {
   /*
    * Returns the collection kind of an object from the singular kind
    */
-  export function toCollectionName(kind: any) {
+  export function toCollectionName(kind: any): any {
     if (angular.isObject(kind)) {
       kind = getKind(kind);
     }
@@ -210,7 +210,7 @@ namespace KubernetesAPI {
   /*
    * Returns the websocket URL for the supplied URL
    */
-  export function wsUrl(url: string) {
+  export function wsUrl(url: string): uri.URI {
     const protocol = wsScheme(url);
     return new URI(url).scheme(protocol);
   }
@@ -241,7 +241,7 @@ namespace KubernetesAPI {
       apiVersion: K8S_API_VERSION,
       kind: toKindName(WatchTypes.LIST),
       objects: []
-    }
+    };
     _.forEach(objects, (object) => {
       if (angular.isArray(object)) {
         _.forEach(object, (o) => {
@@ -271,33 +271,33 @@ namespace KubernetesAPI {
   /**
    * Returns a fully scoped name with the namespace/kind, suitable to use as a key in maps
    **/
-  export function fullName(entity) {
+  export function fullName(entity: any): string {
     const namespace = getNamespace(entity);
     const kind = getKind(entity);
     const name = getName(entity);
     return UrlHelpers.join((namespace ? namespace : ""), kind, name);
   }
 
-  export function getUID(entity) {
+  export function getUID(entity: any): string {
     return Core.pathGet(entity, ['metadata', 'uid']);
   }
 
-  export function getNamespace(entity) {
+  export function getNamespace(entity: any): string {
     const answer = Core.pathGet(entity, ["metadata", "namespace"]);
     // some objects aren't namespaced, so this can return null;
     return answer;
   }
 
-  export function getApiVersion(entity) {
+  export function getApiVersion(entity: any): string {
     return Core.pathGet(entity, ['apiVersion']);
   }
 
-  export function getLabels(entity) {
+  export function getLabels(entity): any {
     const answer = Core.pathGet(entity, ["metadata", "labels"]);
     return answer ? answer : {};
   }
 
-  export function getName(entity) {
+  export function getName(entity): string {
     return Core.pathGet(entity, ["metadata", "name"]) || Core.pathGet(entity, "name") || Core.pathGet(entity, "id");
   }
 
@@ -328,7 +328,7 @@ namespace KubernetesAPI {
   /**
    * Returns true if the current status of the pod is running
    */
-  export function isRunning(podCurrentState) {
+  export function isRunning(podCurrentState: any): boolean {
     const status = (podCurrentState || {}).phase;
     if (status) {
       const lower = status.toLowerCase();
@@ -338,7 +338,7 @@ namespace KubernetesAPI {
     }
   }
 
-  export function podStatus(pod) {
+  export function podStatus(pod: any): any {
     return getStatus(pod);
   }
 }

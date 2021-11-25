@@ -48,7 +48,7 @@ namespace KubernetesAPI {
           next();
         },
         error: (jqXHR, textStatus, errorThrown) => {
-          log.info("Error probing " + testURL + " assuming backend is not an openshift instance.  Error details: status: ", textStatus, " errorThrown: ", errorThrown, " jqXHR instance: ", jqXHR);
+          log.info("Error probing " + testURL + " assuming backend is not an openshift instance.  Error details: status:", textStatus, "errorThrown: ", errorThrown, "jqXHR instance:", jqXHR);
           next();
         }
       });

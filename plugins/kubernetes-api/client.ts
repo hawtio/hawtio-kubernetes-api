@@ -368,7 +368,7 @@ namespace KubernetesAPI {
         this.log.debug("Connection destroyed but still receiving messages, closing websocket, kind: ", this.self.kind, " namespace: ", this.self.namespace);
         try {
           this.log.debug("Closing websocket for kind: ", this.self.kind);
-          this.socket.close()
+          this.socket.close();
         } catch (err) {
           // nothing to do, assume it's already closed
         }
@@ -555,11 +555,11 @@ namespace KubernetesAPI {
         }
         url = new URI(answer);
       } else {
-        url = new URI(UrlHelpers.join(masterApiUrl(), this._path))
+        url = new URI(UrlHelpers.join(masterApiUrl(), this._path));
       }
 
       if (this.options.labelSelector !== null) {
-        url = url.addQuery({labelSelector: this.options.labelSelector});
+        url = url.addQuery({ labelSelector: this.options.labelSelector });
       }
 
       return url;
@@ -593,7 +593,7 @@ namespace KubernetesAPI {
       url = url.query(<any>{ watch: true });
 
       if (this.options.labelSelector !== null) {
-        url = url.addQuery({labelSelector: this.options.labelSelector});
+        url = url.addQuery({ labelSelector: this.options.labelSelector });
       }
       return url;
     }
@@ -909,7 +909,7 @@ namespace KubernetesAPI {
   /*
    * Get a collection
    */
-  export function get(options: K8SOptions) {
+  export function get(options: K8SOptions): void {
     if (!options.kind) {
       throw NO_KIND;
     }
@@ -923,7 +923,7 @@ namespace KubernetesAPI {
         }
       }
       K8SClientFactory.destroy(client);
-    }
+    };
     client.get(success);
     client.connect();
   }
@@ -989,7 +989,7 @@ namespace KubernetesAPI {
     return options;
   }
 
-  export function del(options: any) {
+  export function del(options: any): void {
     options = normalizeOptions(options);
     // support deleting a list of objects
     if (options.object.kind === toKindName(WatchTypes.LIST)) {
@@ -1032,7 +1032,7 @@ namespace KubernetesAPI {
   /*
    * Add/replace an object, or a list of objects
    */
-  export function put(options: any) {
+  export function put(options: any): void {
     options = normalizeOptions(options);
     // support putting a list of objects
     if (options.object.kind === toKindName(WatchTypes.LIST)) {
