@@ -97,7 +97,7 @@ _module.controller('TestStaticController', ['$scope', '$element', function ($sco
         kind: 'List',
         objects: [
           {
-            apiVersion: 'v1',
+            apiVersion: 'route.openshift.io/v1',
             kind: 'Route',
             metadata: {
               namespace: 'default',
@@ -112,7 +112,7 @@ _module.controller('TestStaticController', ['$scope', '$element', function ($sco
             }
           },
           {
-            apiVersion: 'v1',
+            apiVersion: 'route.openshift.io/v1',
             kind: 'Route',
             metadata: {
               namespace: 'default',
