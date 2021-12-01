@@ -71,9 +71,13 @@ _module.controller('TestWatcherController', ['$scope', '$element', 'K8SClientFac
     initWatcherScope(K8SClientFactory, $scope, $element, kind, namespace);
   };
 }]);
-_module.controller('TestStaticController', ['$scope', '$element', function ($scope, $element) {
+_module.controller('TestStaticController', ['$scope', '$element', '$window', 'authService', function ($scope, $element, $window, authService) {
   $scope.init = function (kind, namespace) {
     initStaticScope($scope, $element, kind, namespace);
+  };
+  $scope.logout = function () {
+    authService.logout();
+    $window.location.reload();
   };
   setTimeout(function () {
     if (!KubernetesAPI.isOpenShift) {
