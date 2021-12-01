@@ -64,6 +64,10 @@ namespace KubernetesAPI {
           log.debug('Fetched keycloak config:', window['KeycloakConfig']);
           OSOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.openshift');
           GoogleOAuthConfig = _.get(window, 'OPENSHIFT_CONFIG.google');
+          if (!OSOAuthConfig) {
+            next();
+            return;
+          }
           if (OSOAuthConfig.oauth_authorize_uri) {
             next();
           } else if (OSOAuthConfig.oauth_metadata_uri) {

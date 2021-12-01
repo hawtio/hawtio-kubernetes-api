@@ -93,18 +93,13 @@ gulp.task('connect', ['watch'], function () {
       hostname: kube.hostname(),
       path: '/kubernetes',
       targetPath: '/',
-    }, {
+    },
+    {
       proto: kube.protocol(),
       hostname: kube.hostname(),
       port: kube.port(),
       path: '/jolokia',
       targetPath: '/hawtio/jolokia'
-    }, {
-      proto: kube.protocol(),
-      hostname: kube.hostname(),
-      port: kube.port(),
-      path: '/git',
-      targetPath: '/hawtio/git'
     }
   ];
 
@@ -121,6 +116,7 @@ gulp.task('connect', ['watch'], function () {
   });
   const debugLoggingOfProxy = process.env.DEBUG_PROXY === "true";
   const useAuthentication = process.env.DISABLE_OAUTH !== "true";
+  const formUri = process.env.FORM_URI;
 
   const googleClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
   const googleClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
@@ -140,8 +136,8 @@ gulp.task('connect', ['watch'], function () {
         }
       }
     };
+    config.master_uri = kubeBase;
     if (googleClientId && googleClientSecret) {
-      config.master_uri = kubeBase;
       config.google = {
         clientId: googleClientId,
         clientSecret: googleClientSecret,
@@ -154,11 +150,15 @@ gulp.task('connect', ['watch'], function () {
       const namespace = process.env.NAMESPACE || 'hawtio';
       const clientId = process.env.CLIENT_ID || 'hawtio-online-dev';
 
-      config.master_uri = kubeBase;
       config.openshift = {
         oauth_authorize_uri: urljoin(kubeBase, '/oauth/authorize'),
         oauth_client_id: `system:serviceaccount:${namespace}:${clientId}`,
         scope: 'user:info user:check-access role:edit:hawtio',
+      };
+    }
+    if (formUri) {
+      config.form = {
+        uri: formUri,
       };
     }
     if (token) {
@@ -179,12 +179,12 @@ gulp.task('connect', ['watch'], function () {
     const path = req.originalUrl;
     // avoid returning these files, they should get pulled from js
     if (s.startsWith(path, '/plugins/') && s.endsWith(path, 'html')) {
-      console.log("returning 404 for: ", path);
+      console.log("Returning 404 for:", path);
       res.statusCode = 404;
       res.end();
     } else {
       if (debugLoggingOfProxy) {
-        console.log("allowing: ", path);
+        console.log("Allowing:", path);
       }
       next();
     }
@@ -193,7 +193,7 @@ gulp.task('connect', ['watch'], function () {
   hawtio.listen(function (server) {
     const host = server.address().address;
     const port = server.address().port;
-    console.log("started from gulp file at ", host, ":", port);
+    console.log("Started from gulp file at", host, ":", port);
   });
 });
 
