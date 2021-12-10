@@ -35,7 +35,7 @@ namespace KubernetesAPI {
   // Detect if we're running against openshift or not
   hawtioPluginLoader.registerPreBootstrapTask({
     name: 'KubernetesAPIProviderInit',
-    depends: ['hawtio-oauth', 'KubernetesApiInit'],
+    depends: ['HawtioOAuthBootstrap', 'KubernetesApiInit'],
     task: (next) => {
       isOpenShift = false;
       const testURL = new URI(KubernetesAPI.masterUrl).segment('apis/apps.openshift.io/v1').toString();
