@@ -14,8 +14,8 @@
     "test": "gulp build"
   },
   "dependencies": {
-    "@hawtio/core": "^4.15.0",
-    "@hawtio/oauth": "^4.13.1",
+    "@hawtio/core": "^4.16.0",
+    "@hawtio/oauth": "^4.13.6",
     "eventemitter3": "~3.1.0"
   },
   "devDependencies": {
