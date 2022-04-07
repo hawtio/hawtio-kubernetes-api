@@ -218,6 +218,8 @@
     "y18n": "4.0.3",
     "wrap-ansi": "5.1.0",
     "emoji-regex": "8.0.0",
-    "angular": "1.8.2"
+    "angular": "1.8.2",
+    "has-symbols": "1.0.0",
+    "destroy": "1.0.4"
   }
 }
