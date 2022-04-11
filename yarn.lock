@@ -41,10 +41,10 @@
     typescript "^3.0.3"
     urijs "1.19.0"
 
-"@hawtio/oauth@^4.13.6":
-  version "4.13.6"
-  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.13.6.tgz#2cfe13521570c7891be246f9953496dcd8488e1e"
-  integrity sha512-Fq+EcrlsbKbwXFlhy7wR8/oHQJSOjAWg/QBagxuatYDVjsT7fLYXafn0GmnnIKMdASxZe23t+PQ9U32PEDbRTA==
+"@hawtio/oauth@^4.13.7":
+  version "4.13.7"
+  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.13.7.tgz#c89b01ba6bde8eefb51e8ebdae54c58288fc8a3d"
+  integrity sha512-Z6ohLdydae/ARlW1GDwHAqjMkoxZTk6eO7KB+kACqOGqk98EEF/1jnYEw9FaFkt3xlmFZPc7jyuLtbX+K+Attw==
   dependencies:
     "@hawtio/core" "^4.16.0"
     "@types/angular-cookies" "^1.4.5"
@@ -1261,7 +1261,7 @@ deprecated@^0.0.1:
   resolved "https://registry.yarnpkg.com/deprecated/-/deprecated-0.0.1.tgz#f9c9af5464afa1e7a971458a8bdef2aa94d5bb19"
   integrity sha1-+cmvVGSvoeepcUWKi97yqpTVuxk=
 
-destroy@1.2.0, destroy@~1.0.4:
+destroy@1.0.4, destroy@1.2.0, destroy@~1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/destroy/-/destroy-1.0.4.tgz#978857442c44749e4206613e37946205826abd80"
   integrity sha1-l4hXRCxEdJ5CBmE+N5RiBYJqvYA=
@@ -2166,7 +2166,7 @@ has-gulplog@^0.1.0:
   dependencies:
     sparkles "^1.0.0"
 
-has-symbols@^1.0.0, has-symbols@^1.0.1:
+has-symbols@1.0.0, has-symbols@^1.0.0, has-symbols@^1.0.1:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/has-symbols/-/has-symbols-1.0.0.tgz#ba1a8f1af2a0fc39650f5c850367704122063b44"
   integrity sha1-uhqPGvKg/DllD1yFA2dwQSIGO0Q=
