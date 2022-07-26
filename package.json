@@ -14,8 +14,8 @@
     "test": "gulp build"
   },
   "dependencies": {
-    "@hawtio/core": "^4.16.1",
-    "@hawtio/oauth": "^4.13.8",
+    "@hawtio/core": "^4.16.3",
+    "@hawtio/oauth": "^4.13.10",
     "eventemitter3": "~3.1.0"
   },
   "devDependencies": {
@@ -72,7 +72,7 @@
     "marked": "0.3.17",
     "bootstrap-datepicker": "1.7.1",
     "datatables.net-colreorder": "1.4.1",
-    "moment": "2.21.0",
+    "moment": "2.29.4",
     "@types/clipboard": "1.5.36",
     "codemirror": "5.33.0",
     "js-beautify": "1.7.5",
