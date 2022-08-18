@@ -41,10 +41,10 @@
     typescript "^3.0.3"
     urijs "1.19.0"
 
-"@hawtio/oauth@^4.13.10":
-  version "4.13.10"
-  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.13.10.tgz#5b9df02995f45b2b1e03ef01373e3a312ea511ef"
-  integrity sha512-XEcoR3H459ux7VNmFjxdg9U+xOI8gBTkc48IbhZiHFNjVQiBjnbECTJBWtfCX4fHA8wCDWsGnwXDqGs6s19lOQ==
+"@hawtio/oauth@^4.13.11":
+  version "4.13.11"
+  resolved "https://registry.yarnpkg.com/@hawtio/oauth/-/oauth-4.13.11.tgz#df1e2105b416f39c2fc8068d5086672ee39a835f"
+  integrity sha512-OiYOqPjhxtwZBObotYmZDbOFrb0LVHnojy1Htf6T28tPH8wulK6Z78+ZN3UZ3Izty+wwPAMOUo46PI6Bu0Zptg==
   dependencies:
     "@hawtio/core" "^4.16.3"
     "@types/angular-cookies" "^1.4.5"
@@ -749,10 +749,10 @@ bootstrap-touchspin@~3.1.1:
   resolved "https://registry.yarnpkg.com/bootstrap-touchspin/-/bootstrap-touchspin-3.1.1.tgz#9779deac72aaf577e5e762b8512c747c871d9597"
   integrity sha1-l3nerHKq9Xfl52K4USx0fIcdlZc=
 
-bootstrap@3.3.7, bootstrap@3.4.1, bootstrap@^3.3, bootstrap@^3.4.1, bootstrap@~3.4.1:
-  version "3.3.7"
-  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.3.7.tgz#5a389394549f23330875a3b150656574f8a9eb71"
-  integrity sha1-WjiTlFSfIzMIdaOxUGVldPip63E=
+bootstrap@3.4.1, bootstrap@^3.3, bootstrap@^3.4.1, bootstrap@~3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-3.4.1.tgz#c3a347d419e289ad11f4033e3c4132b87c081d72"
+  integrity sha512-yN5oZVmRCwe5aKwzRj6736nSmKDX7pLYwsXiCj/EYmo16hODaBiT4En5btW/jhBF/seV+XMx3aYwukYC3A49DA==
 
 bower-config@^0.5.0:
   version "0.5.3"
