@@ -11,11 +11,12 @@
     "start": "gulp",
     "build": "gulp build",
     "prepack": "gulp version",
-    "test": "gulp build"
+    "test": "gulp build",
+    "preversion": "gulp build"
   },
   "dependencies": {
     "@hawtio/core": "^4.16.4",
-    "@hawtio/oauth": "^4.13.13",
+    "@hawtio/oauth": "^4.13.14",
     "eventemitter3": "~3.1.0"
   },
   "devDependencies": {
