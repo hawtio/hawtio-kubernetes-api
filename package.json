@@ -219,6 +219,8 @@
     "emoji-regex": "8.0.0",
     "angular": "1.8.2",
     "has-symbols": "1.0.0",
-    "destroy": "1.0.4"
+    "destroy": "1.0.4",
+    "function-bind": "1.1.2",
+    "content-type": "1.0.5"
   }
 }
